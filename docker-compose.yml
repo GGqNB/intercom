@@ -1,67 +1,17 @@
-    version: "3.8"
-    services:
-      # Твои приложения (FastAPI, Quasar и т.д.)
-      fastapi:
-        build:
-          context: ./back
-          dockerfile: Dockerfile
-        ports:
-          - "8000" # Убираем mapping порта на хост
-        environment:
-          - VIRTUAL_HOST=intercom-rental.ru  # Добавляем VIRTUAL_HOST
-          - VIRTUAL_PORT=8000
-        networks:
-          - app-network
+version: "3.8"
+services:
+  fastapi:
+    build:
+      context: ./back
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+  
 
-      quasar:
-        build:
-          context: ./front
-          dockerfile: Dockerfile
-        ports:
-          - "80" # Убираем mapping порта на хост
-        environment:
-          - VIRTUAL_HOST=intercom-rental.ru  # Добавляем VIRTUAL_HOST
-          - VIRTUAL_PORT=80
-        networks:
-          - app-network
+  quasar:
+    build:
+      context: ./front
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"  # Local port : Container port
 
-      # Nginx reverse proxy
-      nginx-proxy:
-        image: nginxproxy/nginx-proxy:latest
-        ports:
-          - "80:80"
-          - "443:443"
-        volumes:
-          - certs:/etc/nginx/certs
-          - vhost.d:/etc/nginx/vhost.d
-          - html:/usr/share/nginx/html
-          - /var/run/docker.sock:/tmp/docker.sock:ro
-        networks:
-          - app-network
-        environment:
-          - DEFAULT_HOST=intercom-rental.ru # Замени на свой домен
-        restart: always
-
-      # Let's Encrypt companion
-      nginx-proxy-letsencrypt:
-        image: nginxproxy/acme-companion:latest
-        depends_on:
-          - nginx-proxy
-        volumes:
-          - certs:/etc/nginx/certs
-          - vhost.d:/etc/nginx/vhost.d
-          - html:/usr/share/nginx/html
-          - /var/run/docker.sock:/tmp/docker.sock:ro
-        environment:
-          - DEFAULT_EMAIL=andreyka.drogan@gmail.com # Замени на свой email
-        networks:
-          - app-network
-        restart: always
-
-    networks:
-      app-network:
-
-    volumes:
-      certs:
-      vhost.d:
-      html:
