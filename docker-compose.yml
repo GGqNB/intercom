@@ -5,7 +5,10 @@ services:
       context: ./back
       dockerfile: Dockerfile
     ports:
-      - "8000:8000"  # Local port : Container port
+      - "8000:8000"
+    dns:
+      - 8.8.8.8  # Google Public DNS
+      - 8.8.4.4  # Google Public DNS (secondary)  # Local port : Container port
 
   quasar:
     build:
