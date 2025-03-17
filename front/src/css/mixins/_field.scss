@@ -1,0 +1,71 @@
+@mixin field-base {
+  border-radius: $border-radius-base;
+  .q-field__control {
+    border-radius: $border-radius-base;
+    color: $color-brand;
+    &::before {
+      border-color: $color-grey;
+    }
+    &:hover::before {
+      border-color: $color-brand;
+    }
+  }
+
+  // Обводка ошибки
+  &.q-field--error.q-field--outlined.q-field--highlighted .q-field__control:after {
+    border-color: $color-error;
+    // border-width: 1px;
+  }
+  // Обводка ошибки в фокусе
+  &.q-field--error.q-field--focused {
+    &.q-field--outlined.q-field--highlighted .q-field__control:after {
+      // border-width: 1px;
+    }
+  }
+
+  // // Сдвиг лейбла после увеличения размера input
+  // .q-field__label {
+  //   //padding-top: 2px;
+  //   @include font-text-2;
+  //   color: $color-black;
+  //   top: 16px;
+  // }
+  // // Покараска лейбла при фокусе
+  // &.q-field--focused {
+  //   .q-field__label {
+  //     color: $color-brand;
+  //   }
+  // }
+  // // Подсветка лейбла красным при ошибки валидации
+  // &.q-field--error {
+  //   .q-field__label {
+  //     color: $color-error;
+  //   }
+  // }
+  // // Основной текст
+  // .q-field__native {
+  //   color: $color-text-base;
+  //   @include font-text-2;
+  // }
+  // // Нижний блок ошибок или подписей
+  // .q-field__bottom {
+  //   padding: 4px;
+  // }
+  // // Нижний блок ошибок или подписей настройка сообщения
+  // .q-field__messages {
+  //   @include font-caption;
+  // }
+
+  // // Обязательное поле
+  // &--required .q-field__label,
+  // &--required.field-select__option-group .label,
+  // &--required .file-label {
+  //   &:after {
+  //     content: '*';
+  //     color: $color-warning;
+  //     font-weight: bold;
+  //     font-size: $font-size-small;
+  //     margin-right: $base-indent-extra-small;
+  //   }
+  // }
+}

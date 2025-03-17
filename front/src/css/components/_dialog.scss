@@ -1,0 +1,71 @@
+.s-modal--form {
+  border-radius: $border-radius-large !important;
+  min-height: 30vh;
+  width: 960px;
+  max-width: 90vw !important;
+  border: $border-base-value;
+  z-index: 1000;
+
+  &::-webkit-scrollbar {
+    width: 6px; /* for vertical scrollbars */
+    height: 6px; /* for horizontal scrollbars */
+    border-radius: 10px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba($color-black, 0.25);
+  }
+
+  &.s-modal--xs {
+    width: 320px;
+    max-width: 480px;
+  }
+
+  &.s-modal--sm {
+    width: 600px;
+    max-width: 640px;
+  }
+
+  &.s-modal--md {
+    width: 720px;
+    max-width: 960px;
+  }
+
+  &.s-modal--lg {
+    width: 960px;
+    max-width: 1280px;
+  }
+
+  &.s-modal--xl {
+    width: 1280px;
+    max-width: 1440px;
+  }
+
+  .s-modal--form__header {
+    padding: $indent-large $indent-medium;
+    background-color: $dark-page;
+  }
+
+  .s-modal--form__header-title {
+    font-weight: 500;
+    color: $secondary;
+    font-size: $font-size-base;
+  }
+
+  .s-modal--form__body {
+    margin-top: $indent-medium;
+    padding: 0 $indent-medium $indent-large $indent-medium;
+  }
+
+  .s-modal--form__footer {
+    padding-top: 65px;
+  }
+}
+.s-confirm-dialog{
+  max-width: 150px !important;
+  min-height: 150px !important;
+}

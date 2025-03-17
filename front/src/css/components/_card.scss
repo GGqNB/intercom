@@ -1,0 +1,14 @@
+.s-card {
+  @include card();
+
+  &.large-padding {
+    padding: $indent-large;
+  }
+}
+
+.s-card__shadowed {
+  background: #F3F8FB;
+  border: 2px solid #FFFFFF;
+  box-shadow: 3px 2px 4px rgba(58, 93, 119, 0.1);
+  border-radius: 16px;
+}

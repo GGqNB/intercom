@@ -1,0 +1,368 @@
+$color-brand-disabled: #E1E8FF;
+
+@mixin button-properties() {
+  font-family: $font-family-monteserrat;
+  font-weight: 500;
+  font-size: $font-size-base;
+  padding: 8px 24px;
+  border-radius: $border-radius-base;
+  box-sizing: border-box;
+  box-shadow: none;
+  text-transform: none;
+  .q-btn__wrapper::before {
+    box-shadow: none;
+  }
+
+  &.icon {
+    padding: 0;
+  }
+}
+
+.q-btn--dense {
+  &.s-btn,
+  &.s-btn--inverse {
+    padding: 4px 20px;
+  }
+  &.gosuslugi {
+    padding: 0 20px;
+  }
+}
+
+
+@mixin btn-base {
+  background: $color-brand;
+  color: $color-white;
+
+  &__fat {
+    padding: 8px 30px;
+    @include font-text-1;
+    line-height: 28px;
+    min-height: 48px;
+  }
+
+  &::before {
+    box-shadow: none;
+  }
+  &:hover,
+  &:focus,
+  &:active {
+    // border: 2px solid $color-brand;
+    background: rgba($color-brand, 0.9);
+    // Убираем затенение прозрачность при наведении на кнопку
+    .q-focus-helper {
+      opacity: 0 !important;
+    }
+  }
+  &:focus {
+    background: rgba($color-brand, 0.9);
+    .q-focus-helper {
+      opacity: 0 !important;
+    }
+  }
+  &:disabled,
+  [disabled] {
+    // border: 2px solid $element-base-background;
+    background: rgba($color-brand, 0.5);
+    color: $color-grey-900;
+    opacity: 1;
+    &:active::before {
+      box-shadow: none !important;
+    }
+  }
+
+  .q-btn__content {
+    .q-icon {
+      font-size: 1.2em;
+    }
+  }
+
+  // Убираем моргание тенью при нажатии на кнопку
+  &.q-btn--actionable {
+    &.q-btn--standard {
+      &:before {
+        transition: box-shadow 0s;
+      }
+    }
+  }
+}
+
+// type secondary - outline
+@mixin btn-outline {
+  border: 1px solid $color-brand;
+  background: $color-white;
+  color: $color-brand;
+
+  &:disabled,
+  [disabled] {
+    border: 1px solid $color-grey;
+    background: $color-white;
+    color: $color-grey;
+  }
+
+  &:hover,
+  &:focus {
+    border: 1px solid rgba($color-brand, 0.9);
+    background: $color-white;
+    color: $color-brand-active;
+  }
+
+  &:active {
+    border: 1px solid rgba($color-brand, 0.9);
+    color: $color-brand-active;
+    // background: $element-base-background-success;
+  }
+  &:active::before {
+    box-shadow: none !important;
+  }
+}
+
+// type light
+@mixin btn-light {
+  border: 1px solid transparent;
+  background: transparent;
+  color: $color-brand;
+
+  &:hover {
+    border: 1px solid transparent;
+    color: $color-brand-active;
+    background: transparent;
+    // background: $element-base-background-success;
+  }
+  &:focus,
+  &:active {
+    border: 1px solid transparent;
+    background: transparent;
+    color: $color-brand-active;
+  }
+  &:active::before {
+    box-shadow: none !important;
+  }
+  &:disabled,
+  [disabled] {
+    border: 1px solid transparent;
+    background: $color-white;
+    color: $color-grey;
+  }
+}
+
+// type error
+@mixin btn-danger {
+  background: $color-error;
+  color: $color-white;
+
+  &__fat {
+    padding: 8px 30px;
+    @include font-text-1;
+    line-height: 28px;
+    min-height: 48px;
+  }
+
+  &::before {
+    box-shadow: none;
+  }
+  &:hover,
+  &:focus,
+  &:active {
+    // border: 2px solid $color-brand;
+    background: rgba($color-error, 0.9);
+    // Убираем затенение прозрачность при наведении на кнопку
+    .q-focus-helper {
+      opacity: 0 !important;
+    }
+  }
+  &:focus {
+    background: rgba($color-error, 0.9);
+    .q-focus-helper {
+      opacity: 0 !important;
+    }
+  }
+  &:disabled,
+  [disabled] {
+    // border: 2px solid $element-base-background;
+    background: rgba($color-brand, 0.5);
+    color: $color-grey-900;
+    opacity: 1;
+    &:active::before {
+      box-shadow: none !important;
+    }
+  }
+
+  .q-btn__content {
+    .q-icon {
+      font-size: 1.2em;
+    }
+  }
+
+  // Убираем моргание тенью при нажатии на кнопку
+  &.q-btn--actionable {
+    &.q-btn--standard {
+      &:before {
+        transition: box-shadow 0s;
+      }
+    }
+  }
+}
+
+// type error
+@mixin btn-success {
+  background: $color-success;
+  color: $color-white;
+
+  &__fat {
+    padding: 8px 30px;
+    @include font-text-1;
+    line-height: 28px;
+    min-height: 48px;
+  }
+
+  &::before {
+    box-shadow: none;
+  }
+  &:hover,
+  &:focus,
+  &:active {
+    // border: 2px solid $color-brand;
+    background: rgba($color-success, 0.9);
+    // Убираем затенение прозрачность при наведении на кнопку
+    .q-focus-helper {
+      opacity: 0 !important;
+    }
+  }
+  &:focus {
+    background: rgba($color-success, 0.9);
+    .q-focus-helper {
+      opacity: 0 !important;
+    }
+  }
+  &:disabled,
+  [disabled] {
+    // border: 2px solid $element-base-background;
+    background: rgba($color-brand, 0.5);
+    color: $color-grey-900;
+    opacity: 1;
+    &:active::before {
+      box-shadow: none !important;
+    }
+  }
+
+  .q-btn__content {
+    .q-icon {
+      font-size: 1.2em;
+    }
+  }
+
+  // Убираем моргание тенью при нажатии на кнопку
+  &.q-btn--actionable {
+    &.q-btn--standard {
+      &:before {
+        transition: box-shadow 0s;
+      }
+    }
+  }
+}
+
+// type icon
+@mixin btn-icon {
+  @include btn-light;
+  border: 2px solid transparent;
+  background: transparent;
+  padding: 0;
+  min-width: 36px;
+  min-height: 36px;
+  font-size: 24px;
+  .q-btn__content {
+    .q-icon {
+      font-size: 1em;
+    }
+  }
+  &:focus,
+  &:active {
+    border: 2px solid $color-white;
+    background: $color-white;
+  }
+  &.s-btn--icon__gray {
+    .q-btn__content {
+      .q-icon {
+        color: $color-grey;
+      }
+    }
+    &:focus,
+    &:active {
+      .q-btn__content {
+        .q-icon {
+          color: $color-grey-800;
+        }
+      }
+    }
+  }
+  &.s-btn--icon__dark-gray {
+    .q-btn__content {
+      .q-icon {
+        color: $color-grey-800;
+      }
+    }
+    &:focus,
+    &:active {
+      .q-btn__content {
+        .q-icon {
+          color: $color-grey-800;
+        }
+      }
+    }
+  }
+}
+
+.s-btn {
+  @include button-properties();
+
+  @include btn-base();
+
+  &__outline {
+    @include btn-outline;
+  }
+
+  &__light {
+    @include btn-light;
+  }
+
+  &__danger {
+    @include btn-danger;
+  }
+
+  &__success {
+    @include btn-success;
+  }
+
+  &__icon {
+    @include btn-icon;
+  }
+
+  &__wide {
+    width: 100%;
+  }
+
+  // Класс для квадрата в кнопке "Очистить все"
+  &__icon-square {
+    .q-btn__content {
+      .q-icon {
+        border: 1px solid $color-brand;
+        border-radius: 6px;
+        font-size: 0.8em;
+        width: 18px;
+        height: 18px;
+      }
+    }
+    &:focus,
+    &:active {
+      .q-btn__content {
+        .q-icon {
+          border: 1px solid $color-white;
+          border-radius: 6px;
+          font-size: 0.8em;
+          width: 18px;
+          height: 18px;
+        }
+      }
+    }
+  }
+}

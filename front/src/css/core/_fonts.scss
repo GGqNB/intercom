@@ -1,0 +1,206 @@
+
+/*
+100 – Thin || Hairline
+200 – Extra Light || Ultra Light || Thin
+300 – Light
+400 – Normal || Regular
+500 – Medium
+600 – Semi Bold || Demi Bold
+700 – Bold
+800 – Extra Bold || Ultra Bold || Heavy
+900 – Black || Heavy
+
+font-style: normal, italic
+font-weight: normal - 400, bold - 700,
+*/
+
+/* MANROPE */
+// @font-face {
+//   font-family: "Manrope";
+//   font-style: normal;
+//   font-weight: 200;
+//   font-display: swap;
+//   src: url("src/assets/fonts/Manrope/Manrope-Thin.woff2") format("woff2"),
+//     /* Chrome 26+, Opera 23+, Firefox 39+ */ url("src/assets/fonts/Manrope/Manrope-Thin.woff") format("woff"); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+// }
+
+// @font-face {
+//   font-family: "Manrope";
+//   font-style: normal;
+//   font-weight: 300;
+//   font-display: swap;
+//   src: url("src/assets/fonts/Manrope/Manrope-Light.woff2") format("woff2"),
+//     /* Chrome 26+, Opera 23+, Firefox 39+ */ url("src/assets/fonts/Manrope/Manrope-Light.woff") format("woff"); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+// }
+
+// @font-face {
+//   font-family: "Manrope";
+//   font-style: normal;
+//   font-weight: 400;
+//   font-display: swap;
+//   src: url("src/assets/fonts/Manrope/Manrope-Regular.woff2") format("woff2"),
+//     /* Chrome 26+, Opera 23+, Firefox 39+ */ url("src/assets/fonts/Manrope/Manrope-Regular.woff") format("woff"); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+// }
+
+// @font-face {
+//   font-family: "Manrope";
+//   font-style: normal;
+//   font-weight: 500;
+//   font-display: swap;
+//   src: url("src/assets/fonts/Manrope/Manrope-Medium.woff2") format("woff2"),
+//     /* Chrome 26+, Opera 23+, Firefox 39+ */ url("src/assets/fonts/Manrope/Manrope-Medium.woff") format("woff"); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+// }
+
+// @font-face {
+//   font-family: "Manrope";
+//   font-style: normal;
+//   font-weight: 600;
+//   font-display: swap;
+//   src: url("src/assets/fonts/Manrope/Manrope-Semibold.woff2") format("woff2"),
+//     /* Chrome 26+, Opera 23+, Firefox 39+ */ url("src/assets/fonts/Manrope/Manrope-Semibold.woff") format("woff"); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+// }
+
+// @font-face {
+//   font-family: "Manrope";
+//   font-style: normal;
+//   font-weight: 700;
+//   font-display: swap;
+//   src: url("src/assets/fonts/Manrope/Manrope-Bold.woff2") format("woff2"),
+//     /* Chrome 26+, Opera 23+, Firefox 39+ */ url("src/assets/fonts/Manrope/Manrope-Bold.woff") format("woff"); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+// }
+
+// @font-face {
+//   font-family: "Manrope";
+//   font-style: normal;
+//   font-weight: 800;
+//   font-display: swap;
+//   src: url("src/assets/fonts/Manrope/Manrope-ExtraBold.woff2") format("woff2"),
+//     /* Chrome 26+, Opera 23+, Firefox 39+ */ url("src/assets/fonts/Manrope/Manrope-ExtraBold.woff") format("woff"); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+// }
+
+// /**----------------------------------------------------------------------------------*/
+// @font-face {
+//   font-family: Roboto;
+//   font-weight: 800;
+//   src: url("src/assets/fonts/Roboto/Roboto-Bold.ttf");
+// }
+// @font-face {
+//   font-family: Manrope;
+//   font-weight: 800;
+//   src: url("src/assets/fonts/Manrope2/Manrope-Bold.ttf");
+// }
+
+// @font-face {
+//   font-family: Manrope;
+//   font-weight: 500;
+//   src: url("src/assets/fonts/Manrope2/Manrope-Medium.ttf");
+// }
+
+// @font-face {
+//   font-family: Manrope;
+//   font-weight: 400;
+//   src: url("src/assets/fonts/Manrope2/Manrope-Regular.ttf");
+// }
+
+// @font-face {
+//   font-family: RobotoCondensed;
+//   font-weight: 700;
+//   src: url("src/assets/fonts/Roboto/RobotoCondensed-BoldItalic.ttf");
+// }
+
+// @font-face {
+//   font-family: RobotoCondensed;
+//   font-weight: 400;
+//   src: url("src/assets/fonts/Roboto/RobotoCondensed-Italic.ttf");
+// }
+
+// @font-face {
+//   font-family: NotoSans;
+//   font-weight: 700;
+//   src: url("src/assets/fonts/NotoSans/NotoSans-Bold.ttf");
+// }
+
+// @font-face {
+//   font-family: NotoSans;
+//   font-weight: 400;
+//   src: url("src/assets/fonts/NotoSans/NotoSans-Regular.ttf");
+// }
+
+// @font-face {
+//   font-family: NotoSans;
+//   font-weight: 500;
+//   src: url("src/assets/fonts/NotoSans/NotoSans-Medium.ttf");
+// }
+// @font-face {
+//   font-family: Jost;
+//   font-weight: 400;
+//   src: url("src/assets/fonts/Jost/Jost-Regular.ttf");
+// }
+
+
+/*
+  MONTESERAT
+*/
+@font-face {
+  font-family: 'Montserrat';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+
+  src:
+    url('src/assets/fonts/Montserrat/static/Montserrat-Light.woff2') format('woff2'),
+    url('src/assets/fonts/Montserrat/static/Montserrat-Light.woff') format('woff'),
+    url('src/assets/fonts/Montserrat/static/Montserrat-Light.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Montserrat';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+
+  src:
+    url('src/assets/fonts/Montserrat/static/Montserrat-Regular.woff2') format('woff2'),
+    url('src/assets/fonts/Montserrat/static/Montserrat-Regular.woff') format('woff'),
+    url('src/assets/fonts/Montserrat/static/Montserrat-Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Montserrat';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('src/assets/fonts/Montserrat/static/Montserrat-Medium.woff2') format('truetype');
+  src: url('src/assets/fonts/Montserrat/static/Montserrat-Medium.woff') format('truetype');
+  src: url('src/assets/fonts/Montserrat/static/Montserrat-Medium.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Montserrat';
+  font-style: italic;
+  font-weight: 500;
+  font-display: swap;
+  src: url('src/assets/fonts/Montserrat/static/Montserrat-MediumItalic.woff2') format('truetype');
+  src: url('src/assets/fonts/Montserrat/static/Montserrat-MediumItalic.woff') format('truetype');
+  src: url('src/assets/fonts/Montserrat/static/Montserrat-MediumItalic.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Montserrat';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('src/assets/fonts/Montserrat/static/Montserrat-SemiBold.woff2') format('woff2'),
+    url('src/assets/fonts/Montserrat/static/Montserrat-SemiBold.woff') format('woff'),
+    url('src/assets/fonts/Montserrat/static/Montserrat-SemiBold.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Montserrat';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('src/assets/fonts/Montserrat/static/Montserrat-Bold.woff2') format('woff2'),
+    url('src/assets/fonts/Montserrat/static/Montserrat-Bold.woff') format('woff'),
+    url('src/assets/fonts/Montserrat/static/Montserrat-Bold.ttf') format('truetype');
+}

@@ -1,0 +1,35 @@
+{
+  "extends": "@quasar/app-vite/tsconfig-preset",
+  "compilerOptions": {
+    "allowJs": true,
+    "noImplicitAny": false,
+    "strict": false,
+    "baseUrl": ".",
+    "lib": [
+      "esnext",
+      "dom",
+      "dom.iterable",
+      "scripthost"
+    ],
+    "paths": {
+      "src/*": ["src/*"],
+      "app/*": ["*"],
+      "components/*": ["src/components/*"],
+      "layouts/*": ["src/layouts/*"],
+      "pages/*": ["src/pages/*"],
+      "modules/*": ["src/modules/*"],
+      "assets/*": ["src/assets/*"],
+      "boot/*": ["src/boot/*"],
+      "stores/*": ["src/stores/*"],
+      "RootDir/*": [
+        "src/*"
+      ],
+      "AdminDir/*": [
+        "src/*"
+      ],
+      "SharedDir/*": [
+        "../shared/*"
+      ]
+    }
+  }
+}

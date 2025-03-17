@@ -1,0 +1,51 @@
+.s-icon {
+  &.hovered {
+    &:hover {
+      cursor: pointer;
+    }
+  }
+  &.hovered-color {
+    &:hover {
+      cursor: pointer;
+      color: $color-brand !important;
+    }
+  }
+  &.small {
+    font-size: 20px;
+  }
+  &.small-medium {
+    font-size: 24px;
+  }
+  &.medium {
+    font-size: 28px;
+  }
+  &.large {
+    font-size: 36px;
+  }
+  &.extra-large {
+    font-size: 48px;
+  }
+
+  &.animated {
+    transition: transform 0.25s ease-in;
+    &:hover {
+      transition: transform 0.25s ease-in;
+      transform: rotate(90deg);
+    }
+  }
+  &.outline {
+    outline: solid 1px $color-brand;
+    outline-offset: 2px;
+    border-radius: $border-radius-base;
+  }
+  &.custom-icon {
+    border-radius: $border-radius-base;
+    img {
+      width: 24px;
+      height: 24px;
+    }
+  }
+  &.active {
+    color: $color-brand !important;
+  }
+}

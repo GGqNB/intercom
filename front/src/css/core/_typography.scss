@@ -1,0 +1,174 @@
+$font-family-monteserrat: 'Montserrat', Arial, 'sans-serif'!important;
+
+// Заголовок страницы
+@mixin font-header-1 {
+  font-size: $font-size-xxl;
+  font-family: $font-family-monteserrat;
+  font-weight: 700;
+  line-height: 115%;
+  font-style: normal;
+  letter-spacing: 0.04em;
+}
+
+// Заголовок страницы
+@mixin font-header-1-1 {
+  font-size: $font-size-xl;
+  font-family: $font-family-monteserrat;
+  font-weight: 400;
+  line-height: 120%;
+  font-style: normal;
+}
+
+// Заголовок раздела
+@mixin font-header-2 {
+  font-size: $font-size-xl;
+  font-family: $font-family-monteserrat;
+  font-weight: 700;
+  line-height: 120%;
+  font-style: normal;
+}
+// Заголовок блока
+@mixin font-header-3 {
+  font-size: $font-size-large;
+  font-family: $font-family-monteserrat;
+  font-weight: 700;
+  line-height: 120%;
+  font-style: normal;
+}
+// Заголовок карточки
+@mixin font-header-4 {
+  font-size: $font-size-medium;
+  font-family: $font-family-monteserrat;
+  font-weight: 600;
+  line-height: 140%;
+  font-style: normal;
+}
+// Крупный текст
+@mixin font-text-1 {
+  font-size: $font-size-medium;
+  font-family: $font-family-monteserrat;
+  font-weight: 400;
+  line-height: 140%;
+  font-style: normal;
+}
+// Основной текст
+@mixin font-text-2 {
+  font-size: $font-size-base;
+  font-family: $font-family-monteserrat;
+  font-weight: 400;
+  line-height: 140%;
+  font-style: normal;
+}
+// Текст таблицы, меню
+@mixin font-text-3 {
+  font-size: $font-size-small;
+  font-family: $font-family-monteserrat;
+  font-weight: 400;
+  line-height: 140%;
+  font-style: normal;
+}
+// Текст таблицы и подписи
+@mixin font-caption {
+  font-size: $font-size-xs;
+  font-family: $font-family-monteserrat;
+  font-weight: 400;
+  line-height: 140%;
+  font-style: normal;
+}
+// Текст таблицы и подписи
+@mixin font-caption-mini {
+  font-size: $font-size-xxs;
+  font-family: $font-family-monteserrat;
+  font-weight: 400;
+  line-height: 140%;
+  font-style: normal;
+}
+
+
+
+// $font-family-roboto: "Roboto", sans-serif !important;
+// $font-family-roboto-condensed: "RobotoCondensed", sans-serif !important;
+// $font-family-manrope: "Manrope", sans-serif !important;
+// $font-family-noto-sans: "NotoSans", sans-serif !important;
+// $font-family-jost: "Jost", sans-serif !important;
+
+// /* FONT SIZE BASE VARIABLES */
+// $font-size-base: ("small": 10px, "medium": 12px, "large": 14px, "xl": 15px, "xxl": 16px, "xxxl": 20px, "max": 28px);
+// $font-size-base-small: 10px;
+// $font-size-base-medium: 12px;
+// $font-size-base-large: 14px;
+// $font-size-base-xl: 15px;
+// $font-size-base-xxl: 16px;
+// $font-size-base-xxxl: 20px;
+
+// /* FONT SIZE VARIABLES */
+// $font-size-small: 24px;
+// $font-size-medium: 32px;
+
+// /* FONT WIDTH VARIABLES */
+// $font-weights: 200, 300, 400, 500, 600, 700, 800;
+// $font-weight-semi-bold: 600;
+// $font-weight-medium: 500;
+
+// .error-title {
+//   font-size: 28px;
+// }
+
+// .error-code {
+//   font-size: 200px;
+//   line-height: 1.0;
+// }
+
+// // =================================================
+// /* FONT SIZE BASE */
+// // =================================================
+
+// @each $name, $var in $font-size-base {
+//   .fs-base-#{$name} {
+//     font-size: $var;
+//   }
+// }
+
+.fs-xl {
+  font-size: $font-size-xl;
+}
+
+.fs-caption {
+  font-size: $font-size-small;
+  font-weight: 600;
+  color: $color-grey-600;
+}
+
+// .fs-medium {
+//   font-size: $font-size-medium;
+// }
+
+// .font-family-manrope {
+//   font-family: $font-family-manrope;
+// }
+
+// .font-family-noto-sans {
+//   font-family: $font-family-noto-sans;
+// }
+// .font-family-jost {
+//   font-family: $font-family-jost;
+// }
+
+// .font-family-roboto-condensed {
+//   font-family: $font-family-roboto-condensed;
+// }
+
+// .font-family-roboto {
+//   font-family: $font-family-roboto;
+// }
+
+
+// // =================================================
+// /* FONT WEIGHT */
+// // =================================================
+
+// @each $font-weight in $font-weights {
+//   .fw-#{$font-weight} {
+//     font-weight: #{$font-weight};
+//   }
+// }

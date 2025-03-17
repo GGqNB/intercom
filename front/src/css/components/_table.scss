@@ -1,0 +1,256 @@
+.s-table {
+  background: inherit;
+  // max-height: 65vh;
+  .q-table__middle.scroll {
+    @include scrollbar;
+  }
+  table {
+    // Отступы между строками таблицы
+    border-spacing: 0 12px !important;
+    border-collapse: separate !important;
+    background: inherit;
+
+    width: 100%;
+    thead {
+      // Блок нужен для поднятия шапки к верху из-за отступов в таблице
+      tr:first-of-type {
+        position: relative;
+        top: -12px;
+      }
+
+      tr {
+        th {
+          background: $secondary;
+          font-size: $font-size-base;
+          color: $color-black;
+          font-weight: 400;
+          text-align: center;
+          position: sticky;
+          z-index: 1;
+          padding: $indent-medium !important;
+          max-width: 300px;
+          white-space: pre-wrap;
+        }
+        // Закругление строк таблицы
+        th:first-of-type {
+          border-radius: $border-radius-base 0 0 $border-radius-base;
+        }
+        th:last-of-type {
+          border-radius: 0 $border-radius-base $border-radius-base 0;
+        }
+        &:first-child {
+          th {
+            top: 0;
+          }
+        }
+      }
+    }
+
+    tbody {
+      .deleted {
+        background-color: rgba(244, 106, 106, 0.05);
+      }
+      .unactive {
+        background-color: rgba($warning, 0.05);
+      }
+
+      tr {
+        td {
+          // background: $color-white;
+          max-width: 300px;
+          white-space: normal;
+          word-break: break-word;
+          font-size: $font-size-base;
+          font-weight: 300;
+        }
+        // Закругление строк таблицы
+        td:first-of-type {
+          border-radius: $border-radius-base 0 0 $border-radius-base;
+        }
+        td:last-of-type {
+          border-radius: 0 $border-radius-base $border-radius-base 0;
+        }
+        td:only-of-type {
+          border-radius: $border-radius-base;
+        }
+        .tr-action_button {
+          text-align: center;
+          padding: 0 !important;
+          max-width: 80px;
+          width: 50px !important;
+        }
+
+        td {
+          border-top: 1px solid $color-white;
+          border-bottom: 1px solid $color-white;
+          transition: border 0.2s ease-in;
+        }
+        td:first-of-type {
+          border-left: 1px solid $color-white;
+          transition: border 0.2s ease-in;
+        }
+        td:last-of-type {
+          border-right: 1px solid $color-white;
+          transition: border 0.2s ease-in;
+        }
+        td:only-of-type {
+          border: 1px solid $color-white;
+          transition: border 0.2s ease-in;
+        }
+        // Большой блок для отрисовки рамка при наведении
+        &:hover td {
+          border-top: 1px solid $color-brand;
+          border-bottom: 1px solid $color-brand;
+          transition: border 0.2s ease-in;
+        }
+        &:hover td:first-of-type {
+          border-left: 1px solid $color-brand;
+          transition: border 0.2s ease-in;
+        }
+        &:hover td:last-of-type {
+          border-right: 1px solid $color-brand;
+          transition: border 0.2s ease-in;
+        }
+        &:hover td:only-of-type {
+          border: 1px solid $color-brand;
+        }
+      }
+    }
+  }
+  &.s-dense {
+    tbody {
+      tr {
+        td {
+          padding: 2px 4px;
+          font-size: $font-size-base;
+        }
+      }
+    }
+  }
+  .s-tfoot {
+    tr > td {
+      border-top: 3px dashed $color-grey;
+    }
+  }
+}
+
+.s-table__wrapper {
+  background: inherit;
+  .q-table__bottom--nodata {
+    font-size: $font-size-base;
+    i {
+      color: $color-warning;
+    }
+  }
+  table {
+    width: 100%;
+    border-radius: $border-radius-base;
+  }
+  //&.bordered {
+  //  table {
+  //    border-spacing: 0;
+  //    border: 1px solid #eff2f7;
+  //    thead {
+  //      tr {
+  //        th {
+  //          border-right: 1px solid #eff2f7;
+  //          border-bottom: 2.5px solid #e6ebf3;
+  //          &:last-child {
+  //            border-right: 0;
+  //          }
+  //        }
+  //      }
+  //    }
+  //    tbody {
+  //      tr {
+  //        td {
+  //          border-right: 1px solid #eff2f7;
+  //          border-bottom: 1.5px solid #eff2f7;
+  //          &:last-child {
+  //            border-right: 0;
+  //          }
+  //        }
+  //        &:last-child {
+  //          td {
+  //            border-bottom: 0;
+  //          }
+  //        }
+  //      }
+  //    }
+  //  }
+  //}
+}
+
+// Шапка таблицы прилипающая
+.sticky-table-header {
+  max-height: 80vh;
+
+  thead {
+    tr {
+      &:first-child {
+        th {
+          top: 0;
+        }
+      }
+      th {
+        position: sticky;
+        z-index: 1;
+      }
+    }
+  }
+  &.q-table--loading {
+    thead {
+      tr {
+        &:last-child {
+          th {
+            top: 48px;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Первая колонка таблицы прилипающая
+.sticky-table-first-column {
+  max-width: 100%;
+  thead {
+    tr {
+      &:first-child {
+        th {
+          &:first-child {
+            z-index: 2;
+          }
+        }
+      }
+    }
+  }
+  td {
+    &:first-child {
+      position: sticky;
+      left: 0;
+      z-index: 1;
+    }
+  }
+  th {
+    &:first-child {
+      position: sticky;
+      left: 0;
+      z-index: 1;
+    }
+  }
+}
+
+// Класс нужен что бы sticky таблицы по первому столбцу работал.
+// Подумать как прокидывать ширину не только 300px столбцов
+.table-min-column {
+  table {
+    tbody {
+      tr {
+        td {
+          min-width: 300px;
+        }
+      }
+    }
+  }
+}

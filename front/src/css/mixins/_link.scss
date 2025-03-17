@@ -1,0 +1,25 @@
+@mixin link() {
+  color: $color-brand;
+  text-decoration: none;
+  border-bottom: 1.5px dashed transparent;
+  transition: border 0.2s ease-out 0s;
+
+  &:hover {
+    cursor: pointer;
+    color: $color-brand;
+    border-bottom: 1.5px dashed $color-brand;
+    text-decoration: none;
+    transition: border-bottom 0.2s ease-in;
+  }
+  &:visited {
+    color: $color-brand;
+    text-decoration: underline;
+  }
+}
+@mixin noDefaultLink() {
+  color: inherit;
+  text-decoration: inherit; /* no underline */
+  &:-webkit-any-link {
+    text-decoration: none !important;
+  }
+}

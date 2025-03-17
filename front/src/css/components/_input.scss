@@ -1,0 +1,161 @@
+@mixin input-base {
+  border-radius: $border-radius-base;
+  height: 40px !important;
+  .q-field__control {
+    border-radius: $border-radius-base;
+    color: $color-brand;
+    height: 40px !important;
+    &::before {
+      border-color: $color-grey;
+    }
+    &:hover::before {
+      border-color: $color-brand;
+    }
+  }
+
+  // Обводка ошибки
+  &.q-field--error.q-field--outlined.q-field--highlighted .q-field__control:after {
+    border-color: $color-error;
+    border-width: 1px;
+  }
+  // Обводка ошибки в фокусе
+  &.q-field--error.q-field--focused {
+    &.q-field--outlined.q-field--highlighted .q-field__control:after {
+      border-width: 2px;
+    }
+  }
+
+  .q-field__control:after,
+  .q-field__native,
+  .q-field__append,
+  .q-field__control-container {
+    height: 40px !important;
+  }
+  // Работа с лейблом
+  .q-field__label {
+    color: $color-black;
+    top: 8px;
+  }
+  // Обработка лейбла при фокусе
+  &.q-field--focused {
+    .q-field__label {
+      color: $color-brand;
+      top: 12px;
+    }
+  }
+  // Подсветка лейбла красным при ошибки валидации
+  &.q-field--error {
+    .q-field__label {
+      color: $color-error;
+    }
+  }
+  // Основной текст
+  .q-field__native {
+    color: $color-text-base;
+    // @include font-text-2;
+  }
+  // Нижний блок ошибок или подписей
+  .q-field__bottom {
+    padding: 4px;
+  }
+  // Нижний блок ошибок или подписей настройка сообщения
+  .q-field__messages {
+    // @include font-caption;
+  }
+
+  // Обязательное поле
+  &--required .q-field__label,
+  &--required.field-select__option-group .label,
+  &--required .file-label {
+    &:after {
+      content: '*';
+      color: $color-warning;
+      font-weight: bold;
+      font-size: $font-size-small;
+      margin-right: 5px;
+    }
+  }
+}
+
+@mixin input-disable {
+  background: rgba(237, 242, 247, 1) !important;
+  .q-field__control {
+    background: rgba(237, 242, 247, 1) !important;
+    color: $color-grey;
+    .q-field__label {
+      color: $color-grey;
+    }
+    &::before {
+      border-color: $color-grey;
+    }
+    &:hover::before {
+      border-color: $color-grey;
+    }
+  }
+}
+
+@mixin input-dense {
+  // Основной текст
+  .q-field__native {
+    // @include font-caption;
+    // @include font-text-3;
+    font-size: 13px;
+  }
+
+  // Работа с лейблом
+  .q-field__label {
+    top: 8px;
+  }
+  // Обработка лейбла при фокусе
+  &.q-field--focused {
+    .q-field__label {
+      top: 8px;
+    }
+  }
+
+  // Уменьшение лейбла
+  &.q-field--float {
+    .q-field__label {
+      transform: translateY(-20%) scale(0.65);
+    }
+  }
+}
+
+@mixin input-date {
+  // Покрас иконки календаря в ее состояниях
+  &.q-field--focused {
+    .s-input--date-icon {
+      color: $color-brand;
+    }
+  }
+  // Подсветка лейбла красным при ошибки валидации
+  &.q-field--error {
+    .s-input--date-icon {
+      color: $color-error;
+    }
+  }
+}
+
+.s-input {
+  @include input-base;
+
+  &--disable {
+    @include input-disable;
+  }
+  &--readonly {
+    @include input-disable;
+  }
+  &--date {
+    @include input-date;
+  }
+  &--dense {
+    @include input-dense;
+  }
+  &--indent {
+    @include form-item-indent;
+  }
+}
+
+.s-input-settings{
+  max-width: 100px;
+}

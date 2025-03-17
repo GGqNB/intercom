@@ -1,0 +1,28 @@
+.s-banner {
+  width: 100%;
+  border-radius: $border-radius-medium;
+  &.error {
+    background-color: $color-error;
+  }
+  &.info {
+    background-color: $color-info;
+  }
+  &.success {
+    background-color: $color-success;
+  }
+  &.warning {
+    background-color: $color-warning;
+  }
+}
+
+.s-banner__icon {
+  font-size: 20px;
+  color: $color-white;
+}
+
+.s-banner__text {
+  @include font-text-3;
+  color: $color-white;
+  font-weight: 500;
+  line-height: 150%;
+}

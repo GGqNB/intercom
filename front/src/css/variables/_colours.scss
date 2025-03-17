@@ -1,0 +1,159 @@
+// WHITE | BLACK | GREY
+$color-white: #ffffff;
+$color-black: $dark;
+$color-grey-900: #1A202C;
+$color-grey-800: #2D3748;
+$color-grey-700: #4A5568;
+$color-grey-600: #718096;
+$color-grey-500: #A0AEC0;
+$color-grey-400: #CBD5E0;
+$color-grey-300: #E2E8F0;
+$color-grey-200: #EDF2F7;
+$color-grey-100: #F7FAFC;
+$color-grey-50: #FAFAFA;
+$color-grey: $color-grey-700;
+
+$element-base-background: #ffffff;
+$element-second-background: #e7edf4;
+
+// Typography
+$color-text-base: $color-black;
+$color-text-secondary: $color-grey-800;
+$color-text-title: $color-black;
+$color-text-title-dialog: $color-black;
+
+$color-text-brand: $primary;
+
+//// BRAND
+$color-brand: $primary;
+$color-brand-active: #2346D7;
+
+$color-brand-secondary: $secondary;
+$color-accent: $accent;
+
+//// Information colours
+$color-error: #d52318;
+$color-success: #007352;
+$color-info: #146dc6;
+$color-warning: #e98634;
+
+// Component colours
+$color-container: #F7FAFC;
+// $color-header: $color-brand-four;
+$color-table-header-background: #eff2f7;
+
+$color-border: #bfcce5;
+$color-border-light: #ededed;
+$color-brand-border: rgba($color-brand-secondary, 0.25);
+$color-divider: #bfcce5;
+$color-shadow: #7C8286;
+
+// Global quasar colours
+.text-primary {
+  color: $color-brand;
+}
+
+.bg-primary {
+  background: $color-brand;
+}
+
+.text-brand {
+  color: $color-brand;
+}
+
+.bg-brand {
+  background: $color-brand;
+}
+
+.text-brand-secondary {
+  color: $color-brand-secondary;
+}
+
+.bg-brand-secondary {
+  background: $color-brand-secondary;
+}
+
+.text-base {
+  color: $color-text-base;
+}
+
+.text-color-white {
+  color: $color-white !important;
+}
+
+.bg-base {
+  background: $color-text-base;
+}
+
+.text-brand-grey {
+  color: $color-grey;
+}
+
+.bg-brand-grey {
+  background: $color-grey;
+}
+
+.text-brand-black {
+  color: $color-black;
+}
+
+.bg-brand-black {
+  background: $color-black;
+}
+
+.text-brand-warning {
+  color: $color-warning;
+}
+
+.bg-brand-warning {
+  background: $color-warning;
+}
+
+.text-brand-red {
+  color: $color-error;
+}
+.bg-brand-red {
+  background: $color-error;
+}
+
+.text-danger {
+  color: $color-error;
+}
+
+.bg-danger {
+  background: $color-error;
+}
+
+.text-brand-danger {
+  color: $color-error;
+}
+
+.bg-brand-danger {
+  color: $color-error;
+}
+
+.text-brand-success {
+  color: $color-success;
+}
+.bg-brand-success {
+  background: $color-success;
+}
+
+.text-brand-green {
+  color: $color-success;
+}
+.bg-brand-green {
+  background: $color-success;
+}
+
+.bg-brand-divider {
+  background: rgba($color-grey, 0.5);
+}
+
+.text-brand-info {
+  color: $color-info;
+}
+
+.bg-brand-warning {
+  background: $color-info;
+}

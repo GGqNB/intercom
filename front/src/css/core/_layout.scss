@@ -1,0 +1,88 @@
+/* WIDTH BASE VARIABLES */
+$width-base: 130px;
+$width-base-small: 156px;
+$width-base-medium: 180px;
+$width-base-large: 200px;
+$width-base-xl: 250px;
+$width-base-xxl: 300px;
+$width-base-xxxl: 350px;
+
+/* WIDTH VARIABLES */
+$width-small: 350px;
+$width-medium: 400px;
+$width-large: 430px;
+$width-xl: 500px;
+
+.full-vheight {
+  height: 100vh;
+}
+
+.full-vwidth {
+  width: 100vw;
+}
+
+.full-width {
+  width: 100% !important;
+}
+
+.preloader {
+  z-index: 9999;
+}
+
+
+// =================================================
+/* WIDTH BASE */
+// =================================================
+
+.w-base {
+  width: $width-base;
+}
+
+.w-base-small {
+  width: $width-base-small;
+}
+
+.w-base-medium {
+  width: $width-base-medium;
+}
+
+.w-base-large {
+  width: $width-base-large;
+}
+
+.w-base-xl {
+  width: $width-base-xl;
+}
+
+.w-base-xxl {
+  width: $width-base-xxl;
+}
+
+.w-base-xxxl {
+  width: $width-base-xxxl;
+}
+
+
+// =================================================
+/* WIDTH */
+// =================================================
+
+.w-small {
+  width: $width-small;
+}
+
+.w-medium {
+  width: $width-medium;
+}
+
+.w-large {
+  width: $width-large;
+}
+
+.mw-large {
+  max-width: $width-large;
+}
+
+.mw-xl {
+  max-width: $width-xl;
+}

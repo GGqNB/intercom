@@ -1,0 +1,27 @@
+body,
+html {
+  height: 100%;
+  background: $color-container;
+}
+
+body {
+  font-family: $font-family-monteserrat;
+  font-size: $font-size-base !important;
+  margin: 0;
+  min-height: 100%;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+}
+
+.icon {
+  width: 34px;
+  height: 34px;
+}
+
+a {
+  color: $primary;
+  text-decoration: none; /* no underline */
+}

@@ -1,0 +1,105 @@
+/* MARGIN VARIABLES BASE */
+$margins-base: ("2" :2px, "5": 5px,"10": 10px,"15": 15px, "20": 20px, "25": 25px, "30": 30px, "35": 35px, "40": 40px);
+$margin-base: 10px;
+$margin-base-medium: 20px;
+$margin-base-large: 25px;
+$margin-base-xxxl: 40px;
+
+/* MARGIN VARIABLES */
+$margins: ("45": 45px, "50": 50px, "75": 75px, "80": 80px, "100": 100px, "150": 150px);
+$margin-medium: 50px;
+$margin-xl: 100px;
+
+// =================================================
+/* MARGIN NONE AND AUTO */
+// =================================================
+
+.m-none {
+  margin: 0;
+}
+
+.m-none-auto {
+  margin: 0 auto;
+}
+
+.m-auto-none {
+  margin: auto 0;
+}
+
+.mt-base {
+  margin-top: $margin-base;
+}
+
+.m-align-left {
+  margin-left: auto;
+}
+
+
+// =================================================
+/* MARGIN BASE */
+// =================================================
+
+@each $name, $var in $margins-base {
+  .m-base-#{$name} {
+    margin: $var;
+  }
+
+  .mx-base-#{$name} {
+    margin: 0 $var;
+  }
+
+  .my-base-#{$name} {
+    margin: $var 0;
+  }
+
+  .mt-base-#{$name} {
+    margin-top: $var;
+  }
+
+  .mb-base-#{$name} {
+    margin-bottom: $var;
+  }
+
+  .ml-base-#{$name} {
+    margin-left: $var;
+  }
+
+  .mr-base-#{$name} {
+    margin-right: $var;
+  }
+}
+
+
+// =================================================
+/* MARGIN */
+// =================================================
+
+@each $name, $var in $margins {
+  .m-#{$name} {
+    margin: $var;
+  }
+
+  .mx-#{$name} {
+    margin: 0 $var;
+  }
+
+  .my-#{$name} {
+    margin: $var 0;
+  }
+
+  .mt-#{$name} {
+    margin-top: $var;
+  }
+
+  .mb-#{$name} {
+    margin-bottom: $var;
+  }
+
+  .ml-#{$name} {
+    margin-left: $var;
+  }
+
+  .mr-#{$name} {
+    margin-right: $var;
+  }
+}
