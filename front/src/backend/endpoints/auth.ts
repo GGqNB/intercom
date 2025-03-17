@@ -1,7 +1,7 @@
 import { IEndpointData } from 'src/backend/endpoint';
 import { API_SERVER } from 'src/constants/common';
 
-const authUrl = `${API_SERVER}/valid-key`;
+const authUrl = `http://${API_SERVER}/valid-key`;
 
 
 export const AUTH = {
