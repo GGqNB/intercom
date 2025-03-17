@@ -18,7 +18,9 @@ from starlette.status import HTTP_400_BAD_REQUEST
 from starlette.status import HTTP_403_FORBIDDEN
 
 
-app = FastAPI()
+app = FastAPI(
+    docs_url="/api/docs"
+)
 
 origins = [
     "http://localhost:9000",
