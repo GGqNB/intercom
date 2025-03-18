@@ -149,7 +149,7 @@ export default defineComponent({
         const callApartment = async (apartmentNumber) => {
             isCalling.value = true; // Устанавливаем статус звонка
             try {
-                const response = await axios.get(`https://${API_SERVER}call/${apartmentNumber}`);;
+                const response = await axios.get(`https://${API_SERVER}api/call/${apartmentNumber}`);;
                 const data = response.data;
                 message.value = data.message;
                 console.log(data.message);
@@ -162,7 +162,7 @@ export default defineComponent({
 
         const abortCall = async () => {
             try {
-                const response = await axios.get(`https://${API_SERVER}abort_call/${apartmentNumber.value}`);
+                const response = await axios.get(`https://${API_SERVER}api/abort_call/${apartmentNumber.value}`);
                 const data = response.data;
                 message.value = data.message;
                 console.log(data.message);
@@ -175,7 +175,7 @@ export default defineComponent({
 
         const answerCall = async () => {
       try {
-        const response = await axios.get(`https://${API_SERVER}answer_call/${apartmentNumber.value}`);
+        const response = await axios.get(`https://${API_SERVER}api/answer_call/${apartmentNumber.value}`);
         const data = response.data;
         message.value = data.message;
         console.log(data.message);

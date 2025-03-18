@@ -108,7 +108,7 @@ import {
       hashStr.value = generateRandomString(7);
       isCalling.value = true; // Устанавливаем статус звонка
       try {
-        const response = await axios.get(`https://${API_SERVER}call/${apartmentNumber}/${hashStr.value}?resident_ids=${residentIds.join(',')}`);;
+        const response = await axios.get(`https://${API_SERVER}api/call/${apartmentNumber}/${hashStr.value}?resident_ids=${residentIds.join(',')}`);;
         const data = response.data;
         message.value = data.message;
         console.log(data.message);
@@ -121,7 +121,7 @@ import {
 
     const abortCall = async (apartmentNumber) => {
       try {
-        const response = await axios.get(`https://${API_SERVER}abort_call/${apartmentNumber}`);
+        const response = await axios.get(`https://${API_SERVER}api/abort_call/${apartmentNumber}`);
         const data = response.data;
         message.value = data.message;
         console.log(data.message);
