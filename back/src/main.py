@@ -19,9 +19,7 @@ from starlette.status import HTTP_403_FORBIDDEN
 
 
 app = FastAPI(
-   docs_url=f"/api/docs",
-    openapi_url="/api/openapi.json",
-    redoc_url=None
+   root_path="/api"
 )
 
 origins = [
