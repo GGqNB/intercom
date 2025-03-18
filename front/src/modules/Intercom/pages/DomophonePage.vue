@@ -57,7 +57,7 @@ import {
     const {
       accessToken
         } = useCurrentUser();
-    const serverAddress = `wss://${API_SERVER}/ws?key=${accessToken.value}&user_id=${userId}&role=${role}`;
+    const serverAddress = `wss://${API_SERVER}ws?key=${accessToken.value}&user_id=${userId}&role=${role}`;
     const isCalling = ref(false);
     const hashStr = ref('');
     const connectWebSocket = () => {
