@@ -2,7 +2,7 @@
 <q-header
     id=""
     reveal
-    class="bg-grey-10"
+    class="q-header--gold-multi"
 >
     <q-toolbar class="s-header--toolbar">
         <div class="row items-center s-header">
@@ -17,8 +17,32 @@
                 <q-icon name="menu" />
             </q-btn>
         </div>
-        <q-btn color="red" @click="logout">Выход</q-btn>
+        <q-btn flat>
+            <q-img
+    src="icons/logo.svg"
+    width="78px"
+    height="102px"
+  />
+  <q-img
+    src="icons/name_stown.svg"
+    width="300px"
+    color="red"
+    height="45px"
+  />
+        </q-btn>
+        <!-- <q-btn color="red" @click="logout">Выход</q-btn> -->
         <q-space />
+        <q-btn flat>
+           <div class="text-header-btn">СДЕЛАНО В ЮГРЕ</div>
+  <q-img
+    src="icons/inhamao.svg"
+    width="86px"
+    color="red"
+    height="90px"
+  />
+        </q-btn>
+  
+        
     </q-toolbar>
 </q-header>
 </template>
@@ -101,7 +125,10 @@ export default defineComponent({
         const $indicator = useIndicator();
     
             onMounted(
-                () => getUser()
+                () => {
+                    console.log(collapseSidebar.value)
+                    getUser();
+                }
             ),
             watch(() => indicatorStore.activePhone, (newVal) => {
                 phone_flag.value = newVal;
@@ -139,3 +166,37 @@ export default defineComponent({
     },
 });
 </script>
+<style>
+.q-header--gold-gradient {
+  background: linear-gradient(to right, #D4AF37, #FFD700); /* Темное золото -> Яркое золото */
+  color: #000; /* Убедитесь, что текст хорошо виден на фоне градиента */
+}
+
+/* Вариант 2: Радиальный градиент (из центра) */
+.q-header--gold-gradient-radial {
+  background: radial-gradient(circle, #FFD700, #D4AF37); /* Яркое золото -> Темное золото */
+  color: #000;
+}
+
+/* Вариант 3: Нежный градиент (с добавлением белого) */
+.q-header--gold-gradient-soft {
+  background: linear-gradient(to right, #FAFAD2, #FFD700, #FAFAD2); /* Кремовый -> Золото -> Кремовый */
+  color: #000;
+}
+
+/* Вариант 4: Более насыщенный градиент (с добавлением оранжевого) */
+.q-header--gold-gradient-rich {
+  background: linear-gradient(to right, #D4AF37, #FFA500, #FFD700); /* Темное золото -> Оранжевый -> Яркое золото */
+  color: #000;
+}
+
+/* Вариант 5: Градиент с использованием нескольких оттенков золотого */
+.q-header--gold-multi {
+  background: radial-gradient(ellipse farthest-corner at right bottom, #FEDB37 0%, #FDB931 8%, #9f7928 30%, #8A6E2F 40%, transparent 80%),
+  radial-gradient(ellipse farthest-corner at left top, #FFFFFF 0%, #FFFFAC 8%, #D1B464 25%, #5d4a1f 62.5%, #5d4a1f 100%);
+  color: white;
+}
+.text-header-btn{
+    font-size: 35px;
+}
+</style>

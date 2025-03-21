@@ -1,13 +1,6 @@
-<template v-if="props.hashStr">
-    
-    <div class="home_wrapper">
+<template v-if="props.hashStr && props.isIntercom">
       <video ref="localVideo" autoplay muted></video>
-      <video ref="remoteVideo" autoplay></video>
-     </div>
-
-    <div class="home_wrapper">
-
-    </div>
+      <video ref="remoteVideo" :class="props.isIntercom ? 'display-none':''" autoplay></video>
     
 </template>
 <script>
@@ -15,7 +8,8 @@ import { ref, onMounted } from 'vue';
 
 export default {
   props : {
-      hashStr: String
+      hashStr: String,
+      isIntercom: Boolean
   },
   
   setup(props) {
@@ -67,7 +61,7 @@ export default {
           pc.createOffer().then(localDescCreated).catch(onError);
         };
       }
-
+      
       pc.ontrack = (event) => {
         const stream = event.streams[0];
         if (!remoteVideo.value.srcObject || remoteVideo.value.srcObject.id !== stream.id) {
@@ -121,7 +115,8 @@ export default {
 
     return {
       localVideo,
-      remoteVideo
+      remoteVideo,
+      props
     };
   }
 };
@@ -146,16 +141,14 @@ export default {
   margin-top: 1rem;
   position: absolute;
   top: 100px;
-  /* bottom: 50px; */
   left: 0;
   width: 100%;
-  z-index: 10; /* Чтобы блок был над карточками */
+  z-index: 10; 
 }
 </style>
 <style>
-/* Добавьте стили для ваших видео элементов, если необходимо */
 video {
   width: 100%;
-  max-width: 600px;
+  height: 100%;
 }
 </style>
