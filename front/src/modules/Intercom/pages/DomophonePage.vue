@@ -19,20 +19,19 @@
             </div>
             <div class="button-group">
                 <q-btn
-                    color="red"
-                    :disabled="!isCalling"
+                    v-if="isCalling"
                     icon="phone_disabled"
                     @click="abortCall(selectedNumbers)"
                     label="Сброс"
                     class="call-end-btn"
                 />
                 <q-btn
-                    color="green"
-                    :disabled="isCalling || !selectedNumbers.length > 0"
-                    @click="callApartment(selectedNumbers, ['user999'])"
-                    icon="phone"
-                    label="Вызов"
-                    class="call-start-btn"
+                    v-else
+                    class="call-end-btn"
+                    @click="selectedNumbers = selectedNumbers.slice(0, -1)"
+                    icon="backspace"
+                    label="Удалить"
+                    :disabled="!selectedNumbers.length > 0"
                 />
             </div>
         </div>
@@ -40,17 +39,11 @@
             <div class="result">
                 <div class="result-window flex justify-center items-center">
                     <div v-if="!waitAnswer" class="flex">
-                      <div class="result-window-text">{{ selectedNumbers }}</div>
-                    <q-btn
-                        size="xl"
-                        @click="selectedNumbers = selectedNumbers.slice(0, -1)"
-                        flat
-                        icon="backspace"
-                        v-if="selectedNumbers.length > 0"
-                    />
+                        <div class="result-window-text">{{ selectedNumbers }}</div>
+
                     </div>
-                    <div v-else class="fs-xl">
-                      Идет звонок...
+                    <div v-if="waitAnswer" class=" wait-answer-text">
+                        Идет звонок...
                     </div>
                 </div>
             </div>
@@ -73,8 +66,17 @@
             </div>
             <div class="entry">
                 <q-btn
+                    v-if="selectedNumbers.length > 3"
                     icon="logout"
                     label="ВОЙТИ"
+                    class="entry-btn"
+                />
+                <q-btn
+                    v-else
+                    :disabled="isCalling || !selectedNumbers.length > 0"
+                    @click="callApartment(selectedNumbers, ['user999'])"
+                    icon="phone"
+                    label="Вызов"
                     class="entry-btn"
                 />
             </div>
@@ -117,7 +119,7 @@ export default defineComponent({
         const socket = ref(null);
         const message = ref('');
         const userId = 'domophone1';
-        const apartmentNumber = null; 
+        const apartmentNumber = null;
         const role = 'domophone';
         const {
             accessToken
@@ -126,7 +128,7 @@ export default defineComponent({
         const isCalling = ref(false);
         const hashStr = ref('');
         const waitAnswer = ref(false);
-        const reconnectInterval = 3000; 
+        const reconnectInterval = 3000;
         let reconnectTimer = null;
         const connectWebSocket = () => {
             socket.value = new WebSocket(serverAddress);
@@ -134,14 +136,14 @@ export default defineComponent({
             socket.value.onopen = () => {
                 console.log('Подключено к WebSocket серверу');
                 socket.value.send('Клиент подключен');
-                clearInterval(reconnectTimer); 
+                clearInterval(reconnectTimer);
             };
 
             socket.value.onmessage = (event) => {
                 message.value = event.data;
                 console.log('Сообщение от сервера:', event.data);
                 if (event.data.includes('завершен') || event.data.includes('прерван')) {
-                    isCalling.value = false; 
+                    isCalling.value = false;
                 }
                 // 
                 const data = JSON.parse(event.data);
@@ -149,10 +151,10 @@ export default defineComponent({
                     console.log(`Звонок начался с кв. ${data.apartment}`);
                     isCalling.value = true;
                     waitAnswer.value = true;
-                    console.log(isCalling.value)
+                    console.log(waitAnswer.value)
                 }
                 if (data.type === 'call_answered') {
-                  waitAnswer.value = false;
+                    waitAnswer.value = false;
                 }
                 if (data.type === 'call_ended' || data.type === 'call_aborted') {
                     console.log(`Звонок закончился ${data.apartment}`);
@@ -174,17 +176,17 @@ export default defineComponent({
             };
         };
         const reconnect = () => {
-      if (reconnectTimer) {
-        clearInterval(reconnectTimer);
-        reconnectTimer = null; 
-      }
+            if (reconnectTimer) {
+                clearInterval(reconnectTimer);
+                reconnectTimer = null;
+            }
 
-      reconnectTimer = setTimeout(() => {
-        console.log('Попытка переподключения к WebSocket серверу...');
-        connectWebSocket();
-        reconnectTimer = null; 
-      }, reconnectInterval);
-    };
+            reconnectTimer = setTimeout(() => {
+                console.log('Попытка переподключения к WebSocket серверу...');
+                connectWebSocket();
+                reconnectTimer = null;
+            }, reconnectInterval);
+        };
         const disconnectWebSocket = () => {
             if (socket.value) {
                 socket.value.close();
@@ -194,7 +196,7 @@ export default defineComponent({
 
         const callApartment = async (apartmentNumber, residentIds) => {
             hashStr.value = generateRandomString(7);
-            isCalling.value = true; 
+            isCalling.value = true;
             try {
                 const response = await axios.get(`https://${API_SERVER}api/call/${apartmentNumber}/${hashStr.value}?resident_ids=${residentIds.join(',')}`);;
                 const data = response.data;
@@ -203,7 +205,7 @@ export default defineComponent({
             } catch (error) {
                 console.error('Ошибка при вызове:', error);
                 message.value = 'Ошибка при вызове.';
-                isCalling.value = false; 
+                isCalling.value = false;
             }
         };
 
@@ -213,7 +215,7 @@ export default defineComponent({
                 const data = response.data;
                 message.value = data.message;
                 console.log(data.message);
-                isCalling.value = false; 
+                isCalling.value = false;
             } catch (error) {
                 console.error('Ошибка при сбросе:', error);
                 message.value = 'Ошибка при сбросе.';
@@ -270,8 +272,7 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.intercom-container {
-}
+.intercom-container {}
 
 .left-area {
     margin-right: 5px;
@@ -299,9 +300,11 @@ export default defineComponent({
 }
 
 .call-end-btn {
-    width: 50%;
+    width: 100%;
     height: 151px;
-    font-size: 2rem;
+    font-size: 3rem;
+    background: radial-gradient(ellipse farthest-corner at right bottom, #FEDB37 0%, #FDB931 8%, #9f7928 30%, #8A6E2F 40%, transparent 80%),
+        radial-gradient(ellipse farthest-corner at left top, #FFFFFF 0%, #FFFFAC 8%, #D1B464 25%, #5d4a1f 62.5%, #5d4a1f 100%);
 }
 
 .call-start-btn {
@@ -349,8 +352,7 @@ export default defineComponent({
     border: 2px solid white;
 }
 
-.entry {
-}
+.entry {}
 
 .entry-btn {
     width: 100%;
@@ -364,25 +366,23 @@ export default defineComponent({
 .result-window-text {
     font-size: 4rem;
 }
+.wait-answer-text {
+  font-size: 65px;
+  background: linear-gradient(90deg, #cab01b, #dbce10, #c6b38e, #c2ab28);
+  background-size: 400% 400%; 
+  -webkit-background-clip: text; 
+  -webkit-text-fill-color: transparent; 
+  animation: goldShine 5s linear infinite; 
+  font-weight: bold;
+}
+
+@keyframes goldShine {
+  0% {
+    background-position: 0% 50%; 
+  }
+  100% {
+    background-position: 100% 50%; 
+  }
+}
+
 </style>
-<!-- <h2>Домофон</h2> -->
-<!-- <div class="button-group">
-  <q-btn 
-    v-for="number in buttons" 
-    :key="number" 
-    :label="number"
-    class="" 
-    :class="{ 'active-button': selectedButton === number }" 
-    @click="selectButton(number)" 
-    :disabled="isCalling"
-
-  />
-</div>
-<q-btn
-  label="Сбросить звонок"
-  color="red"
-  @click="abortCall(selectedButton)"
-  :disabled="!isCalling"
-
-/>
-<q-btn label="Вызов" color="primary" @click="callApartment(selectedButton, ['user999'])" :disabled="isCalling" /> -->
