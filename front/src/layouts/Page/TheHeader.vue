@@ -23,14 +23,15 @@
                 width="76px"
                 height="100px"
             />
-            <q-img
+            <!-- <q-img
                 
                 src="icons/name_stown.svg"
                 width="300px"
                 color="red"
                 height="45px"
                 class="text-stown"
-            />
+            /> -->
+            <div class="text-header-btn text-black">STOWN</div>
         </q-btn>
         <!-- <q-btn color="red" @click="logout">Выход</q-btn> -->
         <q-space />
@@ -180,9 +181,9 @@ export default defineComponent({
 }
 
 .text-header-btn {
-    font-size: 45px;
+    font-size: 60px;
     padding-right: 15px;
-    font-weight: 700;
+    font-weight: 500;
 }
 .text-stown{
     margin-left: 15px;

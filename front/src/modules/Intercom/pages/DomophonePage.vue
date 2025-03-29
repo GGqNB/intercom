@@ -302,7 +302,7 @@ export default defineComponent({
 .call-end-btn {
     width: 100%;
     height: 151px;
-    font-size: 3rem;
+    font-size: 60px;
     background: radial-gradient(ellipse farthest-corner at right bottom, #FEDB37 0%, #FDB931 8%, #9f7928 30%, #8A6E2F 40%, transparent 80%),
         radial-gradient(ellipse farthest-corner at left top, #FFFFFF 0%, #FFFFAC 8%, #D1B464 25%, #5d4a1f 62.5%, #5d4a1f 100%);
 }
@@ -310,7 +310,7 @@ export default defineComponent({
 .call-start-btn {
     width: 49%;
     height: 151px;
-    font-size: 2rem;
+    font-size: 80px;
 }
 
 .result-window {
@@ -337,7 +337,7 @@ export default defineComponent({
     width: 157px;
     height: 270px;
     margin: 2px;
-    font-size: 3rem;
+    font-size: 100px;
     padding: 10px;
     border-radius: 5px;
     min-width: auto;
@@ -357,7 +357,7 @@ export default defineComponent({
 .entry-btn {
     width: 100%;
     height: 151px;
-    font-size: 3rem;
+    font-size: 60px;
     /* Увеличение размера шрифта */
     background: radial-gradient(ellipse farthest-corner at right bottom, #FEDB37 0%, #FDB931 8%, #9f7928 30%, #8A6E2F 40%, transparent 80%),
         radial-gradient(ellipse farthest-corner at left top, #FFFFFF 0%, #FFFFAC 8%, #D1B464 25%, #5d4a1f 62.5%, #5d4a1f 100%);

@@ -1,8 +1,8 @@
 <template v-if="props.hashStr && props.isIntercom">
-      <video ref="localVideo" autoplay muted></video>
-      <video ref="remoteVideo" :class="props.isIntercom ? 'display-none':''" autoplay></video>
+      <video ref="localVideo" autoplay muted playsinline></video>
+      <video ref="remoteVideo" :class="props.isIntercom ? 'display-none':''" autoplay playsinline></video>
     
-</template>
+</template> 
 <script>
 import { ref, onMounted } from 'vue';
 
