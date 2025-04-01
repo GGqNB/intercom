@@ -20,8 +20,8 @@
         <q-btn flat  @click="changeVisibilitySidebar">
             <q-img
                 src="icons/logo.svg"
-                width="76px"
-                height="100px"
+                width="55px"
+                height="75px"
             />
             <!-- <q-img
                 
@@ -39,9 +39,9 @@
             <div class="text-header-btn text-black">СДЕЛАНО В ЮГРЕ</div>
             <q-img
                 src="icons/inhamao.svg"
-                width="98px"
+                width="70px"
                 color="red"
-                height="100 px"
+                height="72px"
             />
         </q-btn>
 
@@ -181,7 +181,7 @@ export default defineComponent({
 }
 
 .text-header-btn {
-    font-size: 60px;
+    font-size: 30px;
     padding-right: 15px;
     font-weight: 500;
 }
