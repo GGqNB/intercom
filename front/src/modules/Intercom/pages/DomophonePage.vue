@@ -286,26 +286,26 @@ export default defineComponent({
 
     flex-direction: column;
 
-    max-width: 600px;
+    max-width: 1100px;
 }
 
 .block-video {
-    width: 600px;
-    height: 400px;
+    width: 1135px;
+    height: 851px;
     border-radius: 10px;
     background-color: gray;
 }
 
 .button-group {
-    margin-top: 5px;
+    margin: 20px 0;
     display: flex;
     justify-content: space-between;
 }
 
 .call-end-btn {
     width: 100%;
-    /* height: 101px; */
-    font-size: 35px;
+    height: 151px;
+    font-size: 60px;
     background: radial-gradient(ellipse farthest-corner at right bottom, #FEDB37 0%, #FDB931 8%, #9f7928 30%, #8A6E2F 40%, transparent 80%),
         radial-gradient(ellipse farthest-corner at left top, #FFFFFF 0%, #FFFFAC 8%, #D1B464 25%, #5d4a1f 62.5%, #5d4a1f 100%);
 }
@@ -313,12 +313,12 @@ export default defineComponent({
 .call-start-btn {
     width: 49%;
     height: 151px;
-    font-size: 35px;
+    font-size: 80px;
 }
 
 .result-window {
-    width: 421px;
-    height: 85px;
+    width: 837px;
+    height: 284px;
     border: 2px solid #D6B06F;
     border-radius: 10px;
     font-size: 1.2rem;
@@ -337,10 +337,10 @@ export default defineComponent({
 }
 
 .number-button {
-    width: 75px;
-    height: 75px;
-    margin: 1px;
-    font-size: 54px;
+    width: 157px;
+    height: 270px;
+    margin: 2px;
+    font-size: 100px;
     padding: 10px;
     border-radius: 5px;
     min-width: auto;
@@ -359,8 +359,8 @@ export default defineComponent({
 
 .entry-btn {
     width: 100%;
-    /* height: 151px; */
-    font-size: 35px;
+    height: 151px;
+    font-size: 60px;
     /* Увеличение размера шрифта */
     background: radial-gradient(ellipse farthest-corner at right bottom, #FEDB37 0%, #FDB931 8%, #9f7928 30%, #8A6E2F 40%, transparent 80%),
         radial-gradient(ellipse farthest-corner at left top, #FFFFFF 0%, #FFFFAC 8%, #D1B464 25%, #5d4a1f 62.5%, #5d4a1f 100%);
@@ -370,7 +370,7 @@ export default defineComponent({
     font-size: 4rem;
 }
 .wait-answer-text {
-  font-size: 35px;
+  font-size: 65px;
   background: linear-gradient(90deg, #cab01b, #dbce10, #c6b38e, #c2ab28);
   background-size: 400% 400%; 
   -webkit-background-clip: text; 
@@ -387,5 +387,6 @@ export default defineComponent({
     background-position: 100% 50%; 
   }
 }
+
 
 </style>
