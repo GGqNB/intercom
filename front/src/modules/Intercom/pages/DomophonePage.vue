@@ -4,12 +4,25 @@
             <div class="left-area">
                 <div class="video">
                     <div class="block-video flex justify-center items-center">
-                        <q-img v-if="!isCalling" src="icons/logo.svg" width="260px" height="350px" />
-                        <CallRoom v-if="isCalling" :hash-str="hashStr" :is-intercom="true" />
+                        <!-- <q-img  src="icons/logo.svg" width="260px" height="350px" /> -->
+                        <div class="q-pa-md">
+                          <div class="q-video">
+                            <video
+                              autoplay
+                              muted
+                              playsinline
+                              loop
+                            >
+                              <source src="video/video.mp4" type="video/mp4">
+                              Your browser does not support the video tag.
+                            </video>
+                          </div>
+                        </div>
+                        <CallRoom v-if="isCallingVideo" :hash-str="hashStr" :is-intercom="true" />
                     </div>
                 </div>
                 <div class="button-group">
-                    <q-btn v-if="isCalling" icon="phone_disabled" @click="abortCall(selectedNumbers)" label="Сброс"
+                    <q-btn v-if="isCalling" icon="phone_disabled" :disabled="!isCallingVideo" @click="abortCall(selectedNumbers)" label="Сброс"
                         class="call-end-btn" />
                     <q-btn v-else class="call-end-btn" @click="selectedNumbers = selectedNumbers.slice(0, -1)"
                         icon="backspace" label="Удалить" :disabled="!selectedNumbers.length > 0" />
@@ -62,12 +75,17 @@ import {
 import {
     useCurrentUser
 } from 'src/composables/useCurrentUser';
+import { useTimeout } from 'src/composables/useTimeout';
 export default defineComponent({
     name: 'SettingDevicePage',
     components: {
         CallRoom
     },
     setup() {
+        const {
+    registerTimeout,
+    removeTimeout
+  } = useTimeout()
         const selectedButton = ref(null);
         const selectedNumbers = ref('');
         const selectButton = (number) => {
@@ -76,7 +94,6 @@ export default defineComponent({
                 return
             }
             selectedNumbers.value = selectedNumbers.value + number
-            console.log(`Выбрана квартира: ${number}`);
         }
 
         const socket = ref(null);
@@ -89,6 +106,7 @@ export default defineComponent({
         } = useCurrentUser();
         const serverAddress = `wss://${API_SERVER}ws?key=${accessToken.value}&user_id=${userId}&role=${role}`;
         const isCalling = ref(false);
+        const isCallingVideo = ref(false);
         const hashStr = ref('');
         const waitAnswer = ref(false);
         const reconnectInterval = 3000;
@@ -121,13 +139,15 @@ export default defineComponent({
                 message.value = event.data;
                 console.log('Сообщение от сервера:', event.data);
                 if (event.data.includes('завершен') || event.data.includes('прерван')) {
-                    isCalling.value = false;
+                    start(); // Задержка на клаву
+                    isCallingVideo.value = false;
                 }
                 // 
                 const data = JSON.parse(event.data);
                 if (data.type === 'call_started') {
                     console.log(`Звонок начался с кв. ${data.apartment}`);
                     isCalling.value = true;
+                    isCallingVideo.value = true;
                     waitAnswer.value = true;
                     console.log(waitAnswer.value)
                 }
@@ -137,7 +157,8 @@ export default defineComponent({
                 if (data.type === 'call_ended' || data.type === 'call_aborted') {
                     console.log(`Звонок закончился ${data.apartment}`);
                     selectedNumbers.value = '';
-                    isCalling.value = false;
+                    start(); // Задержка на клаву
+                    isCallingVideo.value = false;
                     waitAnswer.value = false;
 
                 }
@@ -178,6 +199,7 @@ export default defineComponent({
         const callApartment = async (apartmentNumber, residentIds) => {
             hashStr.value = generateRandomString(7);
             isCalling.value = true;
+            isCallingVideo.value = true;
             try {
                 const response = await axios.get(
                     `https://${API_SERVER}api/call/${apartmentNumber}/${hashStr.value}?resident_ids=${residentIds.join(',')}`
@@ -187,10 +209,13 @@ export default defineComponent({
                 console.log(data.message);
             } catch (error) {
                 console.error('Ошибка при вызове:', error);
-                message.value = 'Ошибка при вызове.';
-                isCalling.value = false;
+                disconnectWebSocket();
+                reconnect();
+                start(); // Задержка на клаву
+                isCallingVideo.value = false;
             }
         };
+
 
         const abortCall = async (apartmentNumber) => {
             try {
@@ -198,7 +223,8 @@ export default defineComponent({
                 const data = response.data;
                 message.value = data.message;
                 console.log(data.message);
-                isCalling.value = false;
+                isCallingVideo.value = false;
+                start(); //Задержка на клаву
             } catch (error) {
                 console.error('Ошибка при сбросе:', error);
                 message.value = 'Ошибка при сбросе.';
@@ -227,6 +253,11 @@ export default defineComponent({
             console.log(selectedNumbers.value)
         }
         const buttons = ref(['1', '2', '3', '4', '5', '6', '7', '8', '9', '0']);
+
+        const { start } = useTimeout(() => {
+            isCalling.value = false;
+        }, 2500);
+
         onMounted(() => {
             connectWebSocket();
         });
@@ -247,7 +278,8 @@ export default defineComponent({
             selectedNumbers,
             deleteLast,
             disconnectWebSocket,
-            waitAnswer
+            waitAnswer,
+            isCallingVideo
         };
     },
 });
