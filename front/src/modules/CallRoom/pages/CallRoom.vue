@@ -1,6 +1,6 @@
 <template v-if="props.hashStr && props.isIntercom">
-      <video ref="localVideo" autoplay muted playsinline></video>
-      <video ref="remoteVideo" :class="props.isIntercom ? 'display-none':''" autoplay playsinline></video>
+      <video ref="localVideo" autoplay muted playsinline :class="props.isIntercom ? 'display-none':''"></video>
+      <video ref="remoteVideo"  autoplay playsinline></video>
     
 </template> 
 <script>
@@ -148,7 +148,6 @@ export default {
 </style>
 <style>
 video {
-  width: 100%;
-  height: 100%;
+  width: 750px;
 }
 </style>

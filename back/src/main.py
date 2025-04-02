@@ -118,7 +118,7 @@ async def websocket_endpoint(websocket: WebSocket):
     print(key)
     if key != API_KEY:
         await websocket.close(code=1008, reason="Неверный key")
-        return 
+        return
     user_id = get_user_id(websocket)
     apartment_number = get_apartment_number(websocket)
     role = get_role(websocket)
@@ -148,8 +148,8 @@ async def websocket_endpoint(websocket: WebSocket):
     try:
         while True:
             data = await websocket.receive_text()
-            if data == "ping":
-                await safe_send_json(websocket, {"type": "pong"}) # Использовать safe_send_json
+            if data.lower() == "ping":  # Case-insensitive comparison
+                await safe_send_json(websocket, {"type": "pong"})  # Использовать safe_send_json
             elif data == "call_ended_by_resident" and role == "resident":
                 apartment = user_connection.apartment_number
                 await end_call(apartment, "resident")

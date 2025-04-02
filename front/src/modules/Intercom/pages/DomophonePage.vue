@@ -1,89 +1,49 @@
 <template>
-<q-page class="">
-    <div class="intercom-container flex justify-center mt-base-10">
-        <div class="left-area">
-            <div class="video">
-                <div class="block-video flex justify-center items-center">
-                    <q-img
-                        v-if="!isCalling"
-                        src="icons/logo.svg"
-                       width="260px"
-                        height="350px"
-                    />
-                    <CallRoom
-                        v-if="isCalling"
-                        :hash-str="hashStr"
-                        :is-intercom="true"
-                    />
-                </div>
-            </div>
-            <div class="button-group">
-                <q-btn
-                    v-if="isCalling"
-                    icon="phone_disabled"
-                    @click="abortCall(selectedNumbers)"
-                    label="Сброс"
-                    class="call-end-btn"
-                />
-                <q-btn
-                    v-else
-                    class="call-end-btn"
-                    @click="selectedNumbers = selectedNumbers.slice(0, -1)"
-                    icon="backspace"
-                    label="Удалить"
-                    :disabled="!selectedNumbers.length > 0"
-                />
-            </div>
-        </div>
-        <div class="right-area flex flex-col">
-            <div class="result">
-                <div class="result-window flex justify-center items-center">
-                    <div v-if="!waitAnswer" class="flex">
-                        <div class="result-window-text">{{ selectedNumbers }}</div>
-
-                    </div>
-                    <div v-if="waitAnswer" class=" wait-answer-text">
-                        Идет звонок...
+    <q-page class="">
+        <div class="intercom-container flex justify-center mt-base-10">
+            <div class="left-area">
+                <div class="video">
+                    <div class="block-video flex justify-center items-center">
+                        <q-img v-if="!isCalling" src="icons/logo.svg" width="260px" height="350px" />
+                        <CallRoom v-if="isCalling" :hash-str="hashStr" :is-intercom="true" />
                     </div>
                 </div>
-            </div>
-            <div class="number-pad">
-                <div
-                    class="number-row"
-                    v-for="(row, rowIndex) in numberPadRows"
-                    :key="rowIndex"
-                >
-                    <q-btn
-                        v-for="number in row"
-                        :key="number"
-                        :label="number"
-                        class="number-button"
-                        :class="{ 'active-button': selectedButton === number }"
-                        @click="selectButton(number)"
-                        :disabled="isCalling"
-                    />
+                <div class="button-group">
+                    <q-btn v-if="isCalling" icon="phone_disabled" @click="abortCall(selectedNumbers)" label="Сброс"
+                        class="call-end-btn" />
+                    <q-btn v-else class="call-end-btn" @click="selectedNumbers = selectedNumbers.slice(0, -1)"
+                        icon="backspace" label="Удалить" :disabled="!selectedNumbers.length > 0" />
                 </div>
             </div>
-            <div class="entry">
-                <q-btn
-                    v-if="selectedNumbers.length > 3"
-                    icon="logout"
-                    label="ВОЙТИ"
-                    class="entry-btn"
-                />
-                <q-btn
-                    v-else
-                    :disabled="isCalling || !selectedNumbers.length > 0"
-                    @click="callApartment(selectedNumbers, ['user999'])"
-                    icon="phone"
-                    label="Вызов"
-                    class="entry-btn"
-                />
+            <div class="right-area flex flex-col">
+                <div class="result">
+                    <div class="result-window flex justify-center items-center">
+                        <div v-if="!waitAnswer" class="flex">
+                            <div class="result-window-text">{{ selectedNumbers }}</div>
+
+                        </div>
+                        <div v-if="waitAnswer" class=" wait-answer-text">
+                            Идет звонок...
+                        </div>
+                    </div>
+                </div>
+                <div class="number-pad">
+                    <div class="number-row" v-for="(row, rowIndex) in numberPadRows" :key="rowIndex">
+                        <q-btn v-for="number in row" :key="number" :label="number" class="number-button"
+                            :class="{ 'active-button': selectedButton === number }" @click="selectButton(number)"
+                            :disabled="isCalling" />
+                    </div>
+                </div>
+                <div class="entry">
+                    <q-btn v-if="selectedNumbers.length > 3" icon="logout" label="ВОЙТИ" class="entry-btn" />
+                    <q-btn v-else :disabled="isCalling || !selectedNumbers.length > 0"
+                        @click="callApartment(selectedNumbers, ['user999'])" icon="phone" label="Вызов"
+                        class="entry-btn" />
+                </div>
             </div>
         </div>
-    </div>
 
-</q-page>
+    </q-page>
 </template>
 
 <script>
@@ -112,7 +72,7 @@ export default defineComponent({
         const selectedNumbers = ref('');
         const selectButton = (number) => {
             selectedButton.value = number;
-            if(selectedNumbers.value.length > 4){
+            if (selectedNumbers.value.length > 4) {
                 return
             }
             selectedNumbers.value = selectedNumbers.value + number
@@ -133,6 +93,10 @@ export default defineComponent({
         const waitAnswer = ref(false);
         const reconnectInterval = 3000;
         let reconnectTimer = null;
+
+        // PING interval
+        let pingInterval = null;
+
         const connectWebSocket = () => {
             socket.value = new WebSocket(serverAddress);
 
@@ -140,6 +104,17 @@ export default defineComponent({
                 console.log('Подключено к WebSocket серверу');
                 socket.value.send('Клиент подключен');
                 clearInterval(reconnectTimer);
+
+                // Start PING interval after successful connection
+                pingInterval = setInterval(() => {
+                    if (socket.value && socket.value.readyState === WebSocket.OPEN) {
+                        socket.value.send('ping');
+                        console.log('Отправлен PING');
+                    } else {
+                        console.log('WebSocket не готов, PING не отправлен');
+                        clearInterval(pingInterval); // Stop interval if socket is not open
+                    }
+                }, 3000);
             };
 
             socket.value.onmessage = (event) => {
@@ -170,11 +145,13 @@ export default defineComponent({
 
             socket.value.onclose = () => {
                 console.log('Соединение с WebSocket сервером закрыто');
+                clearInterval(pingInterval); // Stop PING interval on close
                 reconnect();
             };
 
             socket.value.onerror = (error) => {
                 console.error('Ошибка WebSocket:', error);
+                clearInterval(pingInterval);
                 reconnect();
             };
         };
@@ -195,13 +172,16 @@ export default defineComponent({
                 socket.value.close();
             }
             clearInterval(reconnectTimer);
+            clearInterval(pingInterval); // Stop PING interval on manual disconnect
         };
 
         const callApartment = async (apartmentNumber, residentIds) => {
             hashStr.value = generateRandomString(7);
             isCalling.value = true;
             try {
-                const response = await axios.get(`https://${API_SERVER}api/call/${apartmentNumber}/${hashStr.value}?resident_ids=${residentIds.join(',')}`);;
+                const response = await axios.get(
+                    `https://${API_SERVER}api/call/${apartmentNumber}/${hashStr.value}?resident_ids=${residentIds.join(',')}`
+                );;
                 const data = response.data;
                 message.value = data.message;
                 console.log(data.message);
@@ -253,7 +233,6 @@ export default defineComponent({
 
         onBeforeUnmount(() => {
             disconnectWebSocket();
-
         });
 
         return {
@@ -369,23 +348,24 @@ export default defineComponent({
 .result-window-text {
     font-size: 4rem;
 }
+
 .wait-answer-text {
-  font-size: 35px;
-  background: linear-gradient(90deg, #cab01b, #dbce10, #c6b38e, #c2ab28);
-  background-size: 400% 400%; 
-  -webkit-background-clip: text; 
-  -webkit-text-fill-color: transparent; 
-  animation: goldShine 5s linear infinite; 
-  font-weight: bold;
+    font-size: 35px;
+    background: linear-gradient(90deg, #cab01b, #dbce10, #c6b38e, #c2ab28);
+    background-size: 400% 400%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: goldShine 5s linear infinite;
+    font-weight: bold;
 }
 
 @keyframes goldShine {
-  0% {
-    background-position: 0% 50%; 
-  }
-  100% {
-    background-position: 100% 50%; 
-  }
-}
+    0% {
+        background-position: 0% 50%;
+    }
 
+    100% {
+        background-position: 100% 50%;
+    }
+}
 </style>
