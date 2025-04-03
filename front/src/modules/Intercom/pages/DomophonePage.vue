@@ -4,21 +4,19 @@
             <div class="left-area">
                 <div class="video">
                     <div class="block-video flex justify-center items-center">
-                        <!-- <q-img  src="icons/logo.svg" width="260px" height="350px" /> -->
-                        <div class="q-pa-md">
-                          <div class="q-video">
+                        <div v-if="!isCallingVideo">
                             <video
                               autoplay
                               muted
                               playsinline
                               loop
+                              class="videosize"
                             >
                               <source src="video/video.mp4" type="video/mp4">
                               Your browser does not support the video tag.
                             </video>
-                          </div>
                         </div>
-                        <CallRoom v-if="isCallingVideo" :hash-str="hashStr" :is-intercom="true" />
+                        <CallRoom v-else :hash-str="hashStr" :is-intercom="true" />
                     </div>
                 </div>
                 <div class="button-group">
@@ -399,5 +397,17 @@ export default defineComponent({
     100% {
         background-position: 100% 50%;
     }
+}
+video {
+  width: 100% ; /*  Заполняет контейнер по ширине */
+  height: auto ; /*  Высота автоматически масштабируется, сохраняя пропорции */
+  object-fit: cover; /* или contain, см. объяснение ниже */
+  
+}
+.videosize {
+    border-radius: 10px;
+
+    width:100%; 
+    height: 500px;
 }
 </style>

@@ -33,7 +33,7 @@
         <CallRoom
             v-if="videoFlag"
             :hash-str="hashStr"
-            :is-intercom="false"
+            :is-intercom="true"
         />
     </div>
 </q-page>
