@@ -5,8 +5,10 @@
     
 </template> 
 <script>
-import { ref, onMounted } from 'vue';
-
+import { ref, onMounted, onUnmounted } from 'vue';
+import {
+    WEBRTC_KEY
+} from 'src/constants/common';
 export default {
   props : {
       hashStr: String,
@@ -20,7 +22,7 @@ export default {
     const roomHash = props.hashStr;
     const roomName = 'observable-' + roomHash;
   
-    const drone = new ScaleDrone('0QuRggLzh0KMzqc7');
+    const drone = new ScaleDrone(String(WEBRTC_KEY));
     const configuration = {
       iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
     };
@@ -113,7 +115,10 @@ export default {
         });
       });
     });
-
+    onUnmounted(() => {
+      console.log('ЗАКРЫЛ')
+      drone.close();
+    })
     return {
       localVideo,
       remoteVideo,
