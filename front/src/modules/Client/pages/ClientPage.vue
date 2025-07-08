@@ -38,7 +38,7 @@
             :is-intercom="true"
         /> -->
         <div v-if="videoFlag">
-            <iframe class="qwerrty" :src="'https://intercom-stown.edgelive.ru/call/?roomId=serv1'+hashStr" allow="camera;microphone;fullscreen;display-capture;screen-wake-lock">
+            <iframe class="qwerrty" :src="'httpss://intercom-stown.edgelive.ru/call/?roomId=serv1'+hashStr" allow="camera;microphone;fullscreen;display-capture;screen-wake-lock">
             </iframe>
         </div>
     </div>
@@ -90,7 +90,7 @@ export default defineComponent({
         const {
             accessToken
         } = useCurrentUser();
-        const serverAddress = `ws://${API_SERVER}ws?key=${accessToken.value}&user_id=${userId}&apartment_number=${apartmentNumber.value}&role=${role}`;
+        const serverAddress = `wss://${API_SERVER}ws?key=${accessToken.value}&user_id=${userId}&apartment_number=${apartmentNumber.value}&role=${role}`;
 
         const isCalling = ref(false);
         const isAnswer = ref(false);
@@ -157,7 +157,7 @@ export default defineComponent({
         const callApartment = async (apartmentNumber) => {
             isCalling.value = true;
             try {
-                const response = await axios.get(`http://${API_SERVER}api/call/${apartmentNumber}`);;
+                const response = await axios.get(`https://${API_SERVER}api/call/${apartmentNumber}`);;
                 const data = response.data;
                 message.value = data.message;
                 console.log(data.message);
@@ -170,7 +170,7 @@ export default defineComponent({
 
         const abortCall = async () => {
             try {
-                const response = await axios.get(`http://${API_SERVER}api/abort_call/${apartmentNumber.value}`);
+                const response = await axios.get(`https://${API_SERVER}api/abort_call/${apartmentNumber.value}`);
                 const data = response.data;
                 message.value = data.message;
                 console.log(data.message);
@@ -183,7 +183,7 @@ export default defineComponent({
 
         const answerCall = async () => {
             try {
-                const response = await axios.get(`http://${API_SERVER}api/answer_call/${apartmentNumber.value}`);
+                const response = await axios.get(`https://${API_SERVER}api/answer_call/${apartmentNumber.value}`);
                 const data = response.data;
                 message.value = data.message;
                 console.log(data.message);

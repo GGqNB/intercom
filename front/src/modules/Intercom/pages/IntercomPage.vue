@@ -20,7 +20,7 @@
                        <div v-else>
                          <iframe 
                             class="qwerrty"
-                            :src="'https://intercom-stown.edgelive.ru/call/?roomId=serv1'+hashStr"
+                            :src="'httpss://intercom-stown.edgelive.ru/call/?roomId=serv1'+hashStr"
                             allow="camera;microphone;fullscreen;display-capture;screen-wake-lock">
                         </iframe>
                        </div>
@@ -113,7 +113,7 @@ export default defineComponent({
         const {
             accessToken
         } = useCurrentUser();
-        const serverAddress = `ws://${API_SERVER}ws?key=${accessToken.value}&user_id=${userId}&role=${role}`;
+        const serverAddress = `wss://${API_SERVER}ws?key=${accessToken.value}&user_id=${userId}&role=${role}`;
         const isCalling = ref(false);
         const isCallingVideo = ref(false);
         const hashStr = ref('');
@@ -211,7 +211,7 @@ export default defineComponent({
             isCallingVideo.value = true;
             try {
                 const response = await axios.get(
-                    `http://${API_SERVER}api/call/${apartmentNumber}/${hashStr.value}/${userId}?resident_ids=${residentIds.join(',')}`
+                    `https://${API_SERVER}api/call/${apartmentNumber}/${hashStr.value}/${userId}?resident_ids=${residentIds.join(',')}`
                 );;
                 const data = response.data;
                 message.value = data.message;
@@ -229,7 +229,7 @@ export default defineComponent({
 
         const abortCall = async (apartmentNumber) => {
             try {
-                const response = await axios.get(`http://${API_SERVER}api/abort_call/${apartmentNumber}`);
+                const response = await axios.get(`https://${API_SERVER}api/abort_call/${apartmentNumber}`);
                 const data = response.data;
                 message.value = data.message;
                 console.log(data.message);
