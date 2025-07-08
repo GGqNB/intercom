@@ -20,7 +20,7 @@
                        <div v-else>
                          <iframe 
                             class="qwerrty"
-                            :src="'httpss://intercom-stown.edgelive.ru/call/?roomId=serv1'+hashStr"
+                            :src="'https://intercom-stown.edgelive.ru/call/?roomId=serv1'+hashStr"
                             allow="camera;microphone;fullscreen;display-capture;screen-wake-lock">
                         </iframe>
                        </div>
