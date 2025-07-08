@@ -1,4 +1,3 @@
-
 export type MenuItem = {
   id: number;
   ordinalNum: number;
@@ -35,7 +34,7 @@ const menuItemsList: Array<MenuItem> = [
     id: 5,
     ordinalNum: 5,
     title: 'Домофон',
-    routeName: 'domophone',
+    routeName: 'intercom',
     index: '4',
     icon: 'tune',
     children: [],
@@ -50,6 +49,36 @@ const menuItemsList: Array<MenuItem> = [
     index: '4',
     icon: 'tune',
     children: [],
+
+    // permission: userCanAny(permissionSet.service.list),
+  },
+  {
+    id: 6,
+    ordinalNum: 6,
+    title: 'Дебаг',
+    routeName: 'client',
+    index: '4',
+    icon: 'tune',
+    children: [
+      {
+        id: 6,
+        ordinalNum: 6,
+        title: 'Домофон Курьера',
+        routeName: 'courier-intercom',
+        index: '4',
+        icon: 'tune',
+        children: [],
+      },
+      {
+        id: 6,
+        ordinalNum: 6,
+        title: 'Квартира 3',
+        routeName: 'test-client',
+        index: '4',
+        icon: 'tune',
+        children: [],
+      },
+    ],
 
     // permission: userCanAny(permissionSet.service.list),
   },

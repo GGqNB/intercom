@@ -1,9 +1,8 @@
 <template>
 <q-page class="flex flex-center">
     <div class="intercom-container">
-        <h3>2я кв</h3>
-
-        <q-btn @click="disconnectWebSocket">123</q-btn>
+        <h3>3я кв</h3>
+      <q-btn @click="disconnectWebSocket">123</q-btn>
         <transition enter-active-class="shake-enter-active" leave-active-class="fade-leave-active">
             <q-card
                 class="my-card shake"
@@ -32,15 +31,11 @@
             :disabled="!isAnswer"
         />
         {{ data }}
-        <!-- <CallRoom
+        <CallRoom
             v-if="videoFlag"
             :hash-str="hashStr"
             :is-intercom="true"
-        /> -->
-        <div v-if="videoFlag">
-            <iframe class="qwerrty" :src="'https://intercom-stown.edgelive.ru/call/?roomId=serv1'+hashStr" allow="camera;microphone;fullscreen;display-capture;screen-wake-lock">
-            </iframe>
-        </div>
+        />
     </div>
 </q-page>
 </template>
@@ -53,7 +48,7 @@ import {
     onBeforeUnmount
 } from 'vue';
 import axios from 'axios';
-// import CallRoom from 'src/modules/CallRoom/pages/CallRoom.vue';
+import CallRoom from 'src/modules/CallRoom/pages/CallRoom.vue';
 import {
     API_SERVER
 } from 'src/constants/common';
@@ -64,7 +59,7 @@ import {
 export default defineComponent({
     name: 'SettingDevicePage',
     components: {
-        // CallRoom
+        CallRoom
     },
     setup() {
         const selectedButton = ref(null);
@@ -84,8 +79,8 @@ export default defineComponent({
 
         const socket = ref(null);
         const message = ref('');
-        const userId = '002';
-        const apartmentNumber = ref(2);
+        const userId = '003';
+        const apartmentNumber = ref(3);
         const role = 'resident';
         const {
             accessToken
@@ -155,7 +150,7 @@ export default defineComponent({
         };
 
         const callApartment = async (apartmentNumber) => {
-            isCalling.value = true;
+            isCalling.value = true; 
             try {
                 const response = await axios.get(`http://${API_SERVER}api/call/${apartmentNumber}`);;
                 const data = response.data;
@@ -164,7 +159,7 @@ export default defineComponent({
             } catch (error) {
                 console.error('Ошибка при вызове:', error);
                 message.value = 'Ошибка при вызове.';
-                isCalling.value = false;
+                isCalling.value = false; 
             }
         };
 
@@ -174,7 +169,7 @@ export default defineComponent({
                 const data = response.data;
                 message.value = data.message;
                 console.log(data.message);
-                isCalling.value = false;
+                isCalling.value = false; 
             } catch (error) {
                 console.error('Ошибка при сбросе:', error);
                 message.value = 'Ошибка при сбросе.';
@@ -325,9 +320,5 @@ export default defineComponent({
 
 .shake {
     animation: shakeX 1s linear infinite; // infinite для постоянной анимации
-}
-.qwerrty{
-    width: 750px !important;
-    height: 500px !important;
 }
 </style>

@@ -84,7 +84,25 @@ connections_lock = threading.Lock()
 
 call_tasks = {}  # {apartment_number: {'task': Task, 'caller_ws': WebSocket, 'answered_by': str, 'call_ended_event': Event}}
 
+def get_connections():
+    active_calls = []
+    with connections_lock:
+        for apartment_number, call_data in call_tasks.items():
+            caller_id = get_user_id(call_data['caller_ws'])  
+            answered_by = call_data.get('answered_by')
 
+            if answered_by:
+                status = "talking"
+            else:
+                status = "ringing"
+
+            active_calls.append({
+                "apartment_number": apartment_number,
+                "status": status,
+                "caller_id": caller_id,
+                "answered_by": answered_by
+            })
+    return active_calls
 
 def get_user_id(websocket: WebSocket):
     return websocket.query_params.get("user_id")
@@ -113,9 +131,8 @@ async def safe_send_json(websocket: WebSocket, data: dict):
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
-    print(API_KEY)
+    # print(API_KEY)
     key = get_key(websocket)
-    print(key)
     if key != API_KEY:
         await websocket.close(code=1008, reason="Неверный key")
         return
@@ -127,7 +144,7 @@ async def websocket_endpoint(websocket: WebSocket):
         await websocket.close(code=1008, reason="Отсутствует user_id")
         return
 
-    if role not in ("domophone", "resident"):
+    if role not in ("intercom", "resident", "courier"):
         await websocket.close(code=1008, reason="Неверная роль")
         return
 
@@ -153,8 +170,8 @@ async def websocket_endpoint(websocket: WebSocket):
             elif data == "call_ended_by_resident" and role == "resident":
                 apartment = user_connection.apartment_number
                 await end_call(apartment, "resident")
-            else:
-                print(f"Получено сообщение: {data} от user_id {user_id}")
+            # else:
+            #     print(f"Получено сообщение: {data} от user_id {user_id}")
 
     except WebSocketDisconnect:
         print(f"Клиент отключился: user_id={user_id}")
@@ -165,6 +182,7 @@ async def websocket_endpoint(websocket: WebSocket):
         print(f"Соединение закрыто: user_id={user_id}, соединения={connections}")
 
 async def make_call(apartment_number: int, caller_ws: WebSocket, hash_room: str , api_key: APIKey = Depends(get_api_key)):
+
     caller_id = get_user_id(caller_ws)
     print(f"Начат звонок в квартиру {apartment_number} (инициатор: {caller_id}). hash_room: {hash_room}")
     call_ended_event = asyncio.Event()
@@ -172,13 +190,12 @@ async def make_call(apartment_number: int, caller_ws: WebSocket, hash_room: str 
 
     try:
         await safe_send_json(caller_ws, {"type": "call_started", "apartment": apartment_number})
-        print('call_started', apartment_number)
-        # Рассылка уведомлений жильцам
+
         with connections_lock:
             for user_id, user_connection in connections.items():
                 if user_connection.role == "resident" and user_connection.apartment_number == apartment_number:
-                    await safe_send_json(user_connection.websocket, {"type": "incoming_call", "from": "domophone", "apartment": apartment_number, "hash_room": hash_room})
-                    print("incoming_call", apartment_number)
+                    await safe_send_json(user_connection.websocket, {"type": "incoming_call", "from": "intercom", "apartment": apartment_number, "hash_room": hash_room})
+                    # print("incoming_call", apartment_number)
 
         try:
             await asyncio.wait_for(call_ended_event.wait(), timeout=10)  # Ожидаем завершения или ответа
@@ -190,9 +207,9 @@ async def make_call(apartment_number: int, caller_ws: WebSocket, hash_room: str 
                     print(f"Звонок в {apartment_number} был принят, таймаут игнорируется.")
                     return  # ВАЖНО: Не завершаем задачу, если звонок был принят
 
-            print(f"Время ожидания истекло для звонка в квартиру {apartment_number}.")
+            # print(f"Время ожидания истекло для звонка в квартиру {apartment_number}.")
             await end_call(apartment_number, "timeout")
-            print("timeout", apartment_number)
+            # print("timeout", apartment_number)
 
     except asyncio.CancelledError:
         print(f"Звонок в квартиру {apartment_number} был прерван.")
@@ -200,18 +217,20 @@ async def make_call(apartment_number: int, caller_ws: WebSocket, hash_room: str 
 
     finally:
         with connections_lock:
-            # Удаляем задачу только если она не была принята и звонок еще существует
             if apartment_number in call_tasks and call_tasks[apartment_number]['answered_by'] is None:
                 del call_tasks[apartment_number]
                 print(f"Задача звонка для квартиры {apartment_number} удалена из call_tasks.")
             else:
                 print(f"Задача звонка для квартиры {apartment_number} НЕ удалена из call_tasks, answered_by: {call_tasks[apartment_number].get('answered_by') if apartment_number in call_tasks else None}")
         print(f"Завершена задача звонка для квартиры {apartment_number}.")
+      
 
 async def end_call(apartment_number: int, reason: str):
     """Завершает звонок и уведомляет все стороны."""
     with connections_lock:
         if apartment_number in call_tasks:
+            print('__________________________-')
+            print(call_tasks)
             caller_ws = call_tasks[apartment_number]['caller_ws']
             answered_by = call_tasks[apartment_number]['answered_by']
 
@@ -240,16 +259,19 @@ async def end_call(apartment_number: int, reason: str):
         else:
             print(f"Нет активного звонка для квартиры {apartment_number}, нечего завершать.")
 
-@app.get("/call/{apartment_number}/{hash_room}")
-async def call(apartment_number: int, hash_room: str, api_key: APIKey = Depends(get_api_key)):
-    with connections_lock:
-        domophone_ws = next((conn.websocket for conn in connections.values() if conn.role == "domophone"), None)
+@app.get("/call/{apartment_number}/{hash_room}/{indentifier}")
+async def call(apartment_number: int, hash_room: str, indentifier: str, api_key: APIKey = Depends(get_api_key)):
+     with connections_lock:
+        if call_tasks:
+            raise HTTPException(status_code=418, detail="Домофон занят, попробуйте позже")  
+        else:
+           intercom_ws = next((conn.websocket for conn in connections.values() if conn.user_id == indentifier), None)
+           if not intercom_ws:
+            raise HTTPException(status_code=400, detail="Нет подключенного домофона.")  
+           asyncio.create_task(make_call(apartment_number, intercom_ws, hash_room))
+           return {"message": f"Звонок инициирован в квартиру {apartment_number}."}
 
-        if not domophone_ws:
-            raise HTTPException(status_code=400, detail="Нет подключенного домофона.")
-
-        asyncio.create_task(make_call(apartment_number, domophone_ws, hash_room))
-        return {"message": f"Звонок инициирован в квартиру {apartment_number}."}
+        
 
 @app.get("/answer_call/{apartment_number}")
 async def answer_call(apartment_number: int,  api_key: APIKey = Depends(get_api_key)):
@@ -274,7 +296,7 @@ async def answer_call(apartment_number: int,  api_key: APIKey = Depends(get_api_
 
 @app.get("/abort_call/{apartment_number}")
 async def abort_call(apartment_number: int, api_key: APIKey = Depends(get_api_key)):
-    await end_call(apartment_number, "aborted_by_domophone")
+    await end_call(apartment_number, "aborted_by_intercom")
     return {"message": f"Звонок в квартиру {apartment_number} отменен."}
 
 @app.get("/valid-key/{key}")
@@ -285,3 +307,18 @@ async def login(key: str):
         raise HTTPException(
             status_code=HTTP_400_BAD_REQUEST, detail="Неправильный токен"
         )
+
+
+
+@app.get("/active_calls")
+async def get_active_calls(api_key: APIKey = Depends(get_api_key)):
+    
+   
+    return get_connections()
+
+
+# {3: 
+# {
+# 'caller_ws': <starlette.websockets.WebSocket object at 0x0000022144E10950>, 
+# 'answered_by': '003', 'call_ended_event': <asyncio.locks.Event object at 0x0000022144E11EB0 [unset, waiters:1]>}
+# }

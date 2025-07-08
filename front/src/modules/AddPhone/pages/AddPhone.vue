@@ -1,43 +1,55 @@
 <template>
-  <s-page>
-    
-    <s-header
-      :create-btn="false"
-      title="Перейдите в сайдабар"
-    />
-    <div class="home_wrapper">
-    
-      <h3>Перейдите в сайдабар</h3>
-    </div>
-  </s-page>
-</template>
-<script lang="ts">
-import { computed, defineComponent, onMounted } from 'vue';
-// import SInput from 'src/components/ui/Input.vue';
-import { useList } from '../composables/useAddPhone';
-import { useMeta } from 'quasar';
+<s-page>
 
+    <s-header :create-btn="false" title="Перейдите в сайдабар" />
+    <div class="home_wrapper">
+        <iframe 
+        class="qwerrty"
+         src="https://intercom-stown.edgelive.ru/call/?roomId=serv1ow3lzfun"
+         allow="camera;microphone;fullscreen;display-capture;screen-wake-lock">
+        </iframe>
+        <h3>Перейдите в сайдабар</h3>
+    </div>
+</s-page>
+</template>
+
+<script lang="ts">
+import {
+    computed,
+    defineComponent,
+    onMounted
+} from 'vue';
+// import SInput from 'src/components/ui/Input.vue';
+import {
+    useList
+} from '../composables/useAddPhone';
+import {
+    useMeta
+} from 'quasar';
 
 export default defineComponent({
-  name: 'AddPhonePage',
-  components: {
-  },
-  setup() {
-    const {
-  } = useList();
+    name: 'AddPhonePage',
+    components: {},
+    setup() {
+        const {} = useList();
 
-  
-  // const handleInput = (value) => {
-  //   // Убираем маску перед сохранением в переменную phone
-  //   phoneData.value.phone = value.replace(/\D/g, '');
-  // };
-  onMounted(() => console.log('1'));
-    // eslint-disable-next-line no-return-assign
-    // mask=" +7 (###) ###-##-##"
+        // const handleInput = (value) => {
+        //   // Убираем маску перед сохранением в переменную phone
+        //   phoneData.value.phone = value.replace(/\D/g, '');
+        // };
+        onMounted(() => console.log('1'));
+        // eslint-disable-next-line no-return-assign
+        // mask=" +7 (###) ###-##-##"
 
-    return {
-    
-    };
-  },
+        return {
+
+        };
+    },
 });
 </script>
+
+<style>
+.qwerrty {
+    height: 600px;
+}
+</style>

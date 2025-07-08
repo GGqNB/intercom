@@ -7,9 +7,13 @@ const LoginPage = () => import('src/modules/Authorization/Login.vue');
 const MainLayout = () => import('src/layouts/MainLayout.vue');
 const AuthLayout = () => import('src/layouts/AuthLayout.vue');
 const IntercomPage = () =>
-  import('src/modules/Intercom/pages/DomophonePage.vue');
+  import('src/modules/Intercom/pages/IntercomPage.vue');
+const CourierIntercomPage = () =>
+  import('src/modules/Intercom/pages/CourierIntercomPage.vue');
 const ClientPage = () =>
   import('src/modules/Client/pages/ClientPage.vue');
+const TestClientPage = () =>
+  import('src/modules/Client/pages/TestClientPage.vue');
 
 const routes: RouteRecordRaw[] = [
   {
@@ -32,20 +36,37 @@ const routes: RouteRecordRaw[] = [
     }
   },
   {
-    path: '/domophone',
+    path: '/intercom',
     component: () => import('layouts/MainLayout.vue'),
-    children: [{ path: '', component: IntercomPage, name: 'domophone' }],
+    children: [{ path: '', component: IntercomPage, name: 'intercom' }],
     meta: {
       title: 'STOWN',
       authorization: true,
-      
-
+    },
+  },
+    {
+    path: '/courier-intercom',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [{ path: '', component: CourierIntercomPage, name: 'courier-intercom' }],
+    meta: {
+      title: 'STOWN',
+      authorization: true,
     },
   },
   {
     path: '/client',
     component: () => import('layouts/MainLayout.vue'),
     children: [{ path: '', component: ClientPage, name: 'client' }],
+    meta: {
+      title: 'STOWN',
+      authorization: true,
+
+    },
+  },
+    {
+    path: '/test-client',
+    component: () => import('layouts/MainLayout.vue'),
+    children: [{ path: '', component: TestClientPage, name: 'test-client' }],
     meta: {
       title: 'STOWN',
       authorization: true,

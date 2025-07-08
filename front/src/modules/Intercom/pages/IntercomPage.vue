@@ -16,7 +16,14 @@
                               Your browser does not support the video tag.
                             </video>
                         </div>
-                        <CallRoom v-else :hash-str="hashStr" :is-intercom="true" />
+                        <!-- <CallRoom v-else :hash-str="hashStr" :is-intercom="true" /> -->
+                       <div v-else>
+                         <iframe 
+                            class="qwerrty"
+                            :src="'https://intercom-stown.edgelive.ru/call/?roomId=serv1'+hashStr"
+                            allow="camera;microphone;fullscreen;display-capture;screen-wake-lock">
+                        </iframe>
+                       </div>
                     </div>
                 </div>
                 <div class="button-group">
@@ -74,10 +81,13 @@ import {
     useCurrentUser
 } from 'src/composables/useCurrentUser';
 import { useTimeout } from 'src/composables/useTimeout';
+import {
+    useNotifications
+} from 'src/composables/useNotifications';
 export default defineComponent({
     name: 'SettingDevicePage',
     components: {
-        CallRoom
+        // CallRoom
     },
     setup() {
         const {
@@ -86,6 +96,7 @@ export default defineComponent({
   } = useTimeout()
         const selectedButton = ref(null);
         const selectedNumbers = ref('');
+        const $notify = useNotifications();
         const selectButton = (number) => {
             selectedButton.value = number;
             if (selectedNumbers.value.length > 4) {
@@ -96,13 +107,13 @@ export default defineComponent({
 
         const socket = ref(null);
         const message = ref('');
-        const userId = 'domophone1';
+        const userId = 'intercom1';
         const apartmentNumber = null;
-        const role = 'domophone';
+        const role = 'intercom';
         const {
             accessToken
         } = useCurrentUser();
-        const serverAddress = `wss://${API_SERVER}ws?key=${accessToken.value}&user_id=${userId}&role=${role}`;
+        const serverAddress = `ws://${API_SERVER}ws?key=${accessToken.value}&user_id=${userId}&role=${role}`;
         const isCalling = ref(false);
         const isCallingVideo = ref(false);
         const hashStr = ref('');
@@ -125,7 +136,7 @@ export default defineComponent({
                 pingInterval = setInterval(() => {
                     if (socket.value && socket.value.readyState === WebSocket.OPEN) {
                         socket.value.send('ping');
-                        console.log('Отправлен PING');
+                        // console.log('Отправлен PING');
                     } else {
                         console.log('WebSocket не готов, PING не отправлен');
                         clearInterval(pingInterval); // Stop interval if socket is not open
@@ -200,12 +211,13 @@ export default defineComponent({
             isCallingVideo.value = true;
             try {
                 const response = await axios.get(
-                    `https://${API_SERVER}api/call/${apartmentNumber}/${hashStr.value}?resident_ids=${residentIds.join(',')}`
+                    `http://${API_SERVER}api/call/${apartmentNumber}/${hashStr.value}/${userId}?resident_ids=${residentIds.join(',')}`
                 );;
                 const data = response.data;
                 message.value = data.message;
                 console.log(data.message);
             } catch (error) {
+                if(error.response.status == 418) $notify.error(error.response.data.detail);
                 console.error('Ошибка при вызове:', error);
                 disconnectWebSocket();
                 reconnect();
@@ -217,7 +229,7 @@ export default defineComponent({
 
         const abortCall = async (apartmentNumber) => {
             try {
-                const response = await axios.get(`https://${API_SERVER}api/abort_call/${apartmentNumber}`);
+                const response = await axios.get(`http://${API_SERVER}api/abort_call/${apartmentNumber}`);
                 const data = response.data;
                 message.value = data.message;
                 console.log(data.message);
@@ -409,5 +421,9 @@ video {
 
     width:100%; 
     height: 500px;
+}
+.qwerrty{
+    width: 750px !important;
+    height: 500px !important;
 }
 </style>
