@@ -3,11 +3,11 @@
 
     <s-header :create-btn="false" title="Перейдите в сайдабар" />
     <div class="home_wrapper">
-        <iframe 
+        <!-- <iframe 
         class="qwerrty"
-         src="https://intercom-stown.edgelive.ru/call/?roomId=serv1ow3lzfun"
+         src="https://edgeconf.ru/call/?roomId=serv1o312"
          allow="camera;microphone;fullscreen;display-capture;screen-wake-lock">
-        </iframe>
+        </iframe> -->
         <h3>Перейдите в сайдабар</h3>
     </div>
 </s-page>

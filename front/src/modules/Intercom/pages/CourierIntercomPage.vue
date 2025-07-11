@@ -16,6 +16,13 @@
      :hash-str="hashStr"
      :is-intercom="true"
  /> -->
+      <div v-else>
+                         <iframe 
+                            class="qwerrty"
+                            :src="'https://edgeconf.ru/call/?roomId=serv1'+hashStr"
+                            allow="camera;microphone;fullscreen;display-capture;screen-wake-lock">
+                        </iframe>
+                       </div>
                 </div>
             </div>
             <div class="button-group">
