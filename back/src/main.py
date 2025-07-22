@@ -1,4 +1,5 @@
 
+from typing import Dict
 from fastapi import FastAPI, Form, HTTPException, WebSocket, WebSocketDisconnect, BackgroundTasks, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
@@ -322,3 +323,31 @@ async def get_active_calls(api_key: APIKey = Depends(get_api_key)):
 # 'caller_ws': <starlette.websockets.WebSocket object at 0x0000022144E10950>, 
 # 'answered_by': '003', 'call_ended_event': <asyncio.locks.Event object at 0x0000022144E11EB0 [unset, waiters:1]>}
 # }
+active_connections: Dict[str, WebSocket] = {}
+
+@app.websocket("/ws/test/{client_id}")
+async def websocket_endpoint(websocket: WebSocket, client_id: str):
+    await websocket.accept()
+    active_connections[client_id] = websocket
+    print(f"Client {client_id} connected")
+    try:
+        while True:
+            data = await websocket.receive_json()  # Получаем JSON данные от клиента
+            print(f"Received from {client_id}: {data}")
+
+            # Обработка полученных данных
+            recipient_id = data.get("to") # предполагаем, что клиент шлет сообщение с указанием ID получателя
+            if recipient_id and recipient_id in active_connections:
+                recipient_socket = active_connections[recipient_id]
+                await recipient_socket.send_json(data) # пересылаем сообщение получателю
+                print(f"Sent to {recipient_id}: {data}")
+            else:
+                print(f"Recipient {recipient_id} not found")
+                await websocket.send_json({"error": "Recipient not found"}) # сообщаем об ошибке
+
+    except WebSocketDisconnect:
+        print(f"Client {client_id} disconnected")
+        del active_connections[client_id] # удаляем соединение
+    except Exception as e:
+        print(f"Error for client {client_id}: {e}")
+        del active_connections[client_id]

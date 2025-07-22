@@ -97,6 +97,7 @@ export default {
     };
 
     onMounted(() => {
+      console.log('Я попытлася')
       drone.on('open', (error) => {
         if (error) {
           return console.error(error);

@@ -32,15 +32,15 @@
             :disabled="!isAnswer"
         />
         {{ data }}
-        <!-- <CallRoom
+        <CallRoom
             v-if="videoFlag"
             :hash-str="hashStr"
             :is-intercom="true"
-        /> -->
-        <div v-if="videoFlag">
+        />
+        <!-- <div v-if="videoFlag">
             <iframe class="qwerrty" :src="'https://edgeconf.ru/call/?roomId=serv1'+hashStr" allow="camera;microphone;fullscreen;display-capture;screen-wake-lock">
             </iframe>
-        </div>
+        </div> -->
     </div>
 </q-page>
 </template>
@@ -53,7 +53,7 @@ import {
     onBeforeUnmount
 } from 'vue';
 import axios from 'axios';
-// import CallRoom from 'src/modules/CallRoom/pages/CallRoom.vue';
+import CallRoom from 'src/modules/CallRoom/pages/CallRoom.vue';
 import {
     API_SERVER
 } from 'src/constants/common';
@@ -64,7 +64,7 @@ import {
 export default defineComponent({
     name: 'SettingDevicePage',
     components: {
-        // CallRoom
+        CallRoom
     },
     setup() {
         const selectedButton = ref(null);

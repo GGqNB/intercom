@@ -15,15 +15,19 @@
                               <source src="video/video.mp4" type="video/mp4">
                               Your browser does not support the video tag.
                             </video>
+                             {{  isCallingVideo }}
                         </div>
-                        <!-- <CallRoom v-else :hash-str="hashStr" :is-intercom="true" /> -->
                        <div v-else>
-                         <iframe 
+
+                           <CallRoom  :hash-str="hashStr" :is-intercom="true" />
+                       </div>
+                       <!-- <div v-else> -->
+                         <!-- <iframe 
                             class="qwerrty"
                             :src="'https://edgeconf.ru/call/?roomId=serv0'+hashStr"
                             allow="camera;microphone;fullscreen;display-capture;screen-wake-lock">
-                        </iframe>
-                       </div>
+                        </iframe> -->
+                       <!-- </div> -->
                     </div>
                 </div>
                 <div class="button-group">
@@ -87,7 +91,7 @@ import {
 export default defineComponent({
     name: 'SettingDevicePage',
     components: {
-        // CallRoom
+        CallRoom
     },
     setup() {
         const {

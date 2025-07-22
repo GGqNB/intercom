@@ -147,7 +147,7 @@ export default defineComponent({
         const {
             accessToken
         } = useCurrentUser();
-        const serverAddress = `wss://${API_SERVER}ws?key=${accessToken.value}&user_id=${userId}&role=${role}`;
+        const serverAddress = `ws://${API_SERVER}ws?key=${accessToken.value}&user_id=${userId}&role=${role}`;
         const isCalling = ref(false);
         const isCallingVideo = ref(false);
         const hashStr = ref('');
