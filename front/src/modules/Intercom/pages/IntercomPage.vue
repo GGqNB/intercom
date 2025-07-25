@@ -4,7 +4,7 @@
             <div class="left-area">
                 <div class="video">
                     <div class="block-video flex justify-center items-center">
-                        <div v-if="!isCallingVideo">
+                        <!-- <div v-if="!isCallingVideo">
                             <video
                               autoplay
                               muted
@@ -17,10 +17,14 @@
                             </video>
                              {{  isCallingVideo }}
                         </div>
-                       <div v-else>
+                       <div v-else> -->
 
-                           <CallRoom  :hash-str="hashStr" :is-intercom="true" />
-                       </div>
+                            <iframe class="test22" 
+        src="http://127.0.0.1:3030/456" 
+        allow="camera;microphone;fullscreen;display-capture;screen-wake-lock">
+        </iframe>
+                       <!-- </div> -->
+
                        <!-- <div v-else> -->
                          <!-- <iframe 
                             class="qwerrty"
@@ -77,7 +81,7 @@ import {
     computed
 } from 'vue';
 import axios from 'axios';
-import CallRoom from 'src/modules/CallRoom/pages/CallRoom.vue';
+// import CallRoom from 'src/modules/CallRoom/pages/CallRoom.vue';
 import {
     API_SERVER
 } from 'src/constants/common';
@@ -91,7 +95,7 @@ import {
 export default defineComponent({
     name: 'SettingDevicePage',
     components: {
-        CallRoom
+        // CallRoom
     },
     setup() {
         const {
@@ -300,6 +304,11 @@ export default defineComponent({
 </script>
 
 <style scoped>
+.test22{
+    width: 750px !important;
+    height: 500px !important;
+    border-radius: 15px;
+}
 .intercom-container {}
 
 .left-area {

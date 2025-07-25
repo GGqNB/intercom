@@ -1,5 +1,11 @@
 <template>
 <q-page class="flex flex-center">
+    <div class="iframe-container">
+        <iframe class="test22" 
+        src="http://127.0.0.1:3030/eaa3ee2d-09be-44f8-ad98-6f5789ee96cc" 
+        allow="camera;microphone;fullscreen;display-capture;screen-wake-lock">
+        </iframe>
+    </div>
     <div class="intercom-container">
         <h3>2я кв</h3>
 
@@ -41,6 +47,7 @@
             <iframe class="qwerrty" :src="'https://edgeconf.ru/call/?roomId=serv1'+hashStr" allow="camera;microphone;fullscreen;display-capture;screen-wake-lock">
             </iframe>
         </div> -->
+
     </div>
 </q-page>
 </template>
@@ -244,6 +251,10 @@ export default defineComponent({
 </script>
 
 <style scoped>
+.test22{
+    width: 300px !important;
+    height: 500px !important;
+}
 .intercom-container {
     text-align: center;
     max-width: 600px;
@@ -326,8 +337,31 @@ export default defineComponent({
 .shake {
     animation: shakeX 1s linear infinite; // infinite для постоянной анимации
 }
-.qwerrty{
-    width: 750px !important;
-    height: 500px !important;
+
+/* Стили для iframe-обертки (контейнера) - задайте размеры как нужно вам*/
+.iframe-container {
+    position: relative;
+    /* Важно для работы aspect-ratio */
+    width: 100%;
+    /* Занимает всю доступную ширину */
+    height: 0;
+    padding-bottom: 75%;
+    /*  или другое соотношение сторон (высота = 75% ширины) */
+    overflow: hidden;
+    /* Предотвращает выход контента за границы */
+}
+
+/* Стили для самого iframe */
+.iframe-container iframe {
+    position: absolute;
+    /* Абсолютное позиционирование внутри контейнера */
+    top: 0;
+    left: 0;
+    width: 100%;
+    /* Занимает всю ширину контейнера */
+    height: 100%;
+    /* Занимает всю высоту контейнера */
+    border: 0;
+    /* Убираем рамку (по желанию) */
 }
 </style>
