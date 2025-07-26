@@ -1,75 +1,98 @@
 <template>
-    <q-page class="">
-        <div class="intercom-container flex justify-center mt-base-10">
-            <div class="left-area">
-                <div class="video">
-                    <div class="block-video flex justify-center items-center">
-                        <!-- <div v-if="!isCallingVideo">
-                            <video
-                              autoplay
-                              muted
-                              playsinline
-                              loop
-                              class="videosize"
-                            >
-                              <source src="video/video.mp4" type="video/mp4">
-                              Your browser does not support the video tag.
-                            </video>
-                             {{  isCallingVideo }}
-                        </div>
-                       <div v-else> -->
+<q-page class="">
+    <div class="intercom-container flex justify-center mt-base-10">
+        <div class="left-area">
+            <div class="video">
+                <div class="block-video flex justify-center items-center">
+                    <div v-if="!isCallingVideo">
+                        <video autoplay muted playsinline loop class="videosize">
+                            <source src="video/video.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                        {{ isCallingVideo }}
+                    </div>
+                    <div v-else>
 
-                            <iframe class="test22" 
-        src="http://127.0.0.1:3030/456" 
-        allow="camera;microphone;fullscreen;display-capture;screen-wake-lock">
-        </iframe>
-                       <!-- </div> -->
+                        <iframe class="test22" :src="VIDEO_SERVER + hashStr" allow="camera;microphone;fullscreen;display-capture;screen-wake-lock">
+                        </iframe>
+                    </div>
 
-                       <!-- <div v-else> -->
-                         <!-- <iframe 
+                    <!-- <div v-else> -->
+                    <!-- <iframe 
                             class="qwerrty"
                             :src="'https://edgeconf.ru/call/?roomId=serv0'+hashStr"
                             allow="camera;microphone;fullscreen;display-capture;screen-wake-lock">
                         </iframe> -->
-                       <!-- </div> -->
-                    </div>
-                </div>
-                <div class="button-group">
-                    <q-btn v-if="isCalling" icon="phone_disabled" :disabled="!isCallingVideo" @click="abortCall(selectedNumbers)" label="Сброс"
-                        class="call-end-btn" />
-                    <q-btn v-else class="call-end-btn" @click="selectedNumbers = selectedNumbers.slice(0, -1)"
-                        icon="backspace" label="Удалить" :disabled="!selectedNumbers.length > 0" />
+                    <!-- </div> -->
                 </div>
             </div>
-            <div class="right-area flex flex-col">
-                <div class="result">
-                    <div class="result-window flex justify-center items-center">
-                        <div v-if="!waitAnswer" class="flex">
-                            <div class="result-window-text">{{ selectedNumbers }}</div>
-
-                        </div>
-                        <div v-if="waitAnswer" class=" wait-answer-text">
-                            Идет звонок...
-                        </div>
-                    </div>
-                </div>
-                <div class="number-pad">
-                    <div class="number-row" v-for="(row, rowIndex) in numberPadRows" :key="rowIndex">
-                        <q-btn v-for="number in row" :key="number" :label="number" class="number-button"
-                            :class="{ 'active-button': selectedButton === number }" @click="selectButton(number)"
-                            :disabled="isCalling" />
-                    </div>
-                </div>
-                <div class="entry">
-                    <q-btn v-if="selectedNumbers.length > 3" icon="logout" label="ВОЙТИ" class="entry-btn" />
-                    <q-btn v-else :disabled="isCalling || !selectedNumbers.length > 0"
-                        @click="callApartment(selectedNumbers, ['user999'])" icon="phone" label="Вызов"
-                        class="entry-btn" />
-                </div>
+            <div class="button-group">
+                <q-btn
+                    v-if="isCalling"
+                    icon="phone_disabled"
+                    :disabled="!isCallingVideo"
+                    @click="abortCall(selectedNumbers)"
+                    label="Сброс"
+                    class="call-end-btn"
+                />
+                <q-btn
+                    v-else
+                    class="call-end-btn"
+                    @click="selectedNumbers = selectedNumbers.slice(0, -1)"
+                    icon="backspace"
+                    label="Удалить"
+                    :disabled="!selectedNumbers.length > 0"
+                />
             </div>
         </div>
+        <div class="right-area flex flex-col">
+            <div class="result">
+                <div class="result-window flex justify-center items-center">
+                    <div v-if="!waitAnswer" class="flex">
+                        <div class="result-window-text">{{ selectedNumbers }}</div>
 
-    </q-page>
+                    </div>
+                    <div v-if="waitAnswer" class=" wait-answer-text">
+                        Идет звонок...
+                    </div>
+                </div>
+            </div>
+            <div class="number-pad">
+                <div
+                    class="number-row"
+                    v-for="(row, rowIndex) in numberPadRows"
+                    :key="rowIndex"
+                >
+                    <q-btn
+                        v-for="number in row"
+                        :key="number"
+                        :label="number"
+                        class="number-button"
+                        :class="{ 'active-button': selectedButton === number }"
+                        @click="selectButton(number)"
+                        :disabled="isCalling"
+                    />
+                </div>
+            </div>
+            <div class="entry">
+                <q-btn
+                    v-if="selectedNumbers.length > 3"
+                    icon="logout"
+                    label="ВОЙТИ"
+                    class="entry-btn"
+                />
+                <q-btn
+                    v-else
+                    :disabled="isCalling || !selectedNumbers.length > 0"
+                    @click="callApartment(selectedNumbers, ['user999'])"
+                    icon="phone"
+                    label="Вызов"
+                    class="entry-btn"
+                />
+            </div>
+        </div>
+    </div>
+</q-page>
 </template>
 
 <script>
@@ -88,10 +111,15 @@ import {
 import {
     useCurrentUser
 } from 'src/composables/useCurrentUser';
-import { useTimeout } from 'src/composables/useTimeout';
+import {
+    useTimeout
+} from 'src/composables/useTimeout';
 import {
     useNotifications
 } from 'src/composables/useNotifications';
+import {
+    VIDEO_SERVER
+} from 'src/constants/common';
 export default defineComponent({
     name: 'SettingDevicePage',
     components: {
@@ -99,9 +127,9 @@ export default defineComponent({
     },
     setup() {
         const {
-    registerTimeout,
-    removeTimeout
-  } = useTimeout()
+            registerTimeout,
+            removeTimeout
+        } = useTimeout()
         const selectedButton = ref(null);
         const selectedNumbers = ref('');
         const $notify = useNotifications();
@@ -225,7 +253,7 @@ export default defineComponent({
                 message.value = data.message;
                 console.log(data.message);
             } catch (error) {
-                if(error.response.status == 418) $notify.error(error.response.data.detail);
+                if (error.response.status == 418) $notify.error(error.response.data.detail);
                 console.error('Ошибка при вызове:', error);
                 disconnectWebSocket();
                 reconnect();
@@ -233,7 +261,6 @@ export default defineComponent({
                 isCallingVideo.value = false;
             }
         };
-
 
         const abortCall = async (apartmentNumber) => {
             try {
@@ -272,7 +299,9 @@ export default defineComponent({
         }
         const buttons = ref(['1', '2', '3', '4', '5', '6', '7', '8', '9', '0']);
 
-        const { start } = useTimeout(() => {
+        const {
+            start
+        } = useTimeout(() => {
             isCalling.value = false;
         }, 2500);
 
@@ -297,18 +326,20 @@ export default defineComponent({
             deleteLast,
             disconnectWebSocket,
             waitAnswer,
-            isCallingVideo
+            isCallingVideo,
+            VIDEO_SERVER
         };
     },
 });
 </script>
 
 <style scoped>
-.test22{
+.test22 {
     width: 750px !important;
     height: 500px !important;
     border-radius: 15px;
 }
+
 .intercom-container {}
 
 .left-area {
@@ -423,19 +454,25 @@ export default defineComponent({
         background-position: 100% 50%;
     }
 }
+
 video {
-  width: 100% ; /*  Заполняет контейнер по ширине */
-  height: auto ; /*  Высота автоматически масштабируется, сохраняя пропорции */
-  object-fit: cover; /* или contain, см. объяснение ниже */
-  
+    width: 100%;
+    /*  Заполняет контейнер по ширине */
+    height: auto;
+    /*  Высота автоматически масштабируется, сохраняя пропорции */
+    object-fit: cover;
+    /* или contain, см. объяснение ниже */
+
 }
+
 .videosize {
     border-radius: 10px;
 
-    width:100%; 
+    width: 100%;
     height: 500px;
 }
-.qwerrty{
+
+.qwerrty {
     width: 750px !important;
     height: 500px !important;
 }

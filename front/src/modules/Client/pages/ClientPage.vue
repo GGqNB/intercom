@@ -1,11 +1,6 @@
 <template>
 <q-page class="flex flex-center">
-    <div class="iframe-container">
-        <iframe class="test22" 
-        src="http://127.0.0.1:3030/eaa3ee2d-09be-44f8-ad98-6f5789ee96cc" 
-        allow="camera;microphone;fullscreen;display-capture;screen-wake-lock">
-        </iframe>
-    </div>
+
     <div class="intercom-container">
         <h3>2я кв</h3>
 
@@ -38,11 +33,16 @@
             :disabled="!isAnswer"
         />
         {{ data }}
-        <CallRoom
+        <!-- <CallRoom
             v-if="videoFlag"
             :hash-str="hashStr"
             :is-intercom="true"
-        />
+        /> -->
+          <div  v-if="videoFlag">
+
+                        <iframe class="test22" :src="VIDEO_SERVER + hashStr" allow="camera;microphone;fullscreen;display-capture;screen-wake-lock">
+                        </iframe>
+                    </div>
         <!-- <div v-if="videoFlag">
             <iframe class="qwerrty" :src="'https://edgeconf.ru/call/?roomId=serv1'+hashStr" allow="camera;microphone;fullscreen;display-capture;screen-wake-lock">
             </iframe>
@@ -60,7 +60,10 @@ import {
     onBeforeUnmount
 } from 'vue';
 import axios from 'axios';
-import CallRoom from 'src/modules/CallRoom/pages/CallRoom.vue';
+import {
+    VIDEO_SERVER
+} from 'src/constants/common';
+// import CallRoom from 'src/modules/CallRoom/pages/CallRoom.vue';
 import {
     API_SERVER
 } from 'src/constants/common';
@@ -71,7 +74,7 @@ import {
 export default defineComponent({
     name: 'SettingDevicePage',
     components: {
-        CallRoom
+        // CallRoom
     },
     setup() {
         const selectedButton = ref(null);
@@ -244,7 +247,8 @@ export default defineComponent({
             isAnswer,
             videoFlag,
             hashStr,
-            disconnectWebSocket
+            disconnectWebSocket,
+            VIDEO_SERVER
         };
     },
 });
