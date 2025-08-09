@@ -41,7 +41,8 @@ export function usePagination(extraPaginationParams: BasePagination | {} = {}) {
   const sanitizeQueryPagination = paginator;
 
   const setPaginationFromData = (responseData) => {
-    paginationParams.value.page = responseData.page ?? paginationParams.value.page;
+
+      paginationParams.value.page = responseData.page ?? paginationParams.value.page;
 
     paginationParams.value.size =
     responseData.rowsPerPage ?? paginationParams.value.rowsPerPage;
@@ -49,12 +50,17 @@ export function usePagination(extraPaginationParams: BasePagination | {} = {}) {
     paginationParams.value.rowsPerPage =
       responseData.rowsPerPage ?? paginationParams.value.rowsPerPage;
 
+    paginationParams.value.sortBy = 
+      responseData.sortBy ?? paginationParams.value.sortBy;
+
     paginationParams.value.descending =
       responseData.descending ?? paginationParams.value.descending;
 
-    paginationParams.value.sortBy = responseData.sortBy;
 
-    paginationParams.value.pages =
+    paginationParams.value.rowsNumber =
+      responseData.total ?? paginationParams.value.rowsNumber;
+
+    paginationParams.value.pages = 
       responseData.pages ?? paginationParams.value.pages;
   };
 

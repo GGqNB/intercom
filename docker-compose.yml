@@ -15,3 +15,61 @@ services:
     ports:
       - "8080:80"  # Local port : Container port
 
+# version: "3.8"
+# services:
+#   fastapi:
+#     build:
+#       context: ./back
+#       dockerfile: Dockerfile
+#     ports:
+#       - "8000:8000"
+#     depends_on:
+#       - db
+#     environment:
+#       - DATABASE_URL=postgresql://user:password@db:5432/dbname
+#     volumes:
+#       - fastapi_data:/app/data
+
+#   db:
+#     image: postgres:16
+#     ports:
+#       - "5432:5432" # Уберите это для production
+#     environment:
+#       POSTGRES_USER: postgres
+#       POSTGRES_PASSWORD: root
+#       POSTGRES_DB: test
+#     volumes:
+#       - db_data:/var/lib/postgresql/data
+#     healthcheck:  # Проверка готовности базы данных
+#       test: ["CMD-SHELL", "pg_isready -U user -d dbname"]
+#       interval: 10s
+#       timeout: 5s
+#       retries: 5
+#     restart: always  # Перезапускать при сбое
+
+#   db_init: # Сервис для инициализации базы данных
+#     build:
+#       context: ./back
+#       dockerfile: Dockerfile  # Используем тот же Dockerfile, что и для FastAPI
+#     depends_on:
+#       db:
+#         condition: service_healthy  # Ждем, пока база данных не будет готова
+#     environment:
+#       - DATABASE_URL=postgresql://user:password@db:5432/dbname
+#     volumes:
+#       - .:/app # Монтируем текущий каталог (с кодом FastAPI) в контейнер
+#     command: ["alembic", "upgrade", "head"]  # Запускаем миграции Alembic
+#     restart: "no" # Выполнить только один раз
+
+#   quasar:
+#     build:
+#       context: ./front
+#       dockerfile: Dockerfile
+#     ports:
+#       - "8080:80"  # Local port : Container port
+#     depends_on:
+#       - fastapi
+
+# volumes:
+#   db_data:
+#   fastapi_data:

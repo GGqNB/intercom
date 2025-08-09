@@ -1,5 +1,5 @@
 import { Default } from './default'
-import { Locks } from './locks'
+import { Locks } from './crm'
 
 export namespace Phone {
   export interface PhoneBrief {

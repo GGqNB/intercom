@@ -81,6 +81,44 @@ const menuItemsList: Array<MenuItem> = [
     ],
 
     // permission: userCanAny(permissionSet.service.list),
+  },{
+    id: 6,
+    ordinalNum: 6,
+    title: 'CRM',
+    routeName: 'client',
+    index: '4',
+    icon: 'tune',
+    children: [
+      {
+        id: 6,
+        ordinalNum: 6,
+        title: 'Дома',
+        routeName: 'house-list',
+        index: '4',
+        icon: 'tune',
+        children: [],
+      },
+      {
+        id: 6,
+        ordinalNum: 6,
+        title: 'Входы',
+        routeName: 'entry-list',
+        index: '4',
+        icon: 'tune',
+        children: [],
+      },
+        {
+        id: 6,
+        ordinalNum: 6,
+        title: 'Домофоны',
+        routeName: 'intercom-list',
+        index: '4',
+        icon: 'tune',
+        children: [],
+      },
+    ],
+
+    // permission: userCanAny(permissionSet.service.list),
   },
 ];
 

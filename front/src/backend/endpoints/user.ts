@@ -1,7 +1,7 @@
 import { IEndpointData } from 'src/backend/endpoint';
-import { API_SERVER } from 'src/constants/common';
+import { URL_SERVER } from 'src/constants/common';
 
-const userUrl = `${API_SERVER}/user`;
+const userUrl = `${URL_SERVER}/user`;
 
 
 export const USER = {

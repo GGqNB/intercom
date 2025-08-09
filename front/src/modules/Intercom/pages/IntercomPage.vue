@@ -106,7 +106,8 @@ import {
 import axios from 'axios';
 // import CallRoom from 'src/modules/CallRoom/pages/CallRoom.vue';
 import {
-    API_SERVER
+    API_SERVER,
+    WSS_SERVER
 } from 'src/constants/common';
 import {
     useCurrentUser
@@ -149,7 +150,7 @@ export default defineComponent({
         const {
             accessToken
         } = useCurrentUser();
-        const serverAddress = `wss://${API_SERVER}ws?key=${accessToken.value}&user_id=${userId}&role=${role}`;
+        const serverAddress = `${WSS_SERVER}?key=${accessToken.value}&user_id=${userId}&role=${role}`;
         const isCalling = ref(false);
         const isCallingVideo = ref(false);
         const hashStr = ref('');
@@ -247,7 +248,7 @@ export default defineComponent({
             isCallingVideo.value = true;
             try {
                 const response = await axios.get(
-                    `https://${API_SERVER}api/call/${apartmentNumber}/${hashStr.value}/${userId}?resident_ids=${residentIds.join(',')}`
+                    `${API_SERVER}api/call/${apartmentNumber}/${hashStr.value}/${userId}?resident_ids=${residentIds.join(',')}`
                 );;
                 const data = response.data;
                 message.value = data.message;
@@ -264,7 +265,7 @@ export default defineComponent({
 
         const abortCall = async (apartmentNumber) => {
             try {
-                const response = await axios.get(`https://${API_SERVER}api/abort_call/${apartmentNumber}`);
+                const response = await axios.get(`${API_SERVER}api/abort_call/${apartmentNumber}`);
                 const data = response.data;
                 message.value = data.message;
                 console.log(data.message);

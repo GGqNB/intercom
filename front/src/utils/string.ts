@@ -151,3 +151,21 @@ export const extractPhoneNumber = (phoneNumber: string): string => {
   console.log(phoneUpdateNumber)
   return phoneUpdateNumber;
 } 
+
+export const generateStringWithDashes = (length: number): string => {
+  if (length <= 0) {
+    return "";
+  }
+
+  let result = "";
+  for (let i = 0; i < length; i++) {
+    if ((i + 1) % 4 === 0) {
+      result += "-";
+    } else {
+      const randomChar = Math.random().toString(36).substring(2, 3);
+      result += randomChar;
+    }
+  }
+
+  return result;
+};

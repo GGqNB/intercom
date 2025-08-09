@@ -10,12 +10,14 @@ import SIcon from 'src/components/ui/SIcon.vue';
 import SToggle from 'src/components/ui/SToggle.vue';
 import SSelect from 'src/components/ui/SSelect.vue';
 import SSelectBackend from 'src/components/backend/SSelectBackend.vue';
-import SBaseFilter from 'src/components/Filters/SBaseFilter.vue';
 // import SStepper from 'src/components/ui/SStepper.vue';
 import SSpinner from 'src/components/Loadings/SSpinner.vue'
 import SDialog from 'src/components/Dialog/SDialog.vue';
 import SBanner from 'src/components/base/Banner/SBanner.vue';
 import STable from 'src/components/Tables/STable.vue';
+import SBaseFilters from 'src/components/Filters/BaseFilters.vue';
+import SBaseModalFilters from 'src/components/Filters/BaseModalFilters.vue';
+import SModalFilters from 'src/components/Filters/ModalFilters.vue';
 
 export default boot(async ({ app }) => {
   app.component('SPage', SPage);
@@ -30,8 +32,10 @@ export default boot(async ({ app }) => {
   // app.component('SIcon', SIcon);
   // app.component('SToggle', SToggle);
   app.component('SSelect', SSelect);
-  // app.component('SSelectBackend', SSelectBackend);
-  // app.component('SBaseFilter', SBaseFilter);
+  app.component('SSelectBackend', SSelectBackend);
+  app.component('SBaseFilters', SBaseFilters);
+  app.component('SBaseModalFilters', SBaseModalFilters);
+  app.component('SModalFilters', SModalFilters);
   // // app.component('SStepper', SStepper);
   app.component('SDialog', SDialog);
   app.component('SBanner', SBanner);

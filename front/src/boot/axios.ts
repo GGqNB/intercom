@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { boot } from 'quasar/wrappers';
 import axios, { AxiosInstance } from 'axios';
-import { API_SERVER } from 'src/constants/common';
+import { URL_SERVER } from 'src/constants/common';
 import { IStringifyOptions, stringify } from 'qs';
 import { useLocalAuthStore } from 'src/stores/auth.store';
 import { Router } from 'vue-router';
@@ -16,7 +16,7 @@ declare module '@vue/runtime-core' {
   }
 }
 const $notify = useNotifications(); 
-const api = axios.create({ baseURL: API_SERVER });
+const api = axios.create({ baseURL: URL_SERVER });
 const defaultStringifyParams: IStringifyOptions = {
   arrayFormat: 'repeat',
   skipNulls: true,

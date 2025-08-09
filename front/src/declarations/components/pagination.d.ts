@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-types */
 export type BasePagination = {
-  pages: number,
+  pages?: number;
   page: number;
   sortBy: string;
   rowsPerPage: null | number;
@@ -37,3 +37,22 @@ export interface OffsetParams {
 export interface Limited<T> extends OffsetParams {
   data: Array<T>;
 }
+
+export interface PaginatedList<T>{
+  items: T[];
+  page: number;
+  size: number;
+  total: number;
+}
+
+// Тип "({ pagination: tablePagination }: { pagination: BasePagination; }) => Promise<void>"
+//  не может быть назначен для типа "(requestProp: { pagination: { sortBy: string; descending: 
+// boolean; page: number; rowsPerPage: number; }; filter?: any; getCellValue: (col: any, row: any) => any; }) => void".
+//   Типы параметров "__0" и "requestProp" несовместимы.
+//     Тип "{ pagination: { sortBy: string; descending: boolean; 
+// page: number; rowsPerPage: number; };
+//  filter?: any; getCellValue: (col: any, row: any) => any; }" не может быть назначен для типа "{ pagination: BasePagination; }".
+//       Типы свойства "pagination" несовместимы.
+//         Свойство "pages" 
+// отсутствует в типе "{ sortBy: string; descending: boolean; page: number; rowsPerPage: number; }" 
+// и является обязательным в типе "BasePagination".

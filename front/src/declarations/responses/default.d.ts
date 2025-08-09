@@ -5,5 +5,9 @@ export namespace Default {
      id: number,
      key: string,
   }
+}
 
+export interface ResponceObject<T>{
+  data: T;
+  succsess: boolean;
 }

@@ -1,7 +1,6 @@
 import axios from 'axios';
 import { User } from 'src/declarations/responses/user';
 import { USER } from 'src/backend/endpoints/user';
-import { Locks } from 'src/declarations/responses/locks';
 export type UserData =  { data: User.UserBrief };
 
 export default class UserApi {
@@ -41,16 +40,6 @@ export default class UserApi {
       ...USER.DELETE,
     })
       .then((r): { messege : string } => r.data);
-
-    return responseData;
-  }
-
-  public static async bindLocks(data : User.UserBare): Promise<Locks.LocksBare> {
-    const responseData: Locks.LocksBare = await axios({
-      ...USER.BIND_ALL_LOCK,
-      data,
-    })
-      .then((r): Locks.LocksBare => r.data);
 
     return responseData;
   }

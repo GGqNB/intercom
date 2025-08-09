@@ -1,14 +1,20 @@
 // /* eslint-disable no-return-await */
-import PhoneApi from 'src/backend/api/classes/PhoneApiClass';
-import LocksApi from 'src/backend/api/classes/LocksApiClass';
+import IntercomApi from 'src/backend/api/classes/IntercomClass';
+import EntryApi from 'src/backend/api/classes/EntryClass';
+import HouseApi from 'src/backend/api/classes/HouseClass';
+import CityApi from 'src/backend/api/classes/CityClass';
 
 export function useSelectBackend() {
-  const getPhones = async (params: any) => await PhoneApi.phoneList(params);
-  const getLocks = async (params: any) => await LocksApi.list(params);
+  const getIntercom = async (params: any) => await IntercomApi.list(params);
+  const getEntry = async (params: any) => await EntryApi.list(params);
+  const getCity = async (params: any) => await CityApi.list(params);
+  const getHouse = async (params: any) => await HouseApi.list(params);
 
 
   return {
-    getPhones,
-    getLocks
+    getIntercom,
+    getEntry,
+    getCity,
+    getHouse
   };
 }

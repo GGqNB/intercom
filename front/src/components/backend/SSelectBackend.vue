@@ -186,9 +186,9 @@ export default defineComponent({
 };
 const onUpdate = (obj: OptionObject) => {
       if (props.valueObject) {
-        emit('update:model-value', obj ? obj : null); // Отправка всего объекта
+        emit('update:model-value', obj ? obj : null); 
       } else {
-        emit('update:model-value', obj ? obj[props.optionValue] : null); // Отправка только значения
+        emit('update:model-value', obj ? obj[props.optionValue] : null); 
       }
     };
 return {
