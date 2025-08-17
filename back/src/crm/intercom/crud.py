@@ -15,6 +15,8 @@ async def get_intercom(
         query = select(Intercom).options(selectinload(Intercom.entry)) 
         if filters_params.name:
              query = query.filter(Intercom.name.ilike(f'%{filters_params.name}%'))
+        if filters_params.entry_id:
+            query = query.filter(Intercom.entry_id == filters_params.entry_id)
         return await paginate(session, query)
 
     except Exception as e:

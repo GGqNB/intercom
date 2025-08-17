@@ -10,6 +10,9 @@ from src.crm.intercom.schemas import ReadIntercom, WrhiteIntercom, FilterIntecom
 from sqlalchemy import delete, func, insert, select, update
 from sqlalchemy.orm import selectinload
 from src.crm.intercom.crud import get_intercom
+from fastapi.security.api_key import APIKey
+from src.auth import get_api_key
+
 router_intercom = APIRouter(
     prefix="/intercom",
     tags=["Работа с домофоном"]
@@ -20,6 +23,8 @@ router_intercom = APIRouter(
 async def read_intercom(
     filters_params: FilterIntecom = Depends(),
     session: AsyncSession = Depends(get_async_session),
+    api_key: APIKey = Depends(get_api_key)
+
 ):
      return await get_intercom(filters_params = filters_params, session = session)
 
@@ -27,6 +32,8 @@ async def read_intercom(
 async def add_intercom(
     new_event: WrhiteIntercom,
     session: AsyncSession = Depends(get_async_session),
+    api_key: APIKey = Depends(get_api_key)
+
 ):
     try:
         stmt = insert(Intercom).values(new_event.model_dump()).returning(Intercom) 
@@ -53,6 +60,8 @@ async def add_intercom(
 async def delete_intercom( 
         id: int, 
         session: AsyncSession = Depends(get_async_session), 
+        api_key: APIKey = Depends(get_api_key)
+
 ): 
     try: 
         query = delete(Intercom).where( 
@@ -75,6 +84,8 @@ async def update_intercom(
     block_id: int,
     updated_block: WrhiteIntercom, 
     session: AsyncSession = Depends(get_async_session),
+    api_key: APIKey = Depends(get_api_key)
+
 ):
     try:
         query = select(Intercom).where(Intercom.id == block_id)

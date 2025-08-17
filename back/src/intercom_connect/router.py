@@ -55,7 +55,7 @@ async def websocket_endpoint(websocket: WebSocket):
     apartment_number = get_apartment_number(websocket)
     role = get_role(websocket)
 
-    if not user_id:
+    if not user_id or user_id=='None':
         await websocket.close(code=1008, reason="Отсутствует user_id")
         return
 
@@ -101,9 +101,9 @@ async def websocket_endpoint(websocket: WebSocket):
 @router_intercom_connect.get("/call/{apartment_number}/{hash_room}/{indentifier}")
 async def call(apartment_number: int, hash_room: str, indentifier: str, api_key: APIKey = Depends(get_api_key)):
      with connections_lock:
-        # if call_tasks:
-        #     raise HTTPException(status_code=418, detail="Домофон занят, попробуйте позже")  
-        # else:
+         if apartment_number in call_tasks:
+            raise HTTPException(status_code=429, detail="Домофон занят, попробуйте позже (слишком много запросов)")
+         else:
            intercom_ws = next((conn.websocket for conn in connections.values() if conn.user_id == indentifier), None)
            if not intercom_ws:
             raise HTTPException(status_code=400, detail="Нет подключенного домофона.")  
@@ -114,7 +114,7 @@ async def call(apartment_number: int, hash_room: str, indentifier: str, api_key:
 
 @router_intercom_connect.get("/answer_call/{apartment_number}")
 async def answer_call(apartment_number: int,  api_key: APIKey = Depends(get_api_key)):
-    with connections_lock:
+     with connections_lock:
         if apartment_number in call_tasks:
             answering_user_id = next((user_id for user_id, conn in connections.items() if conn.apartment_number == apartment_number and conn.role == "resident"), None)
 

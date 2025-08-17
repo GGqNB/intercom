@@ -52,7 +52,7 @@ export function useList(){
   {
     name: 'house',
     label: 'Дом',
-    field: (row) => row.house ? String(row.house.name) : 'Отсутвует',
+    field: (row) => row.entry ? String(row.entry.house.name) : 'Отсутвует',
     align: 'center',
     sortable: false
   },

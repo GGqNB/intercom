@@ -1,7 +1,6 @@
 import { boot } from 'quasar/wrappers';
 import { useLocalAuthStore } from 'src/stores/auth.store';
 import { useUserStore } from 'src/stores/user.store';
-import { useIndicatorStore } from 'src/stores/indicator.store';
 import { useNotifications } from 'src/composables/useNotifications';
 
 export interface MetaParams {
@@ -21,7 +20,6 @@ export interface MetaParams {
       const $notify = useNotifications();
 
       const authStore = useLocalAuthStore();
-      const indicatorStore = useIndicatorStore();
       const { meta } = to;
       if (!auth(meta) && !needNoAuth(meta)) {
         // Если роут не имеет пометку только авторизованным и не имеет пометку требуется не авторизованый, то все ОК, пропускаем

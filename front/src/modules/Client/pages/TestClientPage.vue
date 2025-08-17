@@ -1,7 +1,7 @@
 <template>
 <q-page class="flex flex-center">
     <div class="intercom-container">
-        <h3>3я кв</h3>
+        <h3>100я кв</h3>
       <q-btn @click="disconnectWebSocket">123</q-btn>
         <transition enter-active-class="shake-enter-active" leave-active-class="fade-leave-active">
             <q-card
@@ -84,8 +84,8 @@ export default defineComponent({
 
         const socket = ref(null);
         const message = ref('');
-        const userId = '003';
-        const apartmentNumber = ref(3);
+        const userId = '100';
+        const apartmentNumber = ref(100);
         const role = 'resident';
         const {
             accessToken

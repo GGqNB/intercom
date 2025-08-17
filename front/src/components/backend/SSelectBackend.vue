@@ -51,6 +51,10 @@ export default defineComponent({
       type: Function,
       required: true,
     },
+    params: { 
+      type: Object,
+      default: () => ({}), 
+    },
     optionLabel: {
       type: String,
       required: true,
@@ -148,6 +152,7 @@ export default defineComponent({
         [props.searchFilter]: search.value,
         page: '1',
         size: '20',
+        ...props.params,
       }).then(
         (r: any) => {
           options.value = r.items;
@@ -178,6 +183,7 @@ export default defineComponent({
       search: search.value,
       page: `${currentPage.value}`,
       size: '20',
+      ...props.params,
     }).then((r: any) => {
       options.value.push(...r.items);
     });

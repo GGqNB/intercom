@@ -15,3 +15,4 @@ class WrhiteIntercom(BaseIntercom):
 
 class FilterIntecom(BaseModel):
     name: Annotated[Optional[str], Field(default=None)]
+    entry_id: Annotated[Optional[int], Field(default=None)]

@@ -32,5 +32,6 @@ class FilterHouse(BaseModel):
     geo_adress: Annotated[Optional[str], Field(default=None)]
 
 class FilterEntry(BaseModel):
-    name: Annotated[Optional[str], Field(default=None)]
-    geo_adress: Annotated[Optional[str], Field(default=None)]
+    name: Optional[str] = None
+    geo_adress: Optional[str] = None
+    house_id: Optional[int] = None

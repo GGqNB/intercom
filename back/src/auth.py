@@ -12,5 +12,5 @@ async def get_api_key(api_key_header: str = Security(api_key_header)):
         return api_key_header   
     else:
         raise HTTPException(
-            status_code=HTTP_403_FORBIDDEN, detail="PLS, auth"
+            status_code=HTTP_403_FORBIDDEN, detail="Go to auth"
         )

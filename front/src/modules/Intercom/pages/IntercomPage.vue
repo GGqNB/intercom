@@ -1,6 +1,7 @@
 <template>
 <q-page class="">
-    <div class="intercom-container flex justify-center mt-base-10">
+    <ServiceIntercom v-if="serviceView" @apply="changeDataIntercom" />
+    <div class="intercom-container flex justify-center mt-base-10" v-else>
         <div class="left-area">
             <div class="video">
                 <div class="block-video flex justify-center items-center">
@@ -9,7 +10,6 @@
                             <source src="video/video.mp4" type="video/mp4">
                             Your browser does not support the video tag.
                         </video>
-                        {{ isCallingVideo }}
                     </div>
                     <div v-else>
 
@@ -80,6 +80,7 @@
                     icon="logout"
                     label="ВОЙТИ"
                     class="entry-btn"
+                    @click="serviceOrEntry"
                 />
                 <q-btn
                     v-else
@@ -92,6 +93,8 @@
             </div>
         </div>
     </div>
+    <div v-if="techData"> {{ techData }}</div>
+
 </q-page>
 </template>
 
@@ -105,6 +108,7 @@ import {
 } from 'vue';
 import axios from 'axios';
 // import CallRoom from 'src/modules/CallRoom/pages/CallRoom.vue';
+import ServiceIntercom from '../components/ServiceIntercom.vue';
 import {
     API_SERVER,
     WSS_SERVER
@@ -121,19 +125,24 @@ import {
 import {
     VIDEO_SERVER
 } from 'src/constants/common';
+import {
+    useAppStore
+} from 'src/stores/app.store';
 export default defineComponent({
-    name: 'SettingDevicePage',
+    name: 'IntercomPage',
     components: {
         // CallRoom
+        ServiceIntercom
     },
     setup() {
-        const {
-            registerTimeout,
-            removeTimeout
-        } = useTimeout()
+
         const selectedButton = ref(null);
         const selectedNumbers = ref('');
         const $notify = useNotifications();
+        const $app = useAppStore();
+        const techData = computed(() => $app.getIntercomData);
+        // const router = useRouter();
+
         const selectButton = (number) => {
             selectedButton.value = number;
             if (selectedNumbers.value.length > 4) {
@@ -150,7 +159,7 @@ export default defineComponent({
         const {
             accessToken
         } = useCurrentUser();
-        const serverAddress = `${WSS_SERVER}?key=${accessToken.value}&user_id=${userId}&role=${role}`;
+        const serverAddress = `${WSS_SERVER}?key=${accessToken.value}&user_id=${techData.value ? techData.value.tech_name : 'None'}&role=${role}`;
         const isCalling = ref(false);
         const isCallingVideo = ref(false);
         const hashStr = ref('');
@@ -164,7 +173,8 @@ export default defineComponent({
         const connectWebSocket = () => {
             socket.value = new WebSocket(serverAddress);
 
-            socket.value.onopen = () => {
+            if(techData.value){
+                socket.value.onopen = () => {
                 console.log('Подключено к WebSocket серверу');
                 socket.value.send('Клиент подключен');
                 clearInterval(reconnectTimer);
@@ -176,16 +186,19 @@ export default defineComponent({
                         // console.log('Отправлен PING');
                     } else {
                         console.log('WebSocket не готов, PING не отправлен');
-                        clearInterval(pingInterval); // Stop interval if socket is not open
+                        clearInterval(pingInterval); 
                     }
                 }, 3000);
             };
+            }else{
+                $notify.error('Произведите настройку')
+            }
 
             socket.value.onmessage = (event) => {
                 message.value = event.data;
                 console.log('Сообщение от сервера:', event.data);
                 if (event.data.includes('завершен') || event.data.includes('прерван')) {
-                    start(); // Задержка на клаву
+                    start(); 
                     isCallingVideo.value = false;
                 }
                 // 
@@ -243,12 +256,20 @@ export default defineComponent({
         };
 
         const callApartment = async (apartmentNumber, residentIds) => {
+
+            console.log(techData.value.entry.flat_first)
+            console.log(Number(apartmentNumber))
+            if(Number(apartmentNumber) <=  techData.value.entry.flat_first || Number(apartmentNumber) >= techData.value.entry.flat_last){
+                $notify.warning('Значение кв не входит в диапозон');
+                return
+            }
+
             hashStr.value = generateRandomString(7);
             isCalling.value = true;
             isCallingVideo.value = true;
             try {
                 const response = await axios.get(
-                    `${API_SERVER}api/call/${apartmentNumber}/${hashStr.value}/${userId}?resident_ids=${residentIds.join(',')}`
+                    `${API_SERVER}api/call/${apartmentNumber}/${hashStr.value}/${techData.value ? techData.value.tech_name : 'None'}?resident_ids=${residentIds.join(',')}`
                 );;
                 const data = response.data;
                 message.value = data.message;
@@ -306,6 +327,19 @@ export default defineComponent({
             isCalling.value = false;
         }, 2500);
 
+        const serviceView = ref(false);
+        const serviceOrEntry = () => {
+            if (selectedNumbers.value == '0000') serviceView.value = !serviceView.value
+        }
+
+        const changeDataIntercom = (intercomData) => {
+            $app.setIntercomData(intercomData);
+            serviceView.value = !serviceView.value;
+            selectedNumbers.value = '';
+            window.location.reload();
+
+        }
+
         onMounted(() => {
             connectWebSocket();
         });
@@ -328,7 +362,11 @@ export default defineComponent({
             disconnectWebSocket,
             waitAnswer,
             isCallingVideo,
-            VIDEO_SERVER
+            VIDEO_SERVER,
+            serviceOrEntry,
+            serviceView,
+            changeDataIntercom,
+            techData
         };
     },
 });

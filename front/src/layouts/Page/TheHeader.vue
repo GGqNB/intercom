@@ -54,9 +54,6 @@ import {
     useAppStore
 } from 'stores/app.store';
 import {
-    useIndicatorStore
-} from 'stores/indicator.store';
-import {
     defineComponent,
     onMounted,
     ref,
@@ -73,17 +70,11 @@ import {
     useRouter
 } from 'vue-router';
 import {
-    useIndicator
-} from 'src/composables/useIndicator';
-import {
     useCurrentUser
 } from 'src/composables/useCurrentUser';
 import {
     makeRequest
 } from 'src/composables/useRequest';
-import {
-    Network
-} from 'src/declarations/responses/network';
 import {
     useLoading
 } from 'src/composables/useLoading';
@@ -102,7 +93,6 @@ export default defineComponent({
         const router = useRouter();
         const $currentUser = useCurrentUser();
         const appStore = useAppStore();
-        const indicatorStore = useIndicatorStore();
         // const authStore = useLocalAuthStore();
         // const userStore = useUserStore();
         const phone = ref('');
@@ -113,7 +103,6 @@ export default defineComponent({
                 //     AuthSystemApi.me(''));
             } catch {
                 phone_flag.value = false;
-                $indicator.indicatorDataSet.setActivePhone(false);
 
             }
         }
@@ -128,7 +117,6 @@ export default defineComponent({
         const currentNetwork = ref('');
         const wifi_flag = ref(false);
         const phone_flag = ref(false);
-        const $indicator = useIndicator();
 
         onMounted(
                 () => {
@@ -136,12 +124,6 @@ export default defineComponent({
                     getUser();
                 }
             ),
-            watch(() => indicatorStore.activePhone, (newVal) => {
-                phone_flag.value = newVal;
-            }),
-            watch(() => indicatorStore.currentNetwork, (newVal) => {
-                currentNetwork.value = newVal;
-            }),
             function routeTo(routeName) {
                 if (routeName === 'exit') {
 

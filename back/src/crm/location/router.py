@@ -9,23 +9,26 @@ from fastapi import Depends, HTTPException
 from src.crm.location.models import City
 from src.crm.location.schemas import ReadCity, BaseCity
 from sqlalchemy import delete, func, insert, select, update
-
+from fastapi.security.api_key import APIKey
+from src.auth import get_api_key
 router_location = APIRouter(
     prefix="/city",
     tags=["Работа с локацией"]
 )
 
 
-@router_location.get("/fake_cities/")
-async def get_fake_cities(count: int = 10):
-    """
-    Генерирует список фейковых городов.  (Возвращает Pydantic модели)
-    """
-    return generate_fake_list(ReadCity, count)
+# @router_location.get("/fake_cities/")
+# async def get_fake_cities(count: int = 10):
+#     """
+#     Генерирует список фейковых городов.  (Возвращает Pydantic модели)
+#     """
+#     return generate_fake_list(ReadCity, count)
 
 @router_location.get("", response_model=Page[ReadCity])
 async def get_user(
     session: AsyncSession = Depends(get_async_session),
+    api_key: APIKey = Depends(get_api_key)
+
 ):
     try:
         query = select(City)
@@ -47,6 +50,8 @@ async def get_user(
 async def add_event(
     new_event: BaseCity,
     session: AsyncSession = Depends(get_async_session),
+    api_key: APIKey = Depends(get_api_key)
+
 ):
     try:
         stmt = insert(City).values(new_event.model_dump()).returning(City) 
@@ -73,6 +78,8 @@ async def add_event(
 async def delete_event( 
         id: int, 
         session: AsyncSession = Depends(get_async_session), 
+        api_key: APIKey = Depends(get_api_key)
+
 ): 
     try: 
         query = delete(City).where( 
@@ -95,6 +102,8 @@ async def update_block(
     block_id: int,
     updated_block: BaseCity, 
     session: AsyncSession = Depends(get_async_session),
+    api_key: APIKey = Depends(get_api_key)
+
 ):
     try:
         query = select(City).where(City.id == block_id)
