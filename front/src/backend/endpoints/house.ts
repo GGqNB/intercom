@@ -1,7 +1,7 @@
 import { IEndpointData } from 'src/backend/endpoint';
 import { API_SERVER } from 'src/constants/common';
 
-const url = `${API_SERVER}build/house`;
+const url = `${API_SERVER}api/build/house`;
 
 
 export const HOUSE = {
