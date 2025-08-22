@@ -7,7 +7,7 @@ const url = `${API_SERVER}api/intercom`;
 export const INTERCOM = {
   LIST: {
     method: 'GET',
-    url: `${url}/`,
+    url: `${url}`,
   } as IEndpointData,
   CREATE: {
     method: 'POST',

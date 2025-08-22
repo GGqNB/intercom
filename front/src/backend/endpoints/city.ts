@@ -7,11 +7,11 @@ const url = `${API_SERVER}api/city`;
 export const CITY = {
   LIST: {
     method: 'GET',
-    url: `${url}/`,
+    url: `${url}`,
   } as IEndpointData,
   CREATE: {
     method: 'POST',
-    url: `${url}/`,
+    url: `${url}`,
   } as IEndpointData,
   UPDATE(id: number): IEndpointData {
     return {

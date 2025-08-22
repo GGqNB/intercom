@@ -7,11 +7,11 @@ const url = `${API_SERVER}api/build/house`;
 export const HOUSE = {
   LIST: {
     method: 'GET',
-    url: `${url}/`,
+    url: `${url}`,
   } as IEndpointData,
   CREATE: {
     method: 'POST',
-    url: `${url}/`,
+    url: `${url}`,
   } as IEndpointData,
   UPDATE(id: number): IEndpointData {
     return {
