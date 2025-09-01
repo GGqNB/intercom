@@ -1,13 +1,13 @@
 import { IEndpointData } from 'src/backend/endpoint';
 import { API_SERVER } from 'src/constants/common';
 
-const url = `${API_SERVER}intercom`;
+const url = `${API_SERVER}api/intercom`;
 
 
 export const INTERCOM = {
   LIST: {
     method: 'GET',
-    url: `${url}/`,
+    url: `${url}`,
   } as IEndpointData,
   CREATE: {
     method: 'POST',

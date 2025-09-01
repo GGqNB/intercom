@@ -1,17 +1,17 @@
 import { IEndpointData } from 'src/backend/endpoint';
 import { API_SERVER } from 'src/constants/common';
 
-const url = `${API_SERVER}build/entry`;
+const url = `${API_SERVER}api/build/entry`;
 
 
 export const ENTRY = {
   LIST: {
     method: 'GET',
-    url: `${url}/`,
+    url: `${url}`,
   } as IEndpointData,
   CREATE: {
     method: 'POST',
-    url: `${url}/`,
+    url: `${url}`,
   } as IEndpointData,
   UPDATE(id: number): IEndpointData {
     return {
