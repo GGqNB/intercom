@@ -6,6 +6,63 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db  # Используем имя сервиса как хост
+      DB_PORT: 5432
+      DB_NAME: bd
+      DB_USER: postgres
+      DB_PASS: root
+      API_KEY: qwe123rty
+    volumes:
+      - ./back:/app # Монтируем директорию back, для автоматической перезагрузки сервера при изменениях
+
+  quasar:
+    build:
+      context: ./front
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    depends_on:
+      - fastapi
+
+  db:
+    image: postgres:14
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: bd
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  alembic:
+    build:
+      context: ./back
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db  # Используем имя сервиса как хост
+      DB_PORT: 5432
+      DB_NAME: bd
+      DB_USER: postgres
+      DB_PASS: root
+    command: sh -c "sleep 5 && alembic upgrade head"
+
+volumes:
+  db_data: # Добавляем volume для хранения данных базы данных
+
+version: "3.8"
+services:
+  fastapi:
+    build:
+      context: ./back
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
   
 
   quasar:
@@ -13,7 +70,7 @@ services:
       context: ./front
       dockerfile: Dockerfile
     ports:
-      - "8080:80"  # Local port : Container port
+      - "8080:80"  
 
 # version: "3.8"
 # services:
@@ -28,7 +85,7 @@ services:
 #     environment:
 #       - DATABASE_URL=postgresql://user:password@db:5432/dbname
 #     volumes:
-#       - fastapi_data:/app/data
+#       - fastapi_data:/app/data  
 
 #   db:
 #     image: postgres:16
@@ -73,3 +130,19 @@ services:
 # volumes:
 #   db_data:
 #   fastapi_data:
+
+#   GNU nano 7.2                                              .env                                                        MAIL_HOST=
+# MAIL_USERNAME=
+# MAIL_PASSWORD=
+# MAIL_PORT=
+
+# DB_HOST=localhost
+# DB_PORT=5432
+# DB_NAME=bd
+# DB_USER=postgres
+# DB_PASS=228denis
+
+
+# API_KEY=qwe123rty
+
+
