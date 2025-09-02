@@ -5,7 +5,7 @@ export const URL_SERVER = String(process.env.SERVER_URL);
 
 export const API_SERVER = String('https://'+process.env.SERVER_URL);
 
-export const WSS_SERVER = String('ws    s://' + process.env.SERVER_URL + 'ws');
+export const WSS_SERVER = String('wss://' + process.env.SERVER_URL + 'ws');
 
 export const VIDEO_SERVER = String(process.env.VIDEO_SERVER);
 
