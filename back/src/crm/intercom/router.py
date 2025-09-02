@@ -1,5 +1,11 @@
 
 from fastapi import APIRouter, status
+import requests
+from src.crm.helper.stown import get_access_token
+from src.config import TOKEN_KEY, STOWN_LOGIN, STOWN_PASSWORD, \
+    STOWN_CLIENT_ID, STOWN_CLIENT_SECRET, STOWN_SCOPE, \
+    AUTH_URL, DEVICES_URL
+from src.redis_client import redis_client
 from src.database import get_async_session
 from fastapi_pagination import Page
 from fastapi_pagination.ext.sqlalchemy import paginate
@@ -123,3 +129,51 @@ async def update_intercom(
                 "args": e.args if hasattr(e, 'args') else None,
             }
         )
+
+
+@router_intercom.get("/stown/devices") 
+async def get_devices_stown( 
+        session: AsyncSession = Depends(get_async_session), 
+        api_key: APIKey = Depends(get_api_key)
+
+): 
+ try:
+    token = redis_client.get(TOKEN_KEY)
+    if token == None:
+        get_access_token(STOWN_LOGIN, STOWN_PASSWORD, STOWN_CLIENT_ID, \
+                         STOWN_CLIENT_SECRET, AUTH_URL, STOWN_SCOPE)
+
+    token = redis_client.get(TOKEN_KEY)
+
+    headers = {'Authorization': f'JWT {token}'}
+    try:
+        api_response = requests.get(DEVICES_URL, headers=headers)
+        api_response.raise_for_status()
+        return {
+            "data" : api_response.json(),
+            "status" : "success"
+        }  
+
+    except requests.exceptions.RequestException as e:
+        redis_client.delete(TOKEN_KEY)
+ except Exception as e:
+        await session.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                "code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+                "message": str(e),
+                "args": e.args if hasattr(e, 'args') else None,
+            }
+        )
+
+@router_intercom.get("/test")
+async def test(
+     session: AsyncSession = Depends(get_async_session), 
+    api_key: APIKey = Depends(get_api_key)
+):
+        redis_client.set('A1','2')
+        print('1223')
+        a = redis_client.get('A1')
+        print(2)
+        

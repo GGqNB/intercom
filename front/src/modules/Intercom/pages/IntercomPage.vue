@@ -93,7 +93,7 @@
             </div>
         </div>
     </div>
-    <div v-if="techData"> {{ techData }}</div>
+    <!-- <div v-if="techData"> {{ techData }}</div> -->
 
 </q-page>
 </template>

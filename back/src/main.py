@@ -13,7 +13,7 @@ import json
 from fastapi.security.api_key import APIKey
 
 
-
+from src.redis_client import redis_client
 from src.auth import get_api_key
 from src.config import API_KEY
 from src.intercom_connect.router import router_intercom_connect
@@ -49,32 +49,7 @@ app.add_middleware(
 )
 
 
-# @router_user.post("",  status_code=status.HTTP_201_CREATED)
-# async def add_user(
-#     new_user: BaseUserSchemas,
-#     session: AsyncSession = Depends(get_async_session),
-# ):
-#     try:
-#         stmt = insert(User).values(new_user.model_dump()).returning(User)  # Возвращаем полную запись
-#         result = await session.execute(stmt)
-#         await session.commit()
-#         created_user = result.scalar_one()  #
 
-#         return {
-#             "data" : created_user,
-#             "status" : "success"
-#         }  
-
-#     except Exception as e:
-#         await session.rollback() 
-#         raise HTTPException(
-#             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-#             detail={
-#                 "code": status.HTTP_500_INTERNAL_SERVER_ERROR,
-#                 "message": str(e), 
-#                 "args": e.args if hasattr(e, 'args') else None,
-#             }
-#         )
 
 app.include_router(router_intercom_connect)
 app.include_router(router_location)
