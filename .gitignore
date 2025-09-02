@@ -16,4 +16,3 @@ __pycache__/
 *.pyc
 *.log
 .env
-docker-compose.yml

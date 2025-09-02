@@ -24,16 +24,15 @@ services:
     image: postgres:15
     container_name: postgres_container
     restart: always
-    env_file:
-      - ./back/.env
     environment:
-      POSTGRES_USER: POSTGRES
-      POSTGRES_PASSWORD: PASSWORD
-      POSTGRES_DB: NAMEPASS
+      POSTGRES_USER: USER   
+      POSTGRES_PASSWORD: PASS  
+      POSTGRES_DB: NAME      
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+
 
   redis:
     image: redis:7
