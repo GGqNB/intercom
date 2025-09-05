@@ -11,6 +11,7 @@ from starlette.status import HTTP_400_BAD_REQUEST
 from src.intercom_connect.schemas import UserConnection
 from src.intercom_connect.methods import *
 from src.intercom_connect.helpers import *
+from src.intercom_connect.schemas import BaseCallData, BlockDevice
 
 router_intercom_connect = APIRouter(
     prefix="",
@@ -98,18 +99,33 @@ async def websocket_endpoint(websocket: WebSocket):
 
 
 
-@router_intercom_connect.get("/call/{apartment_number}/{hash_room}/{indentifier}")
-async def call(apartment_number: int, hash_room: str, indentifier: str, api_key: APIKey = Depends(get_api_key)):
+# @router_intercom_connect.get("/call/{apartment_number}/{hash_room}/{indentifier}")
+# async def call(apartment_number: int,
+#                hash_room: str, 
+#                indentifier: str,
+#                api_key: APIKey = Depends(get_api_key),
+#                ):
+#      with connections_lock:
+#          if apartment_number in call_tasks:
+#             raise HTTPException(status_code=429, detail="Домофон занят, попробуйте позже (слишком много запросов)")
+#          else:
+#            intercom_ws = next((conn.websocket for conn in connections.values() if conn.user_id == indentifier), None)
+#            if not intercom_ws:
+#             raise HTTPException(status_code=400, detail="Нет подключенного домофона.")  
+#            asyncio.create_task(make_call(apartment_number, intercom_ws, hash_room))
+#            return {"message": f"Звонок инициирован в квартиру {apartment_number}."}
+
+@router_intercom_connect.post("/call")
+async def call(call_data: BaseCallData, api_key: APIKey = Depends(get_api_key)):
      with connections_lock:
-         if apartment_number in call_tasks:
+         if call_data.apartment_number in call_tasks:
             raise HTTPException(status_code=429, detail="Домофон занят, попробуйте позже (слишком много запросов)")
          else:
-           intercom_ws = next((conn.websocket for conn in connections.values() if conn.user_id == indentifier), None)
+           intercom_ws = next((conn.websocket for conn in connections.values() if conn.user_id == call_data.indentifier), None)
            if not intercom_ws:
             raise HTTPException(status_code=400, detail="Нет подключенного домофона.")  
-           asyncio.create_task(make_call(apartment_number, intercom_ws, hash_room))
-           return {"message": f"Звонок инициирован в квартиру {apartment_number}."}
-
+           asyncio.create_task(make_call(call_data.apartment_number, intercom_ws, call_data.hash_room, call_data.blockDevice))
+           return {"message": f"Звонок инициирован в квартиру {call_data.apartment_number}."}
         
 
 @router_intercom_connect.get("/answer_call/{apartment_number}")
@@ -186,7 +202,7 @@ async def websocket_endpoint(websocket: WebSocket, client_id: str):
         del active_connections[client_id]
 
 
-async def make_call(apartment_number: int, caller_ws: WebSocket, hash_room: str , api_key: APIKey = Depends(get_api_key)):
+async def make_call(apartment_number: int, caller_ws: WebSocket, hash_room: str, blockDevice:BlockDevice, api_key: APIKey = Depends(get_api_key)):
 
     caller_id = get_user_id(caller_ws)
     print(f"Начат звонок в квартиру {apartment_number} (инициатор: {caller_id}). hash_room: {hash_room}")
@@ -199,7 +215,8 @@ async def make_call(apartment_number: int, caller_ws: WebSocket, hash_room: str 
         with connections_lock:
             for user_id, user_connection in connections.items():
                 if user_connection.role == "resident" and user_connection.apartment_number == apartment_number:
-                    await safe_send_json(user_connection.websocket, {"type": "incoming_call", "from": "intercom", "apartment": apartment_number, "hash_room": hash_room})
+                    await safe_send_json(user_connection.websocket, 
+                            {"type": "incoming_call", "from": "intercom", "apartment": apartment_number, "hash_room": hash_room, "block_device": str(blockDevice)})
                     # print("incoming_call", apartment_number)
 
         try:

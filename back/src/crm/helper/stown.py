@@ -3,7 +3,7 @@ from src.redis_client import redis_client
 from src.config import TOKEN_KEY
 
 def get_access_token(login, password, client_id, client_secret, token_url, scope=None):
-    
+
     data = {
         'grant_type': 'password',
         'username': login,
@@ -19,6 +19,7 @@ def get_access_token(login, password, client_id, client_secret, token_url, scope
         response.raise_for_status() 
         token_data = response.json()
         redis_client.set(TOKEN_KEY, token_data.get('token'))
+        return redis_client.get(TOKEN_KEY)
     except requests.exceptions.RequestException as e:
         print(f"Ошибка при запросе токена: {e}")
         return None

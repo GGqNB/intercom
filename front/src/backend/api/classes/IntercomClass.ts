@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { Crm } from 'src/declarations/responses/crm';
+import { IntercomCall } from 'src/declarations/responses/intercom-call';
 import { INTERCOM } from 'src/backend/endpoints/intercom';
 import { PaginatedList } from 'src/declarations/components/pagination';
 import { ResponceObject } from 'src/declarations/responses/default';
@@ -18,6 +19,17 @@ export default class IntercomApi {
 
     return responseData;
   }
+
+  public static async stownDevices<T>(params?: T): Promise<IntercomCall.BlockDevice[]> {
+    const responseData: IntercomCall.BlockDevice[] = await axios({
+      ...INTERCOM.STOWN_DEVICES,
+      params 
+    })
+      .then((r): IntercomCall.BlockDevice[] => r.data);
+
+    return responseData;
+  }
+
 
   public static async create(data : Crm.IntercomBare): Promise< IntercomResponce> {
     const responseData: IntercomResponce = await axios({

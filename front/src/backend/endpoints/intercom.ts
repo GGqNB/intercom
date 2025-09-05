@@ -9,6 +9,10 @@ export const INTERCOM = {
     method: 'GET',
     url: `${url}`,
   } as IEndpointData,
+  STOWN_DEVICES: {
+    method: 'GET',
+    url: `${url}/stown/devices`,
+  } as IEndpointData,
   CREATE: {
     method: 'POST',
     url: `${url}`,

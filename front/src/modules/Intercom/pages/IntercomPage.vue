@@ -17,13 +17,6 @@
                         </iframe>
                     </div>
 
-                    <!-- <div v-else> -->
-                    <!-- <iframe 
-                            class="qwerrty"
-                            :src="'https://edgeconf.ru/call/?roomId=serv0'+hashStr"
-                            allow="camera;microphone;fullscreen;display-capture;screen-wake-lock">
-                        </iframe> -->
-                    <!-- </div> -->
                 </div>
             </div>
             <div class="button-group">
@@ -94,7 +87,6 @@
         </div>
     </div>
     <!-- <div v-if="techData"> {{ techData }}</div> -->
-
 </q-page>
 </template>
 
@@ -128,6 +120,11 @@ import {
 import {
     useAppStore
 } from 'src/stores/app.store';
+import IntercomCallApi from 'src/backend/api/classes/IntercomCallClass';
+import {
+    makeRequest
+} from 'src/composables/useRequest';
+
 export default defineComponent({
     name: 'IntercomPage',
     components: {
@@ -153,8 +150,6 @@ export default defineComponent({
 
         const socket = ref(null);
         const message = ref('');
-        const userId = 'intercom1';
-        const apartmentNumber = null;
         const role = 'intercom';
         const {
             accessToken
@@ -173,24 +168,24 @@ export default defineComponent({
         const connectWebSocket = () => {
             socket.value = new WebSocket(serverAddress);
 
-            if(techData.value){
+            if (techData.value) {
                 socket.value.onopen = () => {
-                console.log('Подключено к WebSocket серверу');
-                socket.value.send('Клиент подключен');
-                clearInterval(reconnectTimer);
+                    console.log('Подключено к WebSocket серверу');
+                    socket.value.send('Клиент подключен');
+                    clearInterval(reconnectTimer);
 
-                // Start PING interval after successful connection
-                pingInterval = setInterval(() => {
-                    if (socket.value && socket.value.readyState === WebSocket.OPEN) {
-                        socket.value.send('ping');
-                        // console.log('Отправлен PING');
-                    } else {
-                        console.log('WebSocket не готов, PING не отправлен');
-                        clearInterval(pingInterval); 
-                    }
-                }, 3000);
-            };
-            }else{
+                    // Start PING interval after successful connection
+                    pingInterval = setInterval(() => {
+                        if (socket.value && socket.value.readyState === WebSocket.OPEN) {
+                            socket.value.send('ping');
+                            // console.log('Отправлен PING');
+                        } else {
+                            console.log('WebSocket не готов, PING не отправлен');
+                            clearInterval(pingInterval);
+                        }
+                    }, 3000);
+                };
+            } else {
                 $notify.error('Произведите настройку')
             }
 
@@ -198,7 +193,7 @@ export default defineComponent({
                 message.value = event.data;
                 console.log('Сообщение от сервера:', event.data);
                 if (event.data.includes('завершен') || event.data.includes('прерван')) {
-                    start(); 
+                    start();
                     isCallingVideo.value = false;
                 }
                 // 
@@ -255,11 +250,12 @@ export default defineComponent({
             clearInterval(pingInterval); // Stop PING interval on manual disconnect
         };
 
+
         const callApartment = async (apartmentNumber, residentIds) => {
 
             console.log(techData.value.entry.flat_first)
             console.log(Number(apartmentNumber))
-            if(Number(apartmentNumber) <=  techData.value.entry.flat_first || Number(apartmentNumber) >= techData.value.entry.flat_last){
+            if (Number(apartmentNumber) < techData.value.entry.flat_first || Number(apartmentNumber) > techData.value.entry.flat_last) {
                 $notify.warning('Значение кв не входит в диапозон');
                 return
             }
@@ -267,15 +263,28 @@ export default defineComponent({
             hashStr.value = generateRandomString(7);
             isCalling.value = true;
             isCallingVideo.value = true;
+
+            const callData = ref({
+                apartment_number: Number(apartmentNumber),
+                hash_room: hashStr.value,
+                indentifier: techData.value ? techData.value.tech_name : 'None',
+                blockDevice: computed(() => $app.getStownDevice),
+            })
+
             try {
-                const response = await axios.get(
-                    `${API_SERVER}api/call/${apartmentNumber}/${hashStr.value}/${techData.value ? techData.value.tech_name : 'None'}?resident_ids=${residentIds.join(',')}`
-                );;
-                const data = response.data;
+                // const response = await axios.get(
+                //     `${API_SERVER}api/call/
+                //     ${apartmentNumber}/${hashStr.value}/${techData.value ? techData.value.tech_name : 'None'}?resident_ids=${residentIds.join(',')}`
+                // );;
+                const response = await makeRequest(async () =>
+                    IntercomCallApi.call(callData.value));
+
+                const data = response;
+
                 message.value = data.message;
                 console.log(data.message);
             } catch (error) {
-                if (error.response.status == 418) $notify.error(error.response.data.detail);
+                if (error.response ?.status == 418) $notify.error(error.response.data.detail);
                 console.error('Ошибка при вызове:', error);
                 disconnectWebSocket();
                 reconnect();
@@ -332,8 +341,11 @@ export default defineComponent({
             if (selectedNumbers.value == '0000') serviceView.value = !serviceView.value
         }
 
-        const changeDataIntercom = (intercomData) => {
+        const changeDataIntercom = (intercomData, stownDevice) => {
+            console.log(intercomData)
+            console.log(stownDevice)
             $app.setIntercomData(intercomData);
+            $app.setStownDevice(stownDevice);
             serviceView.value = !serviceView.value;
             selectedNumbers.value = '';
             window.location.reload();

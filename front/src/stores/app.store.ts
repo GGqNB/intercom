@@ -1,10 +1,12 @@
 import { defineStore } from 'pinia';
 import { Crm } from 'src/declarations/responses/crm';
+import { IntercomCall } from 'src/declarations/responses/intercom-call';
 export interface AppStateInterface {
   collapseSidebar: boolean;
   miniCollapseSidebar: boolean;
   activeTabMenuIndex: string;
-  intercomData: Crm.CityBrief;
+  intercomData: Crm.IntercomBrief;
+  stownDevice: IntercomCall.BlockDevice;
 }
 
 export const useAppStore = defineStore('app', {
@@ -15,6 +17,7 @@ export const useAppStore = defineStore('app', {
     miniCollapseSidebar: false,
     activeTabMenuIndex: '1',
     intercomData: null,
+    stownDevice: null,
   }),
 
   getters: {
@@ -22,6 +25,7 @@ export const useAppStore = defineStore('app', {
     getMiniCollapseSidebar: (state) => state.miniCollapseSidebar,
     getActiveTabMenuIndex: (state) => state.activeTabMenuIndex,
     getIntercomData: (state) => state.intercomData,
+    getStownDevice: (state) => state.stownDevice,
   },
 
   actions: {
@@ -34,8 +38,11 @@ export const useAppStore = defineStore('app', {
     setActiveTabMenuIndex(val: string) {
       this.activeTabMenuIndex = val;
     },
-     setIntercomData(val: Crm.CityBrief) {
+     setIntercomData(val: Crm.IntercomBrief) {
       this.intercomData = val;
+    },
+    setStownDevice(val: IntercomCall.BlockDevice) {
+      this.stownDevice = val;
     },
   },
 });

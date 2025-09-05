@@ -70,9 +70,26 @@
                 <div>С кв: {{ currentIntercom.entry.flat_first }}</div>
                 <div>С кв: {{ currentIntercom.entry.flat_last }}</div>
             </div>
-            <div class="flex justify-center mt-base-15">
-                  <s-btn :disable="currentIntercom" @click="$emit('apply', currentIntercom )">Запомнить на этом устройстве</s-btn>
+               <div class="mt-base-15">
+               <!-- <div v-if="currentIntercom" class="mt-base-15"> -->
+                <s-select-backend
+                    v-model="stownDevice"
+                    :getter="getStownDevices"
+                    option-label="name"
+                    value-object
+                    label="Выберите устройство STOWN"
+                    class=" "
+                    search-filter="name"
+                    :params="{entry_id : currentEntry}"
+                />
             </div>
+
+            <div class="flex justify-center mt-base-15">
+                  <s-btn :disable="currentIntercom" @click="$emit('apply', currentIntercom, stownDevice )">Запомнить на этом устройстве</s-btn>
+            </div>
+
+            
+
         </div>
     </div>
 </div>
@@ -105,7 +122,8 @@ export default defineComponent({
         const {
             getIntercom,
             getHouse, 
-            getEntry
+            getEntry,
+            getStownDevices
         } = useSelectBackend();
         const {
             filterParams,
@@ -115,6 +133,7 @@ export default defineComponent({
         const currentHome = ref(null);
         const currentEntry = ref(null);
         const currentIntercom = ref(null);
+        const stownDevice = ref(null);
         return {
             getHouse,
             getIntercom,
@@ -122,7 +141,9 @@ export default defineComponent({
             currentHome,
             currentIntercom,
             currentEntry,
-            getEntry
+            getEntry,
+            stownDevice,
+            getStownDevices
         };
     },
 });

@@ -137,27 +137,24 @@ async def get_devices_stown(
         api_key: APIKey = Depends(get_api_key)
 
 ): 
- try:
-    token = redis_client.get(TOKEN_KEY)
-    if token == None:
-        get_access_token(STOWN_LOGIN, STOWN_PASSWORD, STOWN_CLIENT_ID, \
-                         STOWN_CLIENT_SECRET, AUTH_URL, STOWN_SCOPE)
+     try:
+        token = redis_client.get(TOKEN_KEY)
 
-    token = redis_client.get(TOKEN_KEY)
+        if not token:
+            token = get_access_token(STOWN_LOGIN, STOWN_PASSWORD, STOWN_CLIENT_ID,
+                                     STOWN_CLIENT_SECRET, AUTH_URL, STOWN_SCOPE)
 
-    headers = {'Authorization': f'JWT {token}'}
-    try:
+        headers = {'Authorization': f'JWT {token}'}
         api_response = requests.get(DEVICES_URL, headers=headers)
         api_response.raise_for_status()
         return {
-            "data" : api_response.json(),
-            "status" : "success"
-        }  
+                "items": api_response.json(),
+                "status": "success"
+        }
 
-    except requests.exceptions.RequestException as e:
-        redis_client.delete(TOKEN_KEY)
- except Exception as e:
+     except Exception as e:
         await session.rollback()
+        redis_client.delete(TOKEN_KEY) 
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail={
@@ -166,14 +163,15 @@ async def get_devices_stown(
                 "args": e.args if hasattr(e, 'args') else None,
             }
         )
-
+        
 @router_intercom.get("/test")
 async def test(
      session: AsyncSession = Depends(get_async_session), 
     api_key: APIKey = Depends(get_api_key)
-):
+):  
+        redis_client.delete(TOKEN_KEY)
         redis_client.set('A1','2')
         print('1223')
         a = redis_client.get('A1')
-        print(2)
+        print(a)
         
