@@ -60,6 +60,7 @@ async def websocket_endpoint(websocket: WebSocket):
     if key != conf.security.API_KEY:
         await websocket.close(code=1008, reason="Неверный key")
         return
+
     user_id = get_user_id(websocket)
     flat_id = get_flat_id(websocket)
     role = get_role(websocket)
@@ -78,69 +79,59 @@ async def websocket_endpoint(websocket: WebSocket):
         await websocket.close(code=1008, reason="Неверный формат apartment_number")
         return
 
+    # 🔥 СНАЧАЛА accept
+    try:
+        await websocket.accept()
+    except Exception:
+        return
+
     user_connection = UserConnection(websocket, user_id, flat_id, role)
 
     with connections_lock:
+        old_conn = connections.get(user_id)
+        if old_conn:
+            try:
+                await old_conn.websocket.close()
+            except:
+                pass
         connections[user_id] = user_connection
-        print(f"Новое соединение: user_id={user_id}, квартира={flat_id}, роль={role}, соединения={connections}")
 
-    await websocket.accept()
+    print(f"Новое соединение: {user_id}")
 
     try:
         while True:
             try:
-                message = await websocket.receive_text()  # получаем текст
+                message = await websocket.receive_text()
             except WebSocketDisconnect:
-                print(f"Клиент отключился: user_id={user_id}")
+                print(f"Клиент отключился: {user_id}")
                 break
             except Exception as e:
                 print(f"Ошибка при приёме сообщения: {e}")
-                continue
+                break  
 
             try:
                 payload = json.loads(message)
             except json.JSONDecodeError:
-                print("Not a JSON:", message)
                 continue
 
             msg_type = payload.get("type")
 
             if msg_type == "ping":
-                battery_level = payload.get("battery_level")
-                battery_temp = payload.get("battery_temp")
-
-                # приведение типов
-                try:
-                    battery_level = int(battery_level) if battery_level is not None else None
-                    battery_temp = float(battery_temp) if battery_temp is not None else None
-                except ValueError:
-                    battery_level = None
-                    battery_temp = None
-
-                print(
-                    f"PING: battery_level={battery_level}, battery_temp={battery_temp}"
-                )
-
-                await safe_send_json(websocket, {
-                    "type": "pong"
-                })
-
-                update_intercom_data(
-                    tech_name=user_id,
-                    battery_level=battery_level,
-                    battery_temp=battery_temp
-                )
+                await safe_send_json(websocket, {"type": "pong"})
 
             elif msg_type == "call_ended_by_resident" and role == "resident":
-                flat = user_connection.flat_id
-                await end_call(flat, "resident")
+                await end_call(user_connection.flat_id, "resident")
 
     finally:
         with connections_lock:
-            if user_id in connections:
-                del connections[user_id]
-        print(f"Соединение закрыто: user_id={user_id}, соединения={connections}")
+            connections.pop(user_id, None)
 
+        try:
+            await websocket.close()
+        except:
+            pass
+
+        print(f"Соединение закрыто: {user_id}")
 
 
 # @router_intercom_connect.post("/call")
