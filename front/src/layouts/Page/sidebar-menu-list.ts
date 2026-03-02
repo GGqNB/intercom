@@ -1,0 +1,115 @@
+export type MenuItem = {
+  id: number;
+  ordinalNum: number;
+  index: string | number;
+  title: string;
+  routeName: string;
+  icon: string | null;
+  children: Array<MenuItem> | [];
+  permission?: (user: any) => boolean;
+};
+
+// const userCanAny = (...args: Array<string | Array<string>>) => (user: UserInfo) => {
+//   const flatPermissions = flatten(args);
+//   const permitted = hasPermission(flatPermissions, false, user);
+//   if (!permitted) {
+//     console.warn(`${user.email} failed permission check(any) for [${flatPermissions}]`);
+//   }
+
+//   return permitted;
+// };
+
+const menuItemsList: Array<MenuItem> = [
+  {
+    id: 5,
+    ordinalNum: 5,
+    title: 'Домофон',
+    routeName: 'intercom',
+    index: '4',
+    icon: 'tune',
+    children: [],
+
+    // permission: userCanAny(permissionSet.service.list),
+  },
+  {
+    id: 6,
+    ordinalNum: 6,
+    title: 'Клиент',
+    routeName: 'client',
+    index: '4',
+    icon: 'tune',
+    children: [],
+
+    // permission: userCanAny(permissionSet.service.list),
+  },
+  {
+    id: 6,
+    ordinalNum: 6,
+    title: 'Дебаг',
+    routeName: 'client',
+    index: '4',
+    icon: 'tune',
+    children: [
+      {
+        id: 6,
+        ordinalNum: 6,
+        title: 'Домофон Курьера',
+        routeName: 'courier-intercom',
+        index: '4',
+        icon: 'tune',
+        children: [],
+      },
+      {
+        id: 6,
+        ordinalNum: 6,
+        title: 'Квартира 3',
+        routeName: 'test-client',
+        index: '4',
+        icon: 'tune',
+        children: [],
+      },
+    ],
+
+    // permission: userCanAny(permissionSet.service.list),
+  },{
+    id: 6,
+    ordinalNum: 6,
+    title: 'CRM',
+    routeName: 'client',
+    index: '4',
+    icon: 'tune',
+    children: [
+      {
+        id: 6,
+        ordinalNum: 6,
+        title: 'Дома',
+        routeName: 'house-list',
+        index: '4',
+        icon: 'tune',
+        children: [],
+      },
+      {
+        id: 6,
+        ordinalNum: 6,
+        title: 'Входы',
+        routeName: 'entry-list',
+        index: '4',
+        icon: 'tune',
+        children: [],
+      },
+        {
+        id: 6,
+        ordinalNum: 6,
+        title: 'Домофоны',
+        routeName: 'intercom-list',
+        index: '4',
+        icon: 'tune',
+        children: [],
+      },
+    ],
+
+    // permission: userCanAny(permissionSet.service.list),
+  },
+];
+
+export default menuItemsList;

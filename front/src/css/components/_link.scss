@@ -1,0 +1,52 @@
+.s-link {
+  @include link();
+
+  &.small {
+    font-size: $font-size-small;
+  }
+
+  &.small-medium {
+    font-size: $font-size-large;
+  }
+
+  &.medium {
+    font-size: $font-size-medium;
+  }
+
+  &.large {
+    font-size: $font-size-large;
+  }
+
+  &.caps {
+    text-transform: uppercase;
+  }
+
+  &.dark {
+    color: $color-text-brand;
+  }
+
+  &.semi-bold {
+    font-weight: 600;
+  }
+
+  &.secondary {
+    color: $secondary;
+    &:hover {
+      color: $secondary;
+    }
+  }
+
+  &.only-hover {
+    color: $color-black;
+    &:hover {
+      cursor: pointer;
+      color: $color-brand;
+    }
+  }
+}
+
+.no-link {
+  pointer-events: none;
+  cursor: default;
+  text-decoration: none;
+}

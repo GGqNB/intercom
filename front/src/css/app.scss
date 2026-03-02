@@ -1,0 +1,42 @@
+// app global css in SCSS form
+@import 'quasar.variables';
+/**
+  VARIABLES
+*/
+@import 'variables/index.scss';
+
+/**
+MIXINS
+*/
+@import 'mixins/index.scss';
+
+/**
+  CORE
+*/
+@import "core/index.scss";
+
+// @import "./core/_typography.scss";
+// @import "./core/_variables-border.scss";
+
+
+/**
+  COMPONENTS
+*/
+@import './components/index.scss';
+// @import "./components/spinner";
+
+/**
+  MODULES
+*/
+@import "./modules/index.scss";
+@import "./layouts/_auth.scss";
+@import "./modules/_home.scss";
+// @import 'src/css/modules/_login.scss';
+// @import 'src/css/modules/_roles.scss';
+// @import "./modules/_sidebar.scss";
+// @import "./modules/_header.scss";
+
+/**
+  LAYOUTS
+*/
+@import "./layouts/_page.scss";

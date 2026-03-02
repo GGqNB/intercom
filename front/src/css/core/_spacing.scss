@@ -1,0 +1,68 @@
+$sides: (
+  'top': 't',
+  'right': 'r',
+  'bottom': 'b',
+  'left': 'l',
+);
+
+// Стандартные отступы
+@each $name, $side in $sides {
+  // MARGIN
+  .s-m#{$side}-no {
+    margin-#{$name}: 0;
+  }
+  .s-m#{$side}-xs {
+    margin-#{$name}: $indent-extra-small;
+  }
+  .s-m#{$side}-sm {
+    margin-#{$name}: $indent-small;
+  }
+  .s-m#{$side}-md {
+    margin-#{$name}: $indent-medium;
+  }
+  .s-m#{$side}-lg {
+    margin-#{$name}: $indent-large;
+  }
+  .s-m#{$side}-xl {
+    margin-#{$name}: $indent-extra-large;
+  }
+  // PADDING
+  .s-pno-#{$side} {
+    padding-#{$name}: 0;
+  }
+  .s-p#{$side}-xs {
+    padding-#{$name}: $indent-extra-small;
+  }
+  .s-p#{$side}-sm {
+    padding-#{$name}: $indent-small;
+  }
+  .s-p#{$side}-md {
+    padding-#{$name}: $indent-medium;
+  }
+  .s-p#{$side}-lg {
+    padding-#{$name}: $indent-large;
+  }
+  .s-p#{$side}-xl {
+    padding-#{$name}: $indent-extra-large;
+  }
+}
+
+.base-margin-top {
+  margin-top: $indent-medium;
+}
+
+.base-margin-bottom {
+  margin-bottom: $indent-medium;
+}
+
+.base-margin-left {
+  margin-left: $indent-medium;
+}
+
+.base-margin-right {
+  margin-right: $indent-medium;
+}
+
+.m-none-auto {
+  margin: 0 auto;
+}

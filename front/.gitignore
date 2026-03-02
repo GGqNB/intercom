@@ -1,0 +1,13 @@
+.idea
+
+# local env files
+/*/.env
+/*/.env.local
+/*/.env.*.local
+/*/.env.backup
+/*/.env.production
+.DS_Store
+node_modules/
+.vscode/
+dist/
+.env

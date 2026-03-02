@@ -1,0 +1,21 @@
+// background: url('/images/bg_main.svg'),
+// linear-gradient(92.18deg, #024372 13.23%, #0089b5 43.65%, #0380a8 63.96%, #00426c 91.37%);
+
+.s-page {
+  .s-page__header {
+    @include container-size();
+    padding: 25px 30px 40px 30px;
+    border-radius: 0px 0px $border-radius-large $border-radius-large;
+    background-color: $secondary;
+    color: $color-black;
+    .s-page-header--btn {
+      margin-left: auto;
+      padding: 20px 80px;
+    }
+  }
+  .s-page__body {
+    @include container-size();
+    margin: 0 auto;
+    padding: 60px 5px;
+  }
+}

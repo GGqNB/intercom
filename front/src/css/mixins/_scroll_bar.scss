@@ -1,0 +1,19 @@
+@mixin scrollbar {
+  // Настройка скролл бара, для firefox и для остального
+  scrollbar-width: thin;
+  scrollbar-color: rgba($color-grey, 0.5) rgba($color-white, 0.5);
+  &::-webkit-scrollbar {
+    width: 6px; /* for vertical scrollbars */
+    height: 6px; /* for horizontal scrollbars */
+    border-radius: 8px;
+  }
+  &::-webkit-scrollbar-track {
+    background: rgba($color-white, 0.5);
+    border-radius: 8px;
+    border: 1px solid rgba($color-grey, 0.2);
+  }
+  &::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    background: rgba($color-grey, 0.5);
+  }
+}

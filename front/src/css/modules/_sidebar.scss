@@ -1,0 +1,85 @@
+.s-sidebar {
+  box-shadow: $shadow-base;
+  @include scrollbar;
+  // Резерв места для скроллбара
+  scrollbar-gutter: stable;
+
+  background-color: $color-white;
+  color: $color-black;
+
+  position: fixed;
+
+  .q-item {
+    padding: $indent-small $indent-medium;
+    .q-focus-helper {
+      border-radius: $border-radius-normal !important;
+    }
+  }
+  //Подсветка родительского элемента при наведении
+  .q-expansion-item {
+    .q-item {
+      border-radius: $border-radius-normal;
+      // @include focus-helper;
+    }
+  }
+
+  .q-expansion-item__toggle-icon {
+    animation: 3s linear 1s infinite running slidein;
+  }
+}
+
+.s-sidebar-container {
+  overflow-y: auto;
+  padding: $indent-large $indent-small;
+
+  .s-sidebar-list {
+    .s-sidebar-item {
+      min-height: 48px;
+      margin-bottom: $indent-small;
+      // @include focus-helper;
+
+      &:hover {
+        color: $color-black;
+        border-radius: $border-radius-normal;
+      }
+      // Активный пункт меню
+      &.s-sidebar-item--active {
+        .q-item__section--avatar,
+        .s-sidebar__title {
+          color: $color-brand;
+        }
+      }
+    }
+    // Отступ для иконки
+    .q-item__section--avatar {
+      padding-right: 12px;
+      min-width: 24px;
+    }
+
+    .s-sidebar-expansion-item {
+      .s-sidebar-expansion-item__icon {
+      }
+    }
+
+    // Подсветка родительского активного элемента, только текст без иконки
+    .s-sidebar-item--active-parent {
+      .q-expansion-item__container {
+        > .q-item {
+          .q-item__section--main {
+            color: $color-brand;
+          }
+        }
+      }
+    }
+
+    .s-sidebar__icon-wrapper {
+      .s-sidebar__icon {
+        font-size: 24px;
+      }
+    }
+
+    .s-sidebar__title {
+      @include font-text-2;
+    }
+  }
+}

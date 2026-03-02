@@ -1,0 +1,44 @@
+.s-stepper-horizontal {
+  border-radius: 5px;
+  border: 1px solid $primary;
+  padding: 2px;
+  .q-stepper__line {
+    &:after, &:before {
+      background: blue;
+      height: 1px;
+    }
+  }
+
+  .q-stepper__tab  {
+    padding: 8px 12px;
+    min-height: 48px;
+    &:hover {
+      border-radius: $border-radius-medium;
+    }
+    .q-stepper__title {
+      font-weight: 500;
+      font-size: 16px;
+      letter-spacing: 0.5px;
+    }
+    .q-stepper__dot {
+      font-size: 24px;
+      width: 50px;
+      height: 50px;
+      min-width: 28px;
+    }
+    .q-stepper__step {
+      display: none;
+    }
+  }
+}
+
+.s-step__empty {
+  .q-stepper__step-content {
+    display: none;
+  }
+}
+
+
+.s-stepper__header {
+  border-bottom: 0;
+}

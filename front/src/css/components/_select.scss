@@ -1,0 +1,42 @@
+.s-select {
+  @include input-base();
+
+  // width: $width-base-large;
+  font-size: $font-size-xs;
+  // font-size: $font-size-medium;
+
+  .q-select__dropdown-icon {
+    color: $color-brand !important;
+  }
+
+  // Если обязательное поле, то будет звездочка к label добавляться
+  &.required .q-field__label,
+  &.required .file-label {
+      &:after {
+          content: '*';
+          color: $color-error;
+          font-weight: bold;
+      }
+  }
+}
+
+.s-select--item {
+  .q-menu {
+    width: 100%;
+  }
+  .q-item {
+    word-wrap: normal;
+    padding-top: $indent-extra-small;
+    padding-bottom: $indent-extra-small;
+    &:hover {
+      background-color: $color-brand;
+      color: $secondary;
+    }
+    &:not(:last-child) {
+      border-bottom: 0.75px solid rgba($secondary, 1);
+    }
+  }
+}
+.s-select .q-field__native {
+  margin-top: -7px;
+}

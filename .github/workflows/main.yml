@@ -1,0 +1,23 @@
+name: Deploy to Server
+
+on:
+  push:
+    branches:
+      - main  
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up SSH for deployment
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.INTERCOM_RSA }}
+
+      - name: Run deployment commands
+        run: |
+          ssh -o StrictHostKeyChecking=no -vvv -T root@37.252.19.13 "cd intercom/ && git pull origin main && docker-compose down && docker-compose build && docker-compose up -d"

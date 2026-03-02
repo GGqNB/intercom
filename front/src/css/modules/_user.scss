@@ -1,0 +1,42 @@
+.user-extension-cards {
+  .user-extension-cards__header {
+    width: 100%;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 20px;
+    line-height: 130%;
+    .user-extension-cards__header__dash {
+      width: 100%;
+      border-bottom: 1px dashed #9a9999;
+    }
+  }
+
+  .q-card {
+    .q-card__section--vert {
+      padding: 5px 16px;
+      &.extension-cards {
+        padding: 0;
+      }
+    }
+  }
+
+  .user-extension-card__wrapper {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    border-radius: 15px;
+    padding: 20px;
+    border: 1px solid #ffffff;
+    transition: border 0.3s ease-in-out;
+    &.clickable {
+      &.active {
+        border-radius: 15px;
+        border: 1px solid $primary;
+      }
+      &:not(.active):hover {
+        border-radius: 15px;
+        border: 1px solid #9e9e9e;
+        cursor: pointer;
+        transition: border 0.3s ease-in-out;
+      }
+    }
+  }
+}

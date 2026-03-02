@@ -1,0 +1,85 @@
+$font-family: "Jost", sans-serif !important;
+
+/* FONT SIZE BASE VARIABLES */
+$font-size-base: ("8": 8px, "small": 10px, "medium": 12px, "large": 14px, "xl": 15px, "xxl": 16px, "xxxl": 20px);
+$font-size-base: 14px;
+$font-size-base-small: 10px;
+$font-size-base-medium: 12px;
+$font-size-base-large: 15px;
+$font-size-base-xl: 16px;
+$font-size-base-xxl: 20px;
+$font-size-base-xxxl: 24px;
+$font-size-xs: 14;
+$font-size-8: 17px;
+
+/* FONT SIZE BASE VARIABLES */
+$font-size-small: 26px;
+$font-size-medium: 28px;
+$font-size-large: 30px;
+$font-size-xl: 32px;
+$font-size-xxl: 34px;
+
+
+/* FONT WIDTH VARIABLES */
+$font-weights: 200, 300, 400, 500, 600, 700, 800;
+$font-weight-semi-bold: 600;
+$font-weight-medium: 500;
+
+
+// =================================================
+/* FONT SIZE BASE */
+// =================================================
+
+@each $name, $var in $font-size-base {
+  .fs-#{$name} {
+    font-size: $var;
+  }
+}
+
+.fs-base-xxl {
+  font-size: $font-size-base-xxl;
+}
+
+.fs-base-small{
+  font-size: $font-size-base-small;
+}
+
+// =================================================
+/* FONT SIZE */
+// =================================================
+.fs-8 {
+  font-size: $font-size-8;
+}
+
+
+.fs-small {
+  font-size: $font-size-small;
+}
+
+.fs-medium {
+  font-size: $font-size-medium;
+}
+
+.fs-large {
+  font-size: $font-size-large;
+}
+
+.fs-xl {
+  font-size: $font-size-xl;
+}
+
+.fs-xxl {
+  font-size: $font-size-xxl;
+}
+
+
+// =================================================
+/* FONT WEIGHT */
+// =================================================
+
+@each $font-weight in $font-weights {
+  .fw-#{$font-weight} {
+    font-weight: #{$font-weight};
+  }
+}
+

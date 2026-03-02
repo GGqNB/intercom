@@ -1,0 +1,20 @@
+.s-checkbox {
+  .q-checkbox__label {
+    font-weight: 500;
+  }
+  .q-checkbox__bg {
+    border-radius: 4px;
+  }
+  .q-checkbox__inner--falsy {
+    .q-checkbox__bg {
+      background: $color-white;
+      border: 1px solid $color-grey-secondary;
+    }
+  }
+  .q-checkbox__inner--truthy {
+    .q-checkbox__bg {
+      border: 2px solid transparent;
+      background: linear-gradient(235.13deg, #00b495 3.07%, #06b2d8 99.77%);
+    }
+  }
+}
