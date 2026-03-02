@@ -143,16 +143,17 @@ async def seed_data(
     ]
 
     
-    for i,entry in entries_house1 + entries_house2:
-        if i >= len(fixed_tech_names):
-            break 
-        intercoms.append(
-            Intercom(
-                name="Абрамс-1",
-                tech_name=fixed_tech_names[i],
-                entry_id=entry.id,
-            )
+    for i, entry in enumerate(entries_house1 + entries_house2):
+     if i >= len(fixed_tech_names):
+        break
+
+     intercoms.append(
+        Intercom(
+            name="Абрамс-1",
+            tech_name=fixed_tech_names[i],
+            entry_id=entry.id,
         )
+    )
 
     session.add_all(intercoms)
 
