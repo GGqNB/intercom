@@ -42,7 +42,7 @@ async def upload_video(
 
 
 @router_files.get("/video/{filename}")
-async def download_video(filename: str):
+async def download_video(filename: str,  api_key: APIKey = Depends(get_api_key)):
     file_path = VIDEO_DIR / filename
 
     if not file_path.exists():
@@ -56,7 +56,7 @@ async def download_video(filename: str):
 
 
 @router_files.get("/latest_video")
-async def latest_video():
+async def latest_video( api_key: APIKey = Depends(get_api_key)):
     if not os.path.exists("video_updates.json"):
         return {"version": "0.0.0", "file_name": ""}
 
