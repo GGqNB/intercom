@@ -2,7 +2,7 @@ from fastapi import FastAPI
 import asyncio
 from fastapi.middleware.cors import CORSMiddleware
 from src.factory.runners import monitor_intercoms, cleanup_task
-from src.intercom_connect.router import router_intercom_connect
+from src.intercom_connect.router import cleanup_old_websockets, router_intercom_connect
 from src.crm.location.router import router_location
 from src.crm.build.router import router_build
 from src.crm.intercom.router import router_intercom
@@ -54,7 +54,7 @@ add_pagination(app)
 
 
 
-# @app.on_event("startup")
-# async def startup_event():
-    # asyncio.create_task(monitor_intercoms())
+@app.on_event("startup")
+async def startup_event():
+    asyncio.create_task(cleanup_old_websockets())
     # asyncio.create_task(cleanup_task())
