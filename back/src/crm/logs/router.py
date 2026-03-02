@@ -2,6 +2,7 @@
 import json
 from typing import Any, Dict, List, Optional
 from fastapi import APIRouter, File, UploadFile, status
+from src.factory.runners import send_to_rabbitmq
 from src.crm.logs.schemas import FilterCallLog, ReadCallLog, WriteCallLog
 from src.crm.logs.crud import update_call_log, get_call_logs, delete_call_log, create_call_log, update_call_log_photo
 from src.crm.logs.methods import get_logs_intercoms, intercom_to_dict
@@ -127,6 +128,7 @@ async def edit_log(
     updated = await update_call_log(session, log_id, updated_log)
     return {"data": updated, "status": "updated"}
 
+QUEUE_CALLING = f"{conf.rabbit.QUEUE_CALLING}"
 @router_logs.put("/{log_id}/rabbit")
 async def update_log_photo(
     log_id: int,
@@ -135,8 +137,22 @@ async def update_log_photo(
     api_key: APIKey = Depends(get_api_key)
 ):
     updated = await update_call_log_photo(session, log_id, photo)
-    return updated
+    print("Updated log photo:", updated)
+    try:
+        payload = {
+            "id": updated["data"].id,
+            "type": updated["data"].type,
+            "house_id": updated["data"].house_id,
+            "flat": updated["data"].flat,
+            "photo_url": updated["data"].photo_url,
+            "created_at": updated["data"].created_at.isoformat()
+        }
+        await send_to_rabbitmq(payload, QUEUE_CALLING)
+    except Exception as e:
+        print("Ошибка отправки в RabbitMQ:", e)
+        pass
 
+    return updated
 
 @router_logs.delete("/{log_id}")
 async def remove_log(

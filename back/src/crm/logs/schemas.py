@@ -13,6 +13,9 @@ class BaseCallLog(BaseModel):
 class ReadCallLog(BaseCallLog):
     id: int
     created_at: datetime
+    model_config = {
+        "from_attributes": True
+    }
 
 class WriteCallLog(BaseCallLog):
     pass

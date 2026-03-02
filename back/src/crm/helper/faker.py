@@ -131,14 +131,25 @@ async def seed_data(
 
     session.add_all(entries_house1 + entries_house2)
 
-    # ----- Домофоны -----
     intercoms = []
 
-    for entry in entries_house1 + entries_house2:
+    fixed_tech_names = [
+    "LWI-I0F-B3M-6RX",
+    "9WN-I60-NCK-MM8",
+    "XNM-YDF-R5Q-QW3",
+    "P4J-VLK-TOI-C26",
+    "51G-NL6-ELO-HGV",
+    "ACT-FOD-IVO-P9R"
+    ]
+
+    
+    for i,entry in entries_house1 + entries_house2:
+        if i >= len(fixed_tech_names):
+            break 
         intercoms.append(
             Intercom(
                 name="Абрамс-1",
-                tech_name=gen_tech_name(),
+                tech_name=fixed_tech_names[i],
                 entry_id=entry.id,
             )
         )
