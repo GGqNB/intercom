@@ -65,7 +65,7 @@ def update_intercom_data(
                         'battery_temp': battery_temp
                     }
                     current_intercoms.append(updated_intercom)
-                    print(f"[{current_time.strftime('%H:%M:%S')}] Домофон с tech_name={tech_name} добавлен.")
+                    # print(f"[{current_time.strftime('%H:%M:%S')}] Домофон с tech_name={tech_name} добавлен.")
                 else:
                     print(f"[{current_time.strftime('%H:%M:%S')}] Домофон с tech_name={tech_name} обновлен.")
 

@@ -2,6 +2,7 @@ from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from src.crm.build.models import House
+from src.crm.users.models import Users
 
 async def validate_flat(session: AsyncSession, house_id: int, flat: int):
     try:
@@ -21,3 +22,17 @@ async def validate_flat(session: AsyncSession, house_id: int, flat: int):
                 status_code=400,
                 detail=f"Ошибка, либо нет дома, либо квартира не в диапозоне"
             )
+
+async def get_users_by_house_and_flat(
+    session: AsyncSession,
+    house_id: int,
+    flat: int
+) -> list[Users]:
+
+    query = select(Users).where(
+        Users.house_id == house_id,
+        Users.flat == flat
+    )
+
+    result = await session.execute(query)
+    return result.scalars().all()

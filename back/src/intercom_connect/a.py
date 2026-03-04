@@ -48,7 +48,17 @@ def get_connections():
             })
     return active_calls
 
-
+async def cleanup_old_websockets():
+    """
+    При старте сервера очищаем все старые WebSocket соединения,
+    чтобы не было обращений к невалидным объектам.
+    """
+    with connections_lock:
+        if connections:
+            print(f"[STARTUP] Очистка старых соединений: {list(connections.keys())}")
+            connections.clear()
+        else:
+            print("[STARTUP] Старых соединений нет")
 
 @router_intercom_connect.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):

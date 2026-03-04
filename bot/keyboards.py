@@ -19,6 +19,41 @@ def main_menu_kb():
         )
     )
 
+def open_door_kb():
+    return Attachment(
+        type="inline_keyboard",
+        payload=ButtonsPayload(
+            buttons=[
+                [
+                    CallbackButton(
+                        text="🔑 Открыть",
+                        intent=Intent.DEFAULT
+                    )
+                ]
+            ]
+        )
+    )
+
+def confirm_menu_kb():
+    return Attachment(
+        type="inline_keyboard",
+        payload=ButtonsPayload(
+            buttons=[
+                [
+                    CallbackButton(
+                        text="⚙ Настройки",
+                        payload="cmd_settings",
+                        intent=Intent.DEFAULT
+                    ),
+                    CallbackButton(
+                        text="🏠 Главная",
+                        payload="cmd_home",
+                        intent=Intent.DEFAULT
+                    ),
+                ]
+            ]
+        )
+    )
 
 def settings_menu_kb():
     return Attachment(
@@ -33,19 +68,19 @@ def settings_menu_kb():
                     )
                 ],
                 [
-                    CallbackButton(
-                        text="⬅ Назад",
-                        payload="cmd_back_main",
-                        intent=Intent.NEGATIVE
-                    )
+                     CallbackButton(
+                        text="🏠 Главная",
+                        payload="cmd_home",
+                        intent=Intent.DEFAULT
+                    ),
                 ]
             ]
         )
     )
 
 HOUSE_MAP = {
-    "house_1": {"id": 13, "text": "Объездная 57"},
-    "house_2": {"id": 14, "text": "Объездная 57А"}
+    "house_1": {"id": 15, "text": "Объездная 57"},
+    "house_2": {"id": 13, "text": "Объездная 57А"}
 }
 
 def houses_kb():

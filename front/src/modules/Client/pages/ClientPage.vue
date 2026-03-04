@@ -114,7 +114,7 @@ export default defineComponent({
         const reconnectInterval = 3000;
         let reconnectTimer = null;
         const connectWebSocket = () => {
-            const serverAddress = `${WSS_SERVER}?key=${accessToken.value}&user_id=${userId}&flat_id=${apartmentNumber.value}&role=${role}`;
+            const serverAddress = `${WSS_SERVER}?key=${accessToken.value}&user_id=${apartmentNumber.value}&flat_id=${apartmentNumber.value}&role=${role}`;
             socket.value = new WebSocket(serverAddress);
 
             socket.value.onopen = () => {

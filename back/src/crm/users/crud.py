@@ -7,7 +7,7 @@ from fastapi import APIRouter, status
 from fastapi_pagination.ext.sqlalchemy import paginate
 from sqlalchemy.orm import selectinload
 from src.crm.intercom.models import Intercom
-
+from src.crm.users.models import Users
 async def get_intercom(
                     filters_params: FilterIntecom,
                     session: AsyncSession):
@@ -27,4 +27,22 @@ async def get_intercom(
                 "args": str(e),  
             }
         )
-        
+    
+async def get_user_by_max_id_service(
+    session: AsyncSession,
+    max_id: str
+) -> Users | None:
+    """
+    Возвращает пользователя по max_id.
+    Возвращает None если не найден.
+    """
+
+    query = (
+        select(Users)
+        .options(selectinload(Users.house))
+        .where(Users.max_id == max_id)
+        .limit(1)
+    )
+
+    result = await session.execute(query)
+    return result.scalar_one_or_none()

@@ -11,10 +11,10 @@ class Users(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
     chat_id = Column(String, nullable=False)
-    max_id = Column(String, nullable=False)
+    max_id = Column(String, nullable=False, unique=True)
     flat = Column(Integer, nullable = False)
     flat_stown = Column(Integer, nullable = False)
     house_id = Column(Integer, ForeignKey("house.id", ondelete='CASCADE'), nullable=False)
     # Relationship
     house = relationship(House, passive_deletes=True)
-
+    

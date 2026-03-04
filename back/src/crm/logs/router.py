@@ -2,6 +2,7 @@
 import json
 from typing import Any, Dict, List, Optional
 from fastapi import APIRouter, File, UploadFile, status
+from src.crm.users.methods import get_users_by_house_and_flat
 from src.factory.runners import send_to_rabbitmq
 from src.crm.logs.schemas import FilterCallLog, ReadCallLog, WriteCallLog
 from src.crm.logs.crud import update_call_log, get_call_logs, delete_call_log, create_call_log, update_call_log_photo
@@ -137,20 +138,42 @@ async def update_log_photo(
     api_key: APIKey = Depends(get_api_key)
 ):
     updated = await update_call_log_photo(session, log_id, photo)
-    print("Updated log photo:", updated)
+
+    log = updated["data"]
+
     try:
+        users = await get_users_by_house_and_flat(
+            session,
+            log.house_id,
+            log.flat
+        )
+        if not users:
+            return updated
+        
+        users_payload = [
+            {
+                "id": user.id,
+                "name": user.name,
+                "chat_id": user.chat_id,
+                "max_id": user.max_id
+            }
+            for user in users
+        ]
+
         payload = {
-            "id": updated["data"].id,
-            "type": updated["data"].type,
-            "house_id": updated["data"].house_id,
-            "flat": updated["data"].flat,
-            "photo_url": updated["data"].photo_url,
-            "created_at": updated["data"].created_at.isoformat()
+            "id": log.id,
+            "type": log.type,
+            "house_id": log.house_id,
+            "flat": log.flat,
+            "photo_url": log.photo_url,
+            "created_at": log.created_at.isoformat(),
+            "users": users_payload 
         }
+
         await send_to_rabbitmq(payload, QUEUE_CALLING)
+
     except Exception as e:
         print("Ошибка отправки в RabbitMQ:", e)
-        pass
 
     return updated
 

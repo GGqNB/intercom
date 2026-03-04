@@ -1,4 +1,4 @@
-from request import register_user
+from request import get_user_settings, register_user
 from maxapi import Router, F
 from maxapi.types import MessageCreated, MessageCallback, Command
 import aiohttp
@@ -8,7 +8,8 @@ from keyboards import (
     settings_menu_kb,
     houses_kb,
     confirm_flat_kb,
-    HOUSE_MAP
+    HOUSE_MAP,
+    confirm_menu_kb
 )
 
 router = Router()
@@ -23,6 +24,21 @@ async def cmd_start(event: MessageCreated):
         attachments=[main_menu_kb()]
     )
 
+@router.message_callback(F.callback.payload == "cmd_home")
+async def callback_home(event: MessageCallback):
+    """Обработка кнопки Home"""
+    chat_id = event.message.recipient.chat_id
+
+    await event.answer(notification="🏠 Домашнее меню")
+
+    await event.message.edit(
+        text=(
+            "🏠 Добро пожаловать на главную!\n\n"
+            "Здесь вы можете вернуться к основным функциям бота.\n\n"
+            "Чтобы увидеть текущие настройки, зайдите в '⚙ Настройки'"
+        ),
+        attachments=[main_menu_kb()]  # кнопка Home
+    )
 
 # --------------------
 # ОТКРЫТЬ НАСТРОЙКИ
@@ -30,17 +46,40 @@ async def cmd_start(event: MessageCreated):
 
 @router.message_callback(F.callback.payload == "cmd_settings")
 async def callback_settings(event: MessageCallback):
-    await event.answer()
+    await event.answer(notification="⚙ Загружаем ваши настройки...")
+
+    user_id = event.callback.user.user_id
+
+    # 🔹 вызываем функцию из requests.py
+    user_data = await get_user_settings(str(user_id))
+
+    if not user_data:
+        await event.message.edit(
+            text="❌ Настройки не найдены",
+            attachments=[settings_menu_kb()]
+        )
+        return
+
+    flat_number = user_data.get("flat")
+    house_id = user_data.get("house_id")
+    name = user_data.get("name")
+
+    house_text = next(
+        (v["text"] for v in HOUSE_MAP.values() if v["id"] == house_id),
+        "Неизвестный дом"
+    )
 
     await event.message.edit(
-        text="⚙ Настройки\n\nВыберите дом:",
+        text=(
+            f"⚙ Настройки пользователя\n\n"
+            f"👤 Имя: {name}\n"
+            f"🏠 Дом: {house_text}\n"
+            f"🏢 Квартира: {flat_number}\n\n"
+            "Выберите действие ниже:"
+        ),
         attachments=[settings_menu_kb()]
     )
 
-
-# --------------------
-# ПОКАЗАТЬ ДОМА
-# --------------------
 
 @router.message_callback(F.callback.payload == "cmd_choose_house")
 async def callback_choose_house(event: MessageCallback):
@@ -52,23 +91,19 @@ async def callback_choose_house(event: MessageCallback):
     )
 
 
-# --------------------
-# ДОМ ВЫБРАН
-# --------------------
-
 @router.message_callback(F.callback.payload.startswith("house_"))
 async def callback_house_selected(event: MessageCallback):
 
     user_id = event.callback.user.user_id
-    key = event.callback.payload  # например 'house_1'
+    key = event.callback.payload 
 
     house_data = HOUSE_MAP.get(key)
     if not house_data:
         return
 
     user_states[user_id] = {
-        "house_id": house_data["id"],   # для сервера
-        "house_text": house_data["text"],  # для отображения пользователю
+        "house_id": house_data["id"],
+        "house_text": house_data["text"], 
         "step": "waiting_flat"
     }
 
@@ -78,11 +113,6 @@ async def callback_house_selected(event: MessageCallback):
         text=f"🏠 Дом {house_data['text']} выбран.\n\nВведите номер квартиры:",
         attachments=[]
     )
-
-
-# --------------------
-# ВВОД КВАРТИРЫ
-# --------------------
 
 
 @router.message_created()
@@ -96,7 +126,6 @@ async def handle_flat_input(event: MessageCreated):
     if user_states[user_id].get("step") != "waiting_flat":
         return
 
-    # берем текст квартиры
     flat_number = event.message.body.text
 
     if not flat_number or not flat_number.isdigit():
@@ -106,26 +135,20 @@ async def handle_flat_input(event: MessageCreated):
         )
         return
 
-    # сохраняем квартиру и меняем шаг
     user_states[user_id]["flat_number"] = flat_number
     user_states[user_id]["step"] = "confirming"
 
-    # берем текст дома для пользователя
     house_text = user_states[user_id]["house_text"]
 
     await event.bot.send_message(
         chat_id=event.message.recipient.chat_id,
         text=(
             "Подтвердите выбор:\n\n"
-            f"🏠 Дом: {house_text}\n"  # показываем адрес, а не id
+            f"🏠 Дом: {house_text}\n" 
             f"🏢 Квартира: {flat_number}"
         ),
         attachments=[confirm_flat_kb()]
     )
-
-# --------------------
-# ПОДТВЕРЖДЕНИЕ
-# --------------------
 
 @router.message_callback(F.callback.payload == "confirm_flat")
 async def confirm_flat(event: MessageCallback):
@@ -142,25 +165,37 @@ async def confirm_flat(event: MessageCallback):
     house_text = data["house_text"]
     flat_number = int(data["flat_number"])
 
-    del user_states[user_id]
-
-    # 🔹 Формируем объект для бэка
     payload = {
         "name": name,
         "chat_id": str(chat_id),
         "max_id": str(user_id),
         "flat": flat_number,
+        "flat_stown": 0,
         "house_id": house_id
     }
 
-    success = await register_user(payload)
+    result = await register_user(payload)
 
-    if not success:
-        await event.answer(notification="❌ Ошибка сохранения")
+    if not result["success"]:
+        if result.get("error") == "Квартира не найдена":
+            user_states[user_id]["step"] = "waiting_flat"
+
+            await event.answer(notification="❌ Квартира не найдена")
+
+            await event.message.edit(
+                text=(
+                    f"⚠ Возможно, вы ошиблись в номере квартиры.\n\n"
+                    f"🏠 Дом: {house_text}\n\n"
+                    f"Введите номер квартиры ещё раз:"
+                ),
+                attachments=[]
+            )
+            return
+
+        await event.answer(notification="❌ Ошибка сервера")
         return
 
-    del user_states[user_id]
-
+    user_states.pop(user_id, None)
 
     await event.answer(notification="✅ Сохранено")
 
@@ -170,13 +205,8 @@ async def confirm_flat(event: MessageCallback):
             f"🏠 Дом: {house_text}\n"
             f"🏢 Квартира: {flat_number}"
         ),
-        attachments=[main_menu_kb()]
+        attachments=[confirm_menu_kb()]
     )
-
-
-# --------------------
-# ИЗМЕНИТЬ
-# --------------------
 
 @router.message_callback(F.callback.payload == "change_flat")
 async def change_flat(event: MessageCallback):

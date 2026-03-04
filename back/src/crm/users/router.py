@@ -1,11 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, insert, update, delete
+from sqlalchemy import select, update, delete
+from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import selectinload
 from fastapi_pagination import Page
 from fastapi_pagination.ext.sqlalchemy import paginate
 from fastapi.security.api_key import APIKey
-
+from sqlalchemy.exc import SQLAlchemyError
+from src.crm.users.crud import get_user_by_max_id_service
 from src.crm.stown.crud import get_flat_by_house
 from src.crm.users.methods import validate_flat
 from src.crm.users.models import Users
@@ -20,7 +22,7 @@ router_users = APIRouter(prefix="/users", tags=["Users"])
 async def get_users(
     filters_params: FilterUser = Depends(),
     session: AsyncSession = Depends(get_async_session),
-    bot_key: APIKey = Depends(get_bot_key)
+    api_key: APIKey = Depends(get_api_key)
 ):
     try:
         query = select(Users).options(selectinload(Users.house)) 
@@ -46,6 +48,34 @@ async def get_users(
             detail={"code": status.HTTP_500_INTERNAL_SERVER_ERROR, "args": str(e)}
         )
 
+@router_users.get("/{max_id}", response_model=ReadUser)
+async def get_user_by_max_id(
+    max_id: str,
+    session: AsyncSession = Depends(get_async_session),
+    bot_key: APIKey = Depends(get_bot_key)
+):
+    try:
+        user = await get_user_by_max_id_service(session, max_id)
+
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Пользователь не найден"
+            )
+
+        return user
+
+    except HTTPException:
+        raise
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                "code": status.HTTP_500_INTERNAL_SERVER_ERROR,
+                "message": str(e)
+            }
+        )
 
 @router_users.post("", status_code=status.HTTP_201_CREATED)
 async def add_user(
@@ -55,19 +85,48 @@ async def add_user(
 ):
     try:
         await validate_flat(session, new_user.house_id, new_user.flat)
-        flat_id_stown = await get_flat_by_house(session, new_user.house_id, new_user.flat)
+
+        flat_id_stown = await get_flat_by_house(
+            session,
+            new_user.house_id,
+            new_user.flat
+        )
+        if not flat_id_stown:
+            raise HTTPException(
+                status_code=status.HTTP_418_IM_A_TEAPOT,
+                detail="Квартира не найдена"
+            )
         new_user.flat_stown = flat_id_stown
-        stmt = insert(Users).values(new_user.model_dump()).returning(Users)
+
+        # 🔥 UPSERT
+        stmt = insert(Users).values(new_user.model_dump())
+
+        stmt = stmt.on_conflict_do_update(
+            index_elements=["max_id"],  # поле с UNIQUE
+            set_={
+                "name": new_user.name,
+                "chat_id": new_user.chat_id,
+                "flat": new_user.flat,
+                "flat_stown": new_user.flat_stown,
+                "house_id": new_user.house_id
+            }
+        ).returning(Users)
+
         result = await session.execute(stmt)
         await session.commit()
-        created_user = result.scalar_one()
-        return {"data": created_user, "status": "success"}
 
-    except Exception as e:
+        created_or_updated_user = result.scalar_one()
+
+        return {
+            "data": created_or_updated_user,
+            "status": "success"
+        }
+
+    except SQLAlchemyError as e:
         await session.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={"code": status.HTTP_500_INTERNAL_SERVER_ERROR, "message": str(e), "args": getattr(e, "args", None)}
+            detail=str(e)
         )
 
 

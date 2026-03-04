@@ -71,7 +71,7 @@ async def monitor_intercoms():
                     merged_item["intercom"] = None
 
                 if delta > timedelta(seconds=10):
-                    print(f"[{current_time.strftime('%H:%M:%S')}] Устарел домофон: {tech_name}")
+                    # print(f"[{current_time.strftime('%H:%M:%S')}] Устарел домофон: {tech_name}")
                     await send_to_rabbitmq({
                         "event": "intercom_offline",
                         "tech_name": tech_name,
