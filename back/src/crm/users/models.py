@@ -13,6 +13,7 @@ class Users(Base):
     chat_id = Column(String, nullable=False)
     max_id = Column(String, nullable=False)
     flat = Column(Integer, nullable = False)
+    flat_stown = Column(Integer, nullable = False)
     house_id = Column(Integer, ForeignKey("house.id", ondelete='CASCADE'), nullable=False)
     # Relationship
     house = relationship(House, passive_deletes=True)

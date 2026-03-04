@@ -8,6 +8,7 @@ class BaseUser(BaseModel):
     max_id: str
     flat: int
     house_id: int
+    flat_stown: int
 
 class ReadUser(BaseUser):
     id: int
@@ -20,4 +21,5 @@ class FilterUser(BaseModel):
     chat_id: Annotated[Optional[str], Field(default=None)]
     max_id: Annotated[Optional[str], Field(default=None)]
     flat: Annotated[Optional[int], Field(default=None)]
+    flat_stown: Annotated[Optional[int], Field(default=None)]
     house_id: Annotated[Optional[int], Field(default=None)]

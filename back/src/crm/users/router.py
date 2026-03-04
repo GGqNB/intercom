@@ -6,11 +6,12 @@ from fastapi_pagination import Page
 from fastapi_pagination.ext.sqlalchemy import paginate
 from fastapi.security.api_key import APIKey
 
+from src.crm.stown.crud import get_flat_by_house
 from src.crm.users.methods import validate_flat
 from src.crm.users.models import Users
 from src.crm.users.schemas import ReadUser, WriteUser, FilterUser
 from src.database import get_async_session
-from src.auth import get_api_key
+from src.auth import get_api_key, get_bot_key
 from src.crm.build.models import House  # для join
 
 router_users = APIRouter(prefix="/users", tags=["Users"])
@@ -19,10 +20,10 @@ router_users = APIRouter(prefix="/users", tags=["Users"])
 async def get_users(
     filters_params: FilterUser = Depends(),
     session: AsyncSession = Depends(get_async_session),
-    api_key: APIKey = Depends(get_api_key)
+    bot_key: APIKey = Depends(get_bot_key)
 ):
     try:
-        query = select(Users).options(selectinload(Users.house))  # загружаем связь house
+        query = select(Users).options(selectinload(Users.house)) 
         
         if filters_params.name:
             query = query.where(Users.name.ilike(f"%{filters_params.name}%"))
@@ -32,6 +33,8 @@ async def get_users(
             query = query.where(Users.max_id.ilike(f"%{filters_params.max_id}%"))
         if filters_params.flat:
             query = query.where(Users.flat == filters_params.flat)
+        if filters_params.flat_stown:
+            query = query.where(Users.flat == filters_params.flat_stown)
         if filters_params.house_id:
             query = query.join(House, Users.house_id == House.id).where(Users.house_id == filters_params.house_id)
 
@@ -48,11 +51,12 @@ async def get_users(
 async def add_user(
     new_user: WriteUser,
     session: AsyncSession = Depends(get_async_session),
-    api_key: APIKey = Depends(get_api_key)
+    bot_key: APIKey = Depends(get_bot_key)
 ):
     try:
         await validate_flat(session, new_user.house_id, new_user.flat)
-        
+        flat_id_stown = await get_flat_by_house(session, new_user.house_id, new_user.flat)
+        new_user.flat_stown = flat_id_stown
         stmt = insert(Users).values(new_user.model_dump()).returning(Users)
         result = await session.execute(stmt)
         await session.commit()

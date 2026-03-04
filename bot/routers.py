@@ -1,5 +1,7 @@
+from request import register_user
 from maxapi import Router, F
 from maxapi.types import MessageCreated, MessageCallback, Command
+import aiohttp
 
 from keyboards import (
     main_menu_kb,
@@ -129,16 +131,36 @@ async def handle_flat_input(event: MessageCreated):
 async def confirm_flat(event: MessageCallback):
 
     user_id = event.callback.user.user_id
+    chat_id = event.message.recipient.chat_id
+    name = event.callback.user.first_name
 
     data = user_states.get(user_id)
     if not data:
         return
 
-    house_id = data["house_id"]       # id для сервера
-    house_text = data["house_text"]   # текст для пользователя
-    flat_number = data["flat_number"]
+    house_id = data["house_id"]
+    house_text = data["house_text"]
+    flat_number = int(data["flat_number"])
 
     del user_states[user_id]
+
+    # 🔹 Формируем объект для бэка
+    payload = {
+        "name": name,
+        "chat_id": str(chat_id),
+        "max_id": str(user_id),
+        "flat": flat_number,
+        "house_id": house_id
+    }
+
+    success = await register_user(payload)
+
+    if not success:
+        await event.answer(notification="❌ Ошибка сохранения")
+        return
+
+    del user_states[user_id]
+
 
     await event.answer(notification="✅ Сохранено")
 
@@ -150,9 +172,6 @@ async def confirm_flat(event: MessageCallback):
         ),
         attachments=[main_menu_kb()]
     )
-
-    # ✅ здесь можно отправлять house_id на сервер
-    # await send_to_server(house_id, flat_number)
 
 
 # --------------------

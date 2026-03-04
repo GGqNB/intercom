@@ -34,11 +34,17 @@ async def upsert_flat(session: AsyncSession, data: ReadSFlat, house_id: int):
 
 async def get_flat_by_house(session: AsyncSession, house_id: int, number: int) -> int | None:
 
-    stmt = select(SFlat.id).where(
+    try:
+        stmt = select(SFlat.id).where(
         SFlat.house_id == house_id,
         SFlat.number == number,
         SFlat.type == 'Квартира'
     )
-    result = await session.execute(stmt)
-    flat_id = result.scalars().first()
-    return flat_id
+        result = await session.execute(stmt)
+        flat_id = result.scalars().first()
+        return flat_id
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e)
+        )

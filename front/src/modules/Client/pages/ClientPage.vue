@@ -2,9 +2,12 @@
 <q-page class="flex flex-center">
 
     <div class="intercom-container">
-        <h3>70я кв</h3>
-
-        <q-btn @click="disconnectWebSocket">123</q-btn>
+        <h3>Проверка клиента</h3>
+        <div>
+            <q-input outlined placeholder="Номер квартиры STOWN" v-model="apartmentNumber"></q-input>
+        </div>
+        <q-btn @click="connectWebSocket();">Подключить</q-btn>
+        <q-btn @click="disconnectWebSocket">Отключить</q-btn>
         <transition enter-active-class="shake-enter-active" leave-active-class="fade-leave-active">
             <q-card
                 class="my-card shake"
@@ -96,12 +99,11 @@ export default defineComponent({
         const socket = ref(null);
         const message = ref('');
         const userId = '001';
-        const apartmentNumber = ref(1448);
+        const apartmentNumber = ref(1447);
         const role = 'resident';
         const {
             accessToken
         } = useCurrentUser();
-        const serverAddress = `${WSS_SERVER}?key=${accessToken.value}&user_id=${userId}&flat_id=${apartmentNumber.value}&role=${role}`;
         // const serverAddress = `${WSS_SERVER}?key=${accessToken.value}&user_id=${userId}&apartment_number=${apartmentNumber.value}&role=${role}`;
         // const serverAddress = `${WSS_SERVER}?key=${accessToken.value}&user_id=${userId}&apartment_number=${apartmentNumber.value}&role=${role}`;
 
@@ -112,7 +114,7 @@ export default defineComponent({
         const reconnectInterval = 3000;
         let reconnectTimer = null;
         const connectWebSocket = () => {
-
+            const serverAddress = `${WSS_SERVER}?key=${accessToken.value}&user_id=${userId}&flat_id=${apartmentNumber.value}&role=${role}`;
             socket.value = new WebSocket(serverAddress);
 
             socket.value.onopen = () => {
@@ -228,10 +230,10 @@ export default defineComponent({
             clearInterval(reconnectTimer);
         };
 
-        onMounted(() => {
-            connectWebSocket();
+        // onMounted(() => {
+        //     connectWebSocket();
 
-        });
+        // });
 
         onBeforeUnmount(() => {
             disconnectWebSocket();
@@ -240,6 +242,7 @@ export default defineComponent({
 
         return {
             buttons: [1, 2, 3, 5, 6, 7, 8, 9, 10],
+            apartmentNumber,
             selectButton,
             callButton,
             selectedButton,
@@ -250,6 +253,7 @@ export default defineComponent({
             isAnswer,
             videoFlag,
             hashStr,
+            connectWebSocket,
             disconnectWebSocket,
             VIDEO_SERVER
         };
