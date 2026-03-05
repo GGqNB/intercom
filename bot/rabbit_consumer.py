@@ -95,14 +95,14 @@ async def rabbit_listener(bot: Bot):
                            )
 
                            # Запускаем удаление клавиатуры через 5 секунд
-                           async def remove_kb(msg):
-                               await asyncio.sleep(5)
-                               try:
-                                   await bot.delete_message(chat_id=msg.recipient.chat_id, message_id=msg.message_id)
-                               except Exception as e:
-                                   logger.error(f"Ошибка удаления клавиатуры: {e}")
+                        #    async def remove_kb(msg):
+                        #        await asyncio.sleep(5)
+                        #        try:
+                        #            await bot.delete_message(chat_id=msg.recipient.chat_id, message_id=msg.message_id)
+                        #        except Exception as e:
+                        #            logger.error(f"Ошибка удаления клавиатуры: {e}")
 
-                           asyncio.create_task(remove_kb(sent_kb_msg))
+                        #    asyncio.create_task(remove_kb(sent_kb_msg))
 
                         else:
                            # Только клавиатура, без фото
