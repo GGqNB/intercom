@@ -351,7 +351,7 @@ export default defineComponent({
 
         const serviceView = ref(false);
         const serviceOrEntry = () => {
-            if (selectedNumbers.value == '9698') {
+            if (selectedNumbers.value == '9193') {
                 serviceView.value = !serviceView.value
             } else {
                 openLock(selectedNumbers.value)

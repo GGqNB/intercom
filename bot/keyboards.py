@@ -28,7 +28,12 @@ def open_door_kb():
                     CallbackButton(
                         text="🔑 Открыть",
                         intent=Intent.DEFAULT
-                    )
+                    ),
+                     CallbackButton(
+                        text="🏠 Главная",
+                        payload="cmd_home",
+                        intent=Intent.DEFAULT
+                    ),
                 ]
             ]
         )

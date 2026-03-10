@@ -11,6 +11,7 @@ async def register_user(payload: dict) -> bool:
     timeout = aiohttp.ClientTimeout(total=5)  # максимум 5 секунд
 
     try:
+        print('запрос')
         async with aiohttp.ClientSession(timeout=timeout) as session:
             async with session.post(
                 f"{BACKEND_URL}/api/users",

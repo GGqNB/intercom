@@ -1,6 +1,6 @@
 from request import get_user_settings, register_user
 from maxapi import Router, F
-from maxapi.types import MessageCreated, MessageCallback, Command
+from maxapi.types import BotStarted, MessageCreated, MessageCallback, Command
 import aiohttp
 
 from keyboards import (
@@ -21,6 +21,17 @@ async def cmd_start(event: MessageCreated):
     await event.bot.send_message(
         chat_id=event.message.recipient.chat_id,
         text="👋 Добро пожаловать!\n\nНажмите ⚙ Настройки.",
+        attachments=[main_menu_kb()]
+    )
+
+@router.bot_started()
+async def handle_bot_started(event: BotStarted):
+    user = event.user
+    name = getattr(user, 'first_name', None) or 'друг'
+
+    await event.bot.send_message(
+        chat_id=event.chat_id,
+        text= f"Добро пожаловать, {name} !\n\nНажмите ⚙ Настройки.",
         attachments=[main_menu_kb()]
     )
 

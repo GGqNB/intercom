@@ -66,8 +66,8 @@ def update_intercom_data(
                     }
                     current_intercoms.append(updated_intercom)
                     # print(f"[{current_time.strftime('%H:%M:%S')}] Домофон с tech_name={tech_name} добавлен.")
-                else:
-                    print(f"[{current_time.strftime('%H:%M:%S')}] Домофон с tech_name={tech_name} обновлен.")
+                # else:
+                #     print(f"[{current_time.strftime('%H:%M:%S')}] Домофон с tech_name={tech_name} обновлен.")
 
                 pipe.multi()
                 pipe.set(conf.redis.INTERCOMS_KEY, json.dumps(current_intercoms))

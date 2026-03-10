@@ -26,12 +26,13 @@ async def validate_flat(session: AsyncSession, house_id: int, flat: int):
 async def get_users_by_house_and_flat(
     session: AsyncSession,
     house_id: int,
-    flat: int
+    flat_stown: int
 ) -> list[Users]:
-
+    print(flat_stown)
+    print(house_id)
     query = select(Users).where(
         Users.house_id == house_id,
-        Users.flat == flat
+        Users.flat_stown == flat_stown
     )
 
     result = await session.execute(query)

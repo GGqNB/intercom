@@ -148,6 +148,7 @@ async def update_log_photo(
             log.flat
         )
         if not users:
+            print('Юзеров нет, Rabbit не трогал')
             return updated
         
         users_payload = [
@@ -171,7 +172,7 @@ async def update_log_photo(
         }
 
         await send_to_rabbitmq(payload, QUEUE_CALLING)
-
+        print('В rabbit ушло')
     except Exception as e:
         print("Ошибка отправки в RabbitMQ:", e)
 

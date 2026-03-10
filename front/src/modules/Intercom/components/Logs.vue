@@ -14,6 +14,10 @@
                     <q-card-section v-if="log.intercom">
                         <div class="text-h6">{{ log.intercom.id }}. {{ log.tech_name }}</div>
                         <div class="text-subtitle2">Вход: {{ log.intercom.entry.name }}</div>
+                        <!-- Выкидывать еще из данных нормально дом -->
+                        <div class="text-subtitle2">
+                            Дом: {{ log.intercom.entry.house_id == 13 ? 'Объездная 57А': log.intercom.entry.house_id == 15 ? 'Объездная 57':'неизвестный дом'}}
+                        </div>
                         <div class="text-subtitle2">Название: {{ log.intercom.name }}</div>
                         <div class="text-subtitle2">Температура: {{ log.battery_temp ? log.battery_temp : '' }}°C</div>
                         <div class="text-subtitle2">Заряд: {{ log.battery_level ? log.battery_level : '' }}%</div>
