@@ -44,87 +44,73 @@ async def rabbit_listener(bot: Bot):
 
     async with queue.iterator() as queue_iter:
         async for message in queue_iter:
-            async with message.process():
+            try:
+                payload = json.loads(message.body.decode())
+
+                if not payload:
+                    logger.warning("Пустой payload")
+                    await message.reject(requeue=False)
+                    continue
+
+                users = payload.get("users", [])
+                if not users:
+                    logger.warning("Нет пользователей в payload")
+                    await message.ack()
+                    continue
+
+                created_at_raw = payload.get("created_at")
+                created_at_formatted = created_at_raw
+
                 try:
-                    payload = json.loads(message.body.decode())
-                    users = payload.get("users", [])
-                    if not users:
-                        continue
+                    dt = datetime.fromisoformat(created_at_raw.replace("Z", "+00:00"))
+                    created_at_formatted = dt.strftime("%d.%m.%Y %H:%M:%S")
+                except Exception:
+                    pass
 
-                    # Форматируем дату
-                    created_at_raw = payload.get("created_at")
-                    created_at_formatted = created_at_raw
-                    try:
-                        dt = datetime.fromisoformat(created_at_raw.replace("Z", "+00:00"))
-                        created_at_formatted = dt.strftime("%d.%m.%Y %H:%M:%S")
-                    except Exception:
-                        pass
+                text = (
+                    f"📢 Новый вызов!\n\n"
+                    f"🏠 Дом: {payload.get('house_id')}\n"
+                    f"🏢 Квартира: {payload.get('flat')}\n"
+                    f"🕒 Время: {created_at_formatted}"
+                )
 
-                    text = (
-                        f"📢 Новый вызов!\n\n"
-                        f"🏠 Дом: {payload['house_id']}\n"
-                        f"🏢 Квартира: {payload['flat']}\n"
-                        f"🕒 Время: {created_at_formatted}"
-                    )
+                photo_url = payload.get("photo_url")
+                tmp_file_path = None
 
-                    # Скачиваем фото
-                    photo_url = payload.get("photo_url")
-                    tmp_file_path = None
-                    if photo_url:
-                        full_photo_url = f"{BACKEND_URL.rstrip('/')}/api/{photo_url.lstrip('/')}"
-                        logger.info(f"PHOTO URL: {full_photo_url}")
-                        tmp_file_path = await download_photo_to_file(full_photo_url)
+                if photo_url:
+                    full_photo_url = f"{BACKEND_URL.rstrip('/')}/api/{photo_url.lstrip('/')}"
+                    logger.info(f"PHOTO URL: {full_photo_url}")
+                    tmp_file_path = await download_photo_to_file(full_photo_url)
 
-                    # Отправляем каждому пользователю
-                    for user in users:
-                        chat_id = user["chat_id"]
+                for user in users:
+                    chat_id = user["chat_id"]
 
-                        # Если есть фото
-                        if tmp_file_path:
-    # Отправляем фото с текстом
-                           sent_msg = await bot.send_message(
-                               chat_id=chat_id,
-                               text=text,
-                               attachments=[InputMedia(path=str(tmp_file_path))]
-                           )
+                    if tmp_file_path:
+                        await bot.send_message(
+                            chat_id=chat_id,
+                            text=text,
+                            attachments=[InputMedia(path=str(tmp_file_path))]
+                        )
 
-                           # Отдельно клавиатуру
-                           sent_kb_msg = await bot.send_message(
-                               chat_id=chat_id,
-                               attachments=[open_door_kb()]
-                           )
+                        await bot.send_message(
+                            chat_id=chat_id,
+                            attachments=[open_door_kb()]
+                        )
+                    else:
+                        await bot.send_message(
+                            chat_id=chat_id,
+                            text=text,
+                            attachments=[open_door_kb()]
+                        )
 
-                           # Запускаем удаление клавиатуры через 5 секунд
-                        #    async def remove_kb(msg):
-                        #        await asyncio.sleep(5)
-                        #        try:
-                        #            await bot.delete_message(chat_id=msg.recipient.chat_id, message_id=msg.message_id)
-                        #        except Exception as e:
-                        #            logger.error(f"Ошибка удаления клавиатуры: {e}")
+                if tmp_file_path and tmp_file_path.exists():
+                    tmp_file_path.unlink()
 
-                        #    asyncio.create_task(remove_kb(sent_kb_msg))
+                # ✅ подтверждаем сообщение
+                await message.ack()
 
-                        else:
-                           # Только клавиатура, без фото
-                           sent_kb_msg = await bot.send_message(
-                               chat_id=chat_id,
-                               text=text,
-                               attachments=[open_door_kb()]
-                           )
+            except Exception as e:
+                logger.error(f"Ошибка обработки сообщения из RabbitMQ: {e}")
 
-                           # Таймер удаления через 5 секунд
-                           async def remove_kb(msg):
-                               await asyncio.sleep(5)
-                               try:
-                                   await bot.delete_message(chat_id=msg.recipient.chat_id, message_id=msg.message_id)
-                               except Exception as e:
-                                   logger.error(f"Ошибка удаления клавиатуры: {e}")
-
-                           asyncio.create_task(remove_kb(sent_kb_msg))
-
-                    # Удаляем временный файл после отправки
-                    if tmp_file_path and tmp_file_path.exists():
-                        tmp_file_path.unlink()
-
-                except Exception as e:
-                    logger.error(f"Ошибка обработки сообщения из RabbitMQ: {e}")
+                # ❌ не возвращаем сообщение обратно в очередь
+                await message.reject(requeue=False)
