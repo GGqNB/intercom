@@ -1,3 +1,5 @@
+import json
+
 from request import get_user_settings, register_user
 from maxapi import Router, F
 from maxapi.types import BotStarted, MessageCreated, MessageCallback, Command
@@ -16,12 +18,50 @@ router = Router()
 
 user_states = {}
 
+    
 @router.message_created(Command("start"))
 async def cmd_start(event: MessageCreated):
     await event.bot.send_message(
         chat_id=event.message.recipient.chat_id,
         text="👋 Добро пожаловать!\n\nНажмите ⚙ Настройки.",
         attachments=[main_menu_kb()]
+    )
+@router.message_created()
+async def handle_contact(event: MessageCreated):
+    message = event.message
+    body = message.body
+
+    if not body or not body.attachments:
+        return
+
+    # ищем контакт
+    contact_att = next((att for att in body.attachments if att.type == "contact"), None)
+    if not contact_att:
+        return
+
+    max_info = contact_att.payload.max_info
+    contact_user_id = max_info.user_id
+    sender_user_id = message.sender.user_id
+
+    # проверка: контакт должен быть своим
+    if contact_user_id != sender_user_id:
+        await event.bot.send_message(
+            chat_id=message.recipient.chat_id,
+            text="❌ Вы можете отправлять только свой контакт!"
+        )
+        return
+
+    # если контакт свой, обрабатываем
+    first_name = max_info.first_name
+    last_name = max_info.last_name
+
+    await event.bot.send_message(
+        chat_id=message.recipient.chat_id,
+        text=(
+            f"✅ Контакт принят:\n"
+            f"ID: {contact_user_id}\n"
+            f"Имя: {first_name} {last_name}"
+        ),
     )
 
 @router.bot_started()
@@ -161,6 +201,7 @@ async def handle_flat_input(event: MessageCreated):
         attachments=[confirm_flat_kb()]
     )
 
+
 @router.message_callback(F.callback.payload == "confirm_flat")
 async def confirm_flat(event: MessageCallback):
 
@@ -233,3 +274,4 @@ async def change_flat(event: MessageCallback):
         text="Введите номер квартиры заново:",
         attachments=[]
     )
+    

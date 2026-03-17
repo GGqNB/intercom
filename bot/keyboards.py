@@ -1,4 +1,4 @@
-from maxapi.types import CallbackButton, ButtonsPayload, Attachment
+from maxapi.types import CallbackButton, ButtonsPayload, Attachment, RequestContactButton
 from maxapi.enums.intent import Intent
 
 
@@ -12,6 +12,11 @@ def main_menu_kb():
                     CallbackButton(
                         text="⚙ Настройки",
                         payload="cmd_settings",
+                        intent=Intent.DEFAULT
+                    ),
+                      RequestContactButton(
+                        text="Контакты",
+                        payload="request_contact",
                         intent=Intent.DEFAULT
                     )
                 ]

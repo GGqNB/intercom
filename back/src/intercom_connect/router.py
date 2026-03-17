@@ -53,19 +53,21 @@ def get_connections():
 
 async def cleanup_old_websockets():
     with connections_lock:
-        if len(connections) > 0:
-            print(f"[STARTUP] Очистка старых соединений: {list(connections.keys())}")
-            connections.clear()
-        else:
-            print("[STARTUP] Старых соединений нет")
+        for user_conns in connections.values():
+            for conn in user_conns:
+                try:
+                    await conn.websocket.close()
+                except:
+                    pass
+        connections.clear()
 
 @router_intercom_connect.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
+    await websocket.accept()
     key = get_key(websocket)
     if key != conf.security.API_KEY:
         await websocket.close(code=1008, reason="Неверный key")
         return
-
     user_id = get_user_id(websocket)
     flat_id = get_flat_id(websocket)
     role = get_role(websocket)
@@ -84,10 +86,11 @@ async def websocket_endpoint(websocket: WebSocket):
 
     user_connection = UserConnection(websocket, user_id, flat_id, role)
     with connections_lock:
-        connections[user_id].append(user_connection)
+        # connections[user_id].append(user_connection)
+        connections.setdefault(user_id, []).append(user_connection)
         print(f"Новое соединение: user_id={user_id}, квартира={flat_id}, роль={role}, всего соединений: {len(connections[user_id])}")
 
-    await websocket.accept()
+    
 
     try:
         while True:
@@ -98,7 +101,7 @@ async def websocket_endpoint(websocket: WebSocket):
                 break
             except Exception as e:
                 print(f"Ошибка при приёме сообщения: {e}")
-                continue
+                break
 
             # Разбор JSON
             try:
