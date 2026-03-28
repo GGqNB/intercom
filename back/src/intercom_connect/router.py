@@ -197,7 +197,7 @@ async def call(call_data: BaseCallData, api_key: APIKey = Depends(get_api_key), 
 
     asyncio.create_task(make_call(flat_id, call_data.apartment_number, 
                                   intercom_ws, call_data.hash_room, 
-                                  call_data.blockDevice, log.id, token_room))
+                                  call_data.blockDevice, log.id, token_room, call_data.indentifier))
     return {"message": f"Звонок инициирован в квартиру {call_data.apartment_number}."}
 
 @router_intercom_connect.get("/answer_call/{flat_id}")
@@ -237,7 +237,7 @@ async def abort_call(flat_id: int, hash_room: str, api_key: APIKey = Depends(get
 async def get_active_calls(api_key: APIKey = Depends(get_api_key)):
     return get_connections()
 
-async def make_call(flat_id: int, apartment_number: int, caller_ws: WebSocket, hash_room: str, blockDevice: BlockDevice, log_id: int, token_room: str):
+async def make_call(flat_id: int, apartment_number: int, caller_ws: WebSocket, hash_room: str, blockDevice: BlockDevice, log_id: int, token_room: str, indentifier: str):
     caller_id = get_user_id(caller_ws)
     print(f"Начат звонок в квартиру {apartment_number} (flat_id={flat_id}, инициатор: {caller_id}). hash_room: {hash_room} token_room:{token_room}")
 
@@ -254,7 +254,8 @@ async def make_call(flat_id: int, apartment_number: int, caller_ws: WebSocket, h
                         await safe_send_json(conn.websocket, {"type": "incoming_call", "from": "intercom", 
                                                               "apartment": apartment_number, "hash_room": hash_room, 
                                                               "block_device": blockDevice.model_dump() if blockDevice else None,
-                                                              "token_room": token_room
+                                                              "token_room": token_room,
+                                                              "indentifier": indentifier
                                                               })
 
         try:
