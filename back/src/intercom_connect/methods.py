@@ -156,7 +156,8 @@ async def send_push_by_external_id(external_ids: list[str], title: str, message:
             headers=headers,
             timeout=5.0
         )
-
+    print(response.json())
+    print(response)
     return response.json()
 
 async def send_push_endpoint(token_room, hash_room, indentifier):

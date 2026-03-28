@@ -172,7 +172,7 @@ async def seed_data(
 @router_fake.post("/test-push")
 async def send_push(api_key=Depends(get_api_key)):
 
-    await send_push_endpoint()
+    await send_push_endpoint('token_room', 'hash_room', 'indentifier')
 
     return {"status": "ok", "onesignal_response": 'Ы'}
 
