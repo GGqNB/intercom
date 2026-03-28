@@ -67,7 +67,7 @@ class StownLocalConfig(BaseSettings):
 
 class SecurityConfig(BaseSettings):
     API_KEY: str = Field('password-into-env', env="API_KEY")
-    NEW_API_KEY: str = Field('password-into-env', env="API_KEY")
+    NEW_API_KEY: str = Field('password-into-env', env="NEW_API_KEY")
     BOT_KEY: str = Field('password-into-env', env="BOT_KEY")
     JWT_SECRET: str = Field(os.environ.get("JWT_SECRET"))
     #ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(60, env="ACCESS_TOKEN_EXPIRE_MINUTES")
