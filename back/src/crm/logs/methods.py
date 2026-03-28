@@ -3,7 +3,7 @@ import json
 from src.redis_client import redis_client
 from src.crm.intercom.models import Intercom
 from typing import Any, Dict
-
+import secrets
 conf = get_config()
 
 def get_logs_intercoms():
@@ -25,3 +25,19 @@ def intercom_to_dict(ic: Intercom) -> Dict[str, Any]:
                     } if getattr(ic, "entry", None) else None,
                 }
 
+
+def generate_token() -> str:
+    return secrets.token_urlsafe(32)
+
+
+async def create_action_token(data: Dict[str, Any]) -> str:
+    token = generate_token()
+    key = f"{conf.redis.MAX_TOKEN_PREFIX}:{token}"
+
+    redis_client.set(
+        key,
+        json.dumps(data),
+        ex=conf.redis.MAX_TOKEN_TTL
+    )
+
+    return token

@@ -8,7 +8,7 @@ class BaseCallLog(BaseModel):
     house_id: int
     flat: int
     photo_url: Optional[str]
-
+    indentifier: Optional[str]
 
 class ReadCallLog(BaseCallLog):
     id: int
@@ -24,7 +24,6 @@ class FilterCallLog(BaseModel):
     type: Annotated[Optional[str], Field(default=None)]
     house_id: Annotated[Optional[int], Field(default=None)]
     flat: Annotated[Optional[int], Field(default=None)]
-
-    # фильтрация по дате
+    indentifier: Annotated[Optional[str], Field(default=None)]
     date_from: Annotated[Optional[datetime], Field(default=None)]
     date_to: Annotated[Optional[datetime], Field(default=None)]

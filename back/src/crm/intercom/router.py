@@ -125,17 +125,4 @@ async def update_intercom(
             }
         )
 
-
-@router_intercom.get("/test")
-async def test(
-     session: AsyncSession = Depends(get_async_session), 
-    api_key: APIKey = Depends(get_api_key)
-):  
-        # redis_client.delete(TOKEN_KEY)
-        redis_client.set('A1','2')
-        print('1223')
-        a = redis_client.get('A1')
-        print(a)
-        print('-------------------------')
-        print(conf.stown.build_login_data)
         

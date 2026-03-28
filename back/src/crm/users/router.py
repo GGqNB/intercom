@@ -6,12 +6,13 @@ from sqlalchemy.orm import selectinload
 from fastapi_pagination import Page
 from fastapi_pagination.ext.sqlalchemy import paginate
 from fastapi.security.api_key import APIKey
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from src.crm.stown.methods import flat_by_phone
 from src.crm.users.crud import get_user_by_max_id_service
 from src.crm.stown.crud import get_flat_by_house
 from src.crm.users.methods import validate_flat
 from src.crm.users.models import Users
-from src.crm.users.schemas import ReadUser, WriteUser, FilterUser
+from src.crm.users.schemas import ReadUser, WriteUser, FilterUser, WriteUserMax
 from src.database import get_async_session
 from src.auth import get_api_key, get_bot_key
 from src.crm.build.models import House  # для join
@@ -98,7 +99,6 @@ async def add_user(
             )
         new_user.flat_stown = flat_id_stown
 
-        # 🔥 UPSERT
         stmt = insert(Users).values(new_user.model_dump())
 
         stmt = stmt.on_conflict_do_update(
@@ -129,6 +129,90 @@ async def add_user(
             detail=str(e)
         )
 
+from sqlalchemy import insert, delete, func
+from sqlalchemy.exc import SQLAlchemyError, IntegrityError
+from fastapi import HTTPException, status
+
+@router_users.post("/max/{phone}", status_code=status.HTTP_201_CREATED)
+async def add_user(
+    phone: str,
+    max_user: WriteUserMax,
+    session: AsyncSession = Depends(get_async_session),
+    bot_key: APIKey = Depends(get_bot_key)
+):
+    try:
+        flats = await flat_by_phone(phone)
+
+        flats_data = flats.get("status", [])
+        if not flats_data:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Нет данных по номеру"
+            )
+
+        max_id_clean = max_user.max_id.strip() 
+        delete_stmt = delete(Users).where(
+            func.trim(Users.max_id) == max_id_clean
+        ).returning(Users)
+        deleted_result = await session.execute(delete_stmt)
+        await session.commit() 
+
+        users_to_insert = []
+        seen = set()
+        for build in flats_data:
+            for home in build.get("homes", []):
+                key = (
+                    max_id_clean,
+                    build["build_id"],
+                    home["home_id"]
+                )
+                if key in seen:
+                    continue
+                seen.add(key)
+
+                users_to_insert.append({
+                    "name": max_user.name,
+                    "chat_id": max_user.chat_id,
+                    "max_id": max_id_clean,
+                    "flat": home["home_id"],
+                    "house_id": build["build_id"],
+                    "flat_stown": 1337
+                })
+
+        if not users_to_insert:
+            return {
+                "data": [],
+                "count_deleted": len(deleted_result.scalars().all()),
+                "count_created": 0,
+                "status": "deleted_no_new_data"
+            }
+
+        insert_stmt = insert(Users).values(users_to_insert).returning(Users)
+        result_insert = await session.execute(insert_stmt)
+        await session.commit()
+
+        created_users = result_insert.scalars().all()
+
+        return {
+            "data": created_users,
+            "count_deleted": len(deleted_result.scalars().all()),
+            "count_created": len(created_users),
+            "status": "success"
+        }
+
+    except IntegrityError:
+        await session.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Такие данные уже существуют. Попробуйте восстановить доступ."
+        )
+
+    except SQLAlchemyError as e:
+        await session.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e)
+        )
 
 @router_users.patch("/{user_id}", status_code=status.HTTP_200_OK)
 async def update_user(
@@ -199,9 +283,6 @@ async def update_user_by_max_id(
         )
 
 
-# -----------------------------
-# DELETE: Удаление пользователя по ID
-# -----------------------------
 @router_users.delete("/{user_id}", status_code=status.HTTP_200_OK)
 async def delete_user(
     user_id: int,
@@ -225,9 +306,7 @@ async def delete_user(
         )
 
 
-# -----------------------------
-# DELETE: Удаление пользователя по max_id
-# -----------------------------
+
 @router_users.delete("/by-max-id/{max_id}", status_code=status.HTTP_200_OK)
 async def delete_user_by_max_id(
     max_id: str,
@@ -235,17 +314,31 @@ async def delete_user_by_max_id(
     api_key: APIKey = Depends(get_api_key)
 ):
     try:
-        stmt = delete(Users).where(Users.max_id == max_id).returning(Users)
-        result = await session.execute(stmt)
-        await session.commit()
-        deleted_user = result.scalar_one_or_none()
-        if not deleted_user:
-            raise HTTPException(status_code=404, detail="User not found with given max_id")
-        return {"data": deleted_user, "status": "deleted"}
+        stmt = delete(Users).where(
+            Users.max_id == max_id
+        ).returning(Users)
 
-    except Exception as e:
+        result = await session.execute(stmt)
+
+        deleted_users = result.scalars().all() 
+
+        if not deleted_users:
+            await session.rollback()
+            raise HTTPException(
+                status_code=404,
+                detail="Не нашлось таких пользователей"
+            )
+
+        await session.commit()
+
+        return {
+            "count": len(deleted_users),
+            "status": "deleted"
+        }
+
+    except SQLAlchemyError as e:
         await session.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail={"code": status.HTTP_500_INTERNAL_SERVER_ERROR, "message": str(e), "args": getattr(e, "args", None)}
+            detail=str(e)
         )

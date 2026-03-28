@@ -32,8 +32,13 @@ class StownConfig(BaseSettings):
     CLIENT_SECRET: str = Field(os.environ.get("STOWN_CLIENT_SECRET"))
     SCOPE: str = Field(os.environ.get("STOWN_SCOPE"))
     
+    LOGIN_USER: str = Field(os.environ.get("STOWN_LOGIN_USER"))
+    PASSWORD_USER: str = Field(os.environ.get("STOWN_LOGIN_PASSWORD"))
+
+    
     AUTH_URL: str = 'https://stown.ooo/api/acount/auth/token/'
     DEVICES_URL: str = "https://stown.ooo/api/control/box/" 
+    FLAT_BY_NUBMER_URL: str = "https://stown.ooo/api/measures/user/phone/{phone}/builds/structure" 
     
     @property
     def build_login_data(self) -> object:
@@ -62,10 +67,15 @@ class StownLocalConfig(BaseSettings):
 
 class SecurityConfig(BaseSettings):
     API_KEY: str = Field('password-into-env', env="API_KEY")
+    NEW_API_KEY: str = Field('password-into-env', env="API_KEY")
     BOT_KEY: str = Field('password-into-env', env="BOT_KEY")
+    JWT_SECRET: str = Field(os.environ.get("JWT_SECRET"))
     #ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(60, env="ACCESS_TOKEN_EXPIRE_MINUTES")
 
-    
+class OneSignalConfig(BaseSettings):
+    ONE_SIGNAL_APP_ID: str = Field('password-into-env', env="ONE_SIGNAL_APP_ID")
+    ONE_SIGNAL_APP_KEY: str = Field('password-into-env', env="ONE_SIGNAL_APP_KEY")
+    URL_NOTIFICATION: str = 'https://onesignal.com/api/v1/notifications'
 
 
 class DatabaseConfig(BaseSettings):
@@ -88,7 +98,8 @@ class RedisConfig(BaseSettings):
 
     STOWN_KEY: str = 'stown_access_token'
     INTERCOMS_KEY : str = 'intercoms'
-    
+    MAX_TOKEN_PREFIX: str = 'max_open'
+    MAX_TOKEN_TTL: int = 120
     @property
     def url(self) -> str:
         return f"redis://{self.HOST}:{self.PORT}/{self.DB}/{self.PASSWORD}"
@@ -97,6 +108,7 @@ class MeasuresConfig(BaseSettings):
     TOKEN: str = Field(os.environ.get("MEASURES_TOKEN"))
     
     HOMES_URL: str = "https://measures.stown.ooo/api/dashboard/builds/{house_id}/homes"
+    RESIDEN_URL: str = "https://measures.stown.ooo/api/measures/build/intercom/home/{house_id}/users/"
 
 class RabbitConfig(BaseSettings):
     USER: str = os.getenv("RABBIT_USER")
@@ -121,6 +133,7 @@ class Config(BaseSettings):
     stown_local: StownLocalConfig = StownLocalConfig()
     measures: MeasuresConfig = MeasuresConfig()
     rabbit: RabbitConfig = RabbitConfig()
+    oneSignal: OneSignalConfig = OneSignalConfig()
 
 
 @lru_cache

@@ -1,13 +1,18 @@
+import asyncio
 from typing import Type, Dict, Any, List
 
 from faker import Faker
 from fastapi import Depends
 from pydantic import BaseModel
+from src.config import get_config
+
 
 from requests import Session
+import requests
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import DeclarativeBase
 
+from src.intercom_connect.methods import register_room, send_push_by_external_id, send_push_endpoint
 from src.crm.build.models import Entry, House
 from src.crm.intercom.models import Intercom
 from src.crm.location.models import City
@@ -18,6 +23,8 @@ from fastapi.security.api_key import APIKey
 from src.auth import get_api_key
 import random
 import string
+
+conf = get_config()
 
 def generate_fake_data(model_class: Type[BaseModel]) -> Dict[str, Any]:
     """
@@ -160,3 +167,23 @@ async def seed_data(
     await session.commit()
 
     return {"status": "ok"}
+
+
+@router_fake.post("/test-push")
+async def send_push(api_key=Depends(get_api_key)):
+
+    await send_push_endpoint()
+
+    return {"status": "ok", "onesignal_response": 'Ы'}
+
+@router_fake.post("/jwt-room")
+async def jwt_room(api_key=Depends(get_api_key)):
+    hash_room = "test-test"
+
+    res = await register_room(1447, hash_room)
+
+
+    return {
+        "room": hash_room,
+        "token": res
+    }

@@ -1,5 +1,5 @@
 import aiohttp
-from config import BACKEND_URL, API_KEY
+from config import BACKEND_URL, API_KEY 
 import asyncio
 
 async def register_user(payload: dict) -> bool:
@@ -11,7 +11,6 @@ async def register_user(payload: dict) -> bool:
     timeout = aiohttp.ClientTimeout(total=5)  # максимум 5 секунд
 
     try:
-        print('запрос')
         async with aiohttp.ClientSession(timeout=timeout) as session:
             async with session.post(
                 f"{BACKEND_URL}/api/users",
@@ -36,14 +35,8 @@ async def register_user(payload: dict) -> bool:
         print(f"Backend error: {e}")
         return {"success": False, f"error": {e}}
     
-import aiohttp
-from config import BACKEND_URL, API_KEY
 
 async def get_user_settings(max_id: str) -> dict | None:
-    """
-    Запрос к backend для получения настроек пользователя по max_id.
-    Возвращает словарь с данными пользователя или None, если не найдено.
-    """
 
     headers = {
         "Authorization": f"{API_KEY}",
@@ -63,6 +56,39 @@ async def get_user_settings(max_id: str) -> dict | None:
 
                 if resp.status != 200:
                     return None
+                data = await resp.json()
+                print(data)
+                return data
+
+    except Exception as e:
+        print(f"Ошибка запроса к backend: {e}")
+        return None
+    
+async def flat_by_number(phone: str, data) -> dict | None:
+
+    headers = {
+        "Authorization": f"{API_KEY}",
+        "Content-Type": "application/json"
+    }
+
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.post(
+                f"{BACKEND_URL}/api/users/max/{phone}",
+                headers=headers,
+                data=data,
+                timeout=2
+            ) as resp:
+                print(resp)
+                if resp.status == 404:
+                    print('400')
+                    
+                    return None
+
+                if resp.status != 200:
+                    return None
+                    print('200')
+                
                 data = await resp.json()
                 print(data)
                 return data

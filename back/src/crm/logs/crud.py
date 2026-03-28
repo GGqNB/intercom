@@ -69,10 +69,14 @@ async def update_call_log(session: AsyncSession, log_id: int, data: WriteCallLog
             detail={"code": 500, "message": str(e)}
         )
 
-async def update_call_log_photo(session: AsyncSession, log_id: int, photo: Optional[UploadFile] = File(None)):
+async def update_call_log_photo(session: AsyncSession, 
+                                indentifier: str,
+                                log_id: int, 
+                                photo: Optional[UploadFile] = File(None), 
+                                ):
     
-    if not photo:
-        raise HTTPException(status_code=400, detail="Фото не передано")
+    if not photo or indentifier =='':
+        raise HTTPException(status_code=400, detail="Что-то не передано для лога")
 
     try:
         file_bytes = await photo.read()
@@ -84,7 +88,7 @@ async def update_call_log_photo(session: AsyncSession, log_id: int, photo: Optio
         stmt = (
             update(CallLog)
             .where(CallLog.id == log_id)
-            .values(photo_url=photo_path)
+            .values(photo_url=photo_path, indentifier = indentifier)
             .returning(CallLog)
         )
 

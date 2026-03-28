@@ -10,6 +10,11 @@ class BaseUser(BaseModel):
     house_id: int
     flat_stown: int
 
+class WriteUserMax(BaseModel):
+    name: str
+    chat_id: str
+    max_id: str
+
 class ReadUser(BaseUser):
     id: int
 

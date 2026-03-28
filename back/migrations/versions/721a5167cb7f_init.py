@@ -1,8 +1,8 @@
 """init
 
-Revision ID: 571dbb9933c8
+Revision ID: 721a5167cb7f
 Revises: 
-Create Date: 2026-03-04 14:48:27.849086
+Create Date: 2026-03-27 16:08:29.821757
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '571dbb9933c8'
+revision: str = '721a5167cb7f'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -28,6 +28,7 @@ def upgrade() -> None:
     sa.Column('house_id', sa.Integer(), nullable=False),
     sa.Column('flat', sa.Integer(), nullable=False),
     sa.Column('photo_url', sa.String(), nullable=True),
+    sa.Column('indentifier', sa.String(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('city',
@@ -72,7 +73,7 @@ def upgrade() -> None:
     sa.Column('house_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['house_id'], ['house.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('max_id')
+    sa.UniqueConstraint('max_id', 'house_id', 'flat', name='uq_user_unique_flat')
     )
     op.create_table('intercom',
     sa.Column('id', sa.Integer(), nullable=False),

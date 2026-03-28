@@ -8,7 +8,6 @@ from src.crm.logs.schemas import FilterCallLog, ReadCallLog, WriteCallLog
 from src.crm.logs.crud import update_call_log, get_call_logs, delete_call_log, create_call_log, update_call_log_photo
 from src.crm.logs.methods import get_logs_intercoms, intercom_to_dict
 from src.config import get_config
-from src.crm.helper.stown import get_access_token
 from src.redis_client import redis_client
 from src.database import get_async_session
 from fastapi_pagination import Page
@@ -21,7 +20,7 @@ from sqlalchemy.orm import selectinload
 from fastapi.security.api_key import APIKey
 from src.auth import get_api_key
 from src.crm.intercom.models import Intercom
-
+from src.crm.logs.methods import create_action_token
 
 router_logs = APIRouter(
     prefix="/logs",
@@ -130,15 +129,21 @@ async def edit_log(
     return {"data": updated, "status": "updated"}
 
 QUEUE_CALLING = f"{conf.rabbit.QUEUE_CALLING}"
-@router_logs.put("/{log_id}/rabbit")
+
+@router_logs.put("/{log_id}/rabbit/{indentifier}")
+@router_logs.put("/{log_id}/rabbit") #Потом убрать!
 async def update_log_photo(
     log_id: int,
+    indentifier: Optional[str] = None,
     photo: Optional[UploadFile] = File(None),
     session: AsyncSession = Depends(get_async_session),
     api_key: APIKey = Depends(get_api_key)
 ):
-    updated = await update_call_log_photo(session, log_id, photo)
-
+    if not indentifier:
+        print("Старый клиент — ничего не делаем")
+        return {"status": "ok"}
+    
+    updated = await update_call_log_photo(session, indentifier, log_id, photo)
     log = updated["data"]
 
     try:
@@ -149,6 +154,18 @@ async def update_log_photo(
         )
         if not users:
             print('Юзеров нет, Rabbit не трогал')
+            return updated
+        
+        try:
+          open_token = await create_action_token({
+           "log_id": log.id,
+           "house_id": log.house_id,
+           "flat_stown": log.flat,
+           "indentifier": log.indentifier,
+           })
+        except Exception as e:
+            print('В redis не смог записать, Rabbit не трогал')
+            print(e)
             return updated
         
         users_payload = [
@@ -165,14 +182,16 @@ async def update_log_photo(
             "id": log.id,
             "type": log.type,
             "house_id": log.house_id,
-            "flat": log.flat,
+            "flat_stown": log.flat,
             "photo_url": log.photo_url,
             "created_at": log.created_at.isoformat(),
+            "open_token": open_token,
             "users": users_payload 
         }
 
         await send_to_rabbitmq(payload, QUEUE_CALLING)
         print('В rabbit ушло')
+        print(open_token)
     except Exception as e:
         print("Ошибка отправки в RabbitMQ:", e)
 

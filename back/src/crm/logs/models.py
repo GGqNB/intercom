@@ -14,7 +14,7 @@ class CallLog(Base):
     house_id = Column(Integer, nullable=False)
     flat = Column(Integer, nullable=False)
     photo_url = Column(String, nullable=True)
-
+    indentifier = Column(String, nullable=True)
 
     # Тип события
 

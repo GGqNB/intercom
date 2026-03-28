@@ -16,3 +16,4 @@ API_KEY = os.getenv("API_KEY")
 BACKEND_URL = os.getenv("BACKEND_URL")
 
 RABBIT_URL= f'amqp://{RABBIT_USER}:{RABBIT_PASSWORD}@{RABBIT_HOST}:{RABBIT_PORT}/{RABBIT_VHOST}'
+# FLAT_BY_NUBMER_URL: str = "https://stown.ooo/api/measures/user/phone/{phone}/builds/structure" 

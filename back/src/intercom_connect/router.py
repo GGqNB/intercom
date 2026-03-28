@@ -3,7 +3,6 @@ from typing import Dict, Optional
 from fastapi import APIRouter, File, Form, UploadFile, status,  HTTPException, WebSocket, WebSocketDisconnect
 import asyncio
 from src.crm.logs.schemas import WriteCallLog
-from src.crm.helper.stown import open_local_lock
 import threading
 import json
 from fastapi.security.api_key import APIKey
@@ -15,7 +14,7 @@ from src.intercom_connect.schemas import UserConnection
 from src.intercom_connect.methods import *
 from src.intercom_connect.helpers import *
 from src.intercom_connect.schemas import BaseCallData, BlockDevice
-from src.intercom_connect.methods import update_intercom_data
+from src.intercom_connect.methods import update_intercom_data, delete_room, send_push_endpoint
 from src.crm.stown.crud import get_flat_by_house
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.database import get_async_session
@@ -23,7 +22,7 @@ from json import JSONDecodeError
 from src.crm.helper.image import compress_image_to_1mb, save_image
 from src.crm.logs.crud import create_call_log
 from src.factory.runners import send_to_rabbitmq
-
+from src.redis_client import redis_client
 
 
 router_intercom_connect = APIRouter(prefix="", tags=["Работа с домофоном как с системой"])
@@ -60,6 +59,48 @@ async def cleanup_old_websockets():
                 except:
                     pass
         connections.clear()
+
+@router_intercom_connect.post("/open")
+async def open_door(
+    redis_open_token: str,
+    api_key: APIKey = Depends(get_api_key),
+    session: AsyncSession = Depends(get_async_session)
+):
+    key = f"{conf.redis.MAX_TOKEN_PREFIX}:{redis_open_token}"
+
+    token_data_raw = redis_client.get(key)
+    if not token_data_raw:
+        raise HTTPException(status_code=400, detail="Токен недействителен или истёк")
+
+    token_data = json.loads(token_data_raw)
+
+    indentifier = token_data.get("indentifier")
+    log_id = token_data.get("log_id")
+    # house_id = token_data.get("house_id")
+    # flat = token_data.get("flat_stown")
+
+    if not indentifier:
+        raise HTTPException(status_code=400, detail="Некорректный токен")
+
+    intercom_ws = None
+    with connections_lock:
+        user_conns = connections.get(indentifier, [])
+        for conn in user_conns:
+            if conn.role == "intercom":
+                intercom_ws = conn.websocket
+                break
+
+    if not intercom_ws:
+        raise HTTPException(status_code=400, detail="Домофон не подключен")
+
+    redis_client.delete(key)
+
+    await safe_send_json(intercom_ws, {
+        "type": "door_open",
+        "log_id": log_id,
+    })
+
+    return {"message": "Команда на открытие отправлена"}
 
 @router_intercom_connect.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
@@ -102,8 +143,6 @@ async def websocket_endpoint(websocket: WebSocket):
             except Exception as e:
                 print(f"Ошибка при приёме сообщения: {e}")
                 break
-
-            # Разбор JSON
             try:
                 payload = json.loads(message)
             except json.JSONDecodeError:
@@ -126,7 +165,7 @@ async def websocket_endpoint(websocket: WebSocket):
                 update_intercom_data(tech_name=user_id, battery_level=battery_level, battery_temp=battery_temp)
 
             elif msg_type == "call_ended_by_resident" and role == "resident":
-                await end_call(flat_id, "resident")
+                await end_call(flat_id, "resident", '')
 
     finally:
         with connections_lock:
@@ -141,9 +180,11 @@ async def call(call_data: BaseCallData, api_key: APIKey = Depends(get_api_key), 
     if flat_id is None:
         raise HTTPException(status_code=429, detail="Квартира не найдена, обратитесь к администратору")
 
-    log_data = WriteCallLog(type="call", house_id=call_data.house_id, flat=flat_id, photo_url='')
+    log_data = WriteCallLog(type="call", house_id=call_data.house_id, flat=flat_id, photo_url='', indentifier='')
     log = await create_call_log(session, log_data)
-
+    asyncio.create_task(send_push_endpoint())
+    
+    token_room = await register_room(flat_id, call_data.hash_room)
     intercom_ws = None
     with connections_lock:
         user_conns = connections.get(call_data.indentifier, [])
@@ -154,7 +195,9 @@ async def call(call_data: BaseCallData, api_key: APIKey = Depends(get_api_key), 
     if not intercom_ws:
         raise HTTPException(status_code=400, detail="Нет подключенного домофона.")
 
-    asyncio.create_task(make_call(flat_id, call_data.apartment_number, intercom_ws, call_data.hash_room, call_data.blockDevice, log.id))
+    asyncio.create_task(make_call(flat_id, call_data.apartment_number, 
+                                  intercom_ws, call_data.hash_room, 
+                                  call_data.blockDevice, log.id, token_room))
     return {"message": f"Звонок инициирован в квартиру {call_data.apartment_number}."}
 
 @router_intercom_connect.get("/answer_call/{flat_id}")
@@ -185,49 +228,58 @@ async def answer_call(flat_id: int, api_key: APIKey = Depends(get_api_key)):
 
         return {"message": f"Звонок в квартиру {flat_id} принят."}
 
-@router_intercom_connect.get("/abort_call/{flat_id}")
-async def abort_call(flat_id: int, api_key: APIKey = Depends(get_api_key)):
-    await end_call(flat_id, "aborted_by_intercom")
+@router_intercom_connect.get("/abort_call/{flat_id}/{hash_room}")
+async def abort_call(flat_id: int, hash_room: str, api_key: APIKey = Depends(get_api_key)):
+    await end_call(flat_id, "aborted_by_intercom", hash_room)
     return {"message": f"Звонок в квартиру c id -{flat_id} отменен."}
 
 @router_intercom_connect.get("/active_calls")
 async def get_active_calls(api_key: APIKey = Depends(get_api_key)):
     return get_connections()
 
-async def make_call(flat_id: int, apartment_number: int, caller_ws: WebSocket, hash_room: str, blockDevice: BlockDevice, log_id: int):
+async def make_call(flat_id: int, apartment_number: int, caller_ws: WebSocket, hash_room: str, blockDevice: BlockDevice, log_id: int, token_room: str):
     caller_id = get_user_id(caller_ws)
-    print(f"Начат звонок в квартиру {apartment_number} (flat_id={flat_id}, инициатор: {caller_id}). hash_room: {hash_room}")
+    print(f"Начат звонок в квартиру {apartment_number} (flat_id={flat_id}, инициатор: {caller_id}). hash_room: {hash_room} token_room:{token_room}")
 
     call_ended_event = asyncio.Event()
     call_tasks[flat_id] = {'task': asyncio.current_task(), 'caller_ws': caller_ws, 'answered_by': None, 'call_ended_event': call_ended_event, 'apartment_number': apartment_number}
 
     try:
-        await safe_send_json(caller_ws, {"type": "call_started", "apartment": apartment_number, "flat_id": flat_id, "log_id": log_id})
+        await safe_send_json(caller_ws, {"type": "call_started", "apartment": apartment_number, "flat_id": flat_id, "log_id": log_id, "token_room":token_room})
 
         with connections_lock:
             for user_conns in connections.values():
                 for conn in user_conns:
                     if conn.role == "resident" and conn.flat_id == flat_id:
-                        await safe_send_json(conn.websocket, {"type": "incoming_call", "from": "intercom", "apartment": apartment_number, "hash_room": hash_room, "block_device": blockDevice.model_dump() if blockDevice else None})
+                        await safe_send_json(conn.websocket, {"type": "incoming_call", "from": "intercom", 
+                                                              "apartment": apartment_number, "hash_room": hash_room, 
+                                                              "block_device": blockDevice.model_dump() if blockDevice else None,
+                                                              "token_room": token_room
+                                                              })
 
         try:
-            await asyncio.wait_for(call_ended_event.wait(), timeout=20)
+            await asyncio.wait_for(call_ended_event.wait(), timeout=30)
             print(f"Звонок в квартиру {apartment_number} flat_id={flat_id} завершен событием.")
         except asyncio.TimeoutError:
             if call_tasks[flat_id]['answered_by'] is not None:
                 print(f"Звонок в квартиру {apartment_number} flat_id={flat_id} был принят, таймаут игнорируется.")
                 return
-            await end_call(flat_id, "timeout")
+            await end_call(flat_id, "timeout", hash_room)
     except asyncio.CancelledError:
         print(f"Звонок в квартиру {apartment_number} flat_id={flat_id} был прерван.")
-        await end_call(flat_id, "aborted")
+        await end_call(flat_id, "aborted", hash_room)
     finally:
         with connections_lock:
             if flat_id in call_tasks and call_tasks[flat_id]['answered_by'] is None:
                 del call_tasks[flat_id]
                 print(f"Задача звонка для квартиры {apartment_number} (flat_id={flat_id}) удалена из call_tasks.")
 
-async def end_call(flat_id: int, reason: str):
+async def end_call(flat_id: int, reason: str, hash_room: str):
+    try:
+        if(hash_room != ''):
+         await delete_room(hash_room)
+    except:
+        print('С удаление не прошло')
     with connections_lock:
         if flat_id not in call_tasks:
             print(f"Нет активного звонка для квартиры {flat_id}, нечего завершать.")

@@ -27,7 +27,6 @@ class BaseCallData(BaseModel):
     indentifier: str
     blockDevice: Optional[BlockDevice] = None
 
-
 class UserConnection:
     def __init__(self, websocket: WebSocket, user_id: str, flat_id: int = None, role: str = "resident"):
         self.websocket = websocket

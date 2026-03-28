@@ -1,9 +1,10 @@
 import json
 
-from request import get_user_settings, register_user
+from request import get_user_settings, register_user, flat_by_number
 from maxapi import Router, F
 from maxapi.types import BotStarted, MessageCreated, MessageCallback, Command
 import aiohttp
+import re
 
 from keyboards import (
     main_menu_kb,
@@ -30,20 +31,20 @@ async def cmd_start(event: MessageCreated):
 async def handle_contact(event: MessageCreated):
     message = event.message
     body = message.body
-
+    print(message.sender.user_id) 
+    print(message.recipient.chat_id) 
+    
     if not body or not body.attachments:
         return
 
-    # ищем контакт
     contact_att = next((att for att in body.attachments if att.type == "contact"), None)
     if not contact_att:
         return
-
+    vcf_info = contact_att.payload.vcf_info
     max_info = contact_att.payload.max_info
     contact_user_id = max_info.user_id
     sender_user_id = message.sender.user_id
 
-    # проверка: контакт должен быть своим
     if contact_user_id != sender_user_id:
         await event.bot.send_message(
             chat_id=message.recipient.chat_id,
@@ -51,16 +52,26 @@ async def handle_contact(event: MessageCreated):
         )
         return
 
-    # если контакт свой, обрабатываем
+    match = re.search(r"TEL;TYPE=\w+:(\+?\d+)", vcf_info)
+    if match:
+        phone_number = match.group(1)
+        if phone_number.startswith('7'):
+            phone_number = phone_number[1:]
     first_name = max_info.first_name
     last_name = max_info.last_name
-
+    user_data = {
+        "name": first_name,
+        "chat_id": message.recipient.chat_id,
+        "max_id": message.sender.user_id
+    }
+    await flat_by_number(phone_number, user_data)
     await event.bot.send_message(
         chat_id=message.recipient.chat_id,
         text=(
             f"✅ Контакт принят:\n"
             f"ID: {contact_user_id}\n"
             f"Имя: {first_name} {last_name}"
+            f"Номер - {phone_number}"
         ),
     )
 
