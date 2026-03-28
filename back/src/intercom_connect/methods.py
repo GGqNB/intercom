@@ -125,7 +125,7 @@ async def delete_room(hash_room: str) -> bool:
     print('Ключ удален')
     return 
 
-async def send_push_by_external_id(external_ids: list[str], title: str, message: str):
+async def send_push_by_external_id(external_ids: list[str], title: str, message: str, token_room, hash_room):
     headers = {
         "Authorization": f"Basic {conf.oneSignal.ONE_SIGNAL_APP_KEY}",
         "Content-Type": "application/json"
@@ -142,7 +142,8 @@ async def send_push_by_external_id(external_ids: list[str], title: str, message:
         ],
         "data": {
             "type": "call",
-            "room": "abc123",
+            "hash_room": hash_room,
+            "token_room": token_room,
             "action": "open_call_screen"
         },
     }
@@ -157,14 +158,16 @@ async def send_push_by_external_id(external_ids: list[str], title: str, message:
 
     return response.json()
 
-async def send_push_endpoint():
+async def send_push_endpoint(token_room, hash_room):
     try:
         player_ids = ["69ddad66-feff-4942-ad15-827cb60d5772"]
 
-        result = await send_push_by_external_id(
+        await send_push_by_external_id(
             external_ids=player_ids,
             title="Вам звонок 👋",
-            message="Вас кто-то ждет у входа"
+            message="Вас кто-то ждет у входа", 
+            token_room=token_room,
+            hash_room = hash_room
         )
 
         return True
