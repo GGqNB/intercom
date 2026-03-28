@@ -106,7 +106,7 @@ async def open_door(
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     key = get_key(websocket)
-    if key != conf.security.API_KEY or key != conf.security.NEW_API_KEY:
+    if key != conf.security.NEW_API_KEY:
         await websocket.close(code=1008, reason="Неверный key")
         return
     user_id = get_user_id(websocket)
