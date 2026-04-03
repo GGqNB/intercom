@@ -1,3 +1,4 @@
+from src.crm.stown.models import SFlat
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, update, delete
@@ -49,7 +50,7 @@ async def get_users(
             detail={"code": status.HTTP_500_INTERNAL_SERVER_ERROR, "args": str(e)}
         )
 
-@router_users.get("/{max_id}", response_model=ReadUser)
+@router_users.get("/{max_id}", response_model=list[ReadUser])
 async def get_user_by_max_id(
     max_id: str,
     session: AsyncSession = Depends(get_async_session),
@@ -142,7 +143,7 @@ async def add_user(
 ):
     try:
         flats = await flat_by_phone(phone)
-
+        
         flats_data = flats.get("status", [])
         if not flats_data:
             raise HTTPException(
@@ -159,6 +160,7 @@ async def add_user(
 
         users_to_insert = []
         seen = set()
+      
         for build in flats_data:
             for home in build.get("homes", []):
                 key = (
@@ -174,9 +176,9 @@ async def add_user(
                     "name": max_user.name,
                     "chat_id": max_user.chat_id,
                     "max_id": max_id_clean,
-                    "flat": home["home_id"],
+                    "flat": int(home["home_number"]),
                     "house_id": build["build_id"],
-                    "flat_stown": 1337
+                    "flat_stown": home["home_id"]
                 })
 
         if not users_to_insert:
@@ -193,8 +195,40 @@ async def add_user(
 
         created_users = result_insert.scalars().all()
 
+        flat_stown_ids = [user.flat_stown for user in created_users if user.flat_stown]
+        stown_flats = {}
+        if flat_stown_ids:
+            stown_flat_query = select(SFlat).where(SFlat.id.in_(flat_stown_ids))
+            stown_flat_result = await session.execute(stown_flat_query)
+            stown_flats = {sf.id: sf for sf in stown_flat_result.scalars().all()}
+
+        response_data = []
+        for user in created_users:
+            user_dict = {
+                "id": user.id,
+                "max_id": user.max_id,
+                "chat_id": user.chat_id,
+                "name": user.name,
+                "flat": user.flat,
+                "house_id": user.house_id,
+                "flat_stown": user.flat_stown,
+                "stown_flat": None
+            }
+
+            if user.flat_stown and user.flat_stown in stown_flats:
+                sf = stown_flats[user.flat_stown]
+                user_dict["stown_flat"] = {
+                    "id": sf.id,
+                    "type": sf.type,
+                    "number": sf.number,
+                    "ext_number": sf.ext_number,
+                    "house_id": sf.house_id
+                }
+
+            response_data.append(user_dict)
+
         return {
-            "data": created_users,
+            "data": response_data,
             "count_deleted": len(deleted_result.scalars().all()),
             "count_created": len(created_users),
             "status": "success"

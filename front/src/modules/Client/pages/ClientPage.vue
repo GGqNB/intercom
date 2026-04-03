@@ -5,6 +5,7 @@
         <h3>Проверка клиента</h3>
         <div>
             <q-input outlined placeholder="Номер квартиры STOWN" v-model="apartmentNumber"></q-input>
+            <q-input outlined placeholder="Token" v-model="token"></q-input>
         </div>
         <q-btn @click="connectWebSocket();">Подключить</q-btn>
         <q-btn @click="disconnectWebSocket">Отключить</q-btn>
@@ -100,6 +101,7 @@ export default defineComponent({
         const message = ref('');
         const userId = '001';
         const apartmentNumber = ref(1447);
+        const token = ref('');
         const role = 'resident';
         const {
             accessToken
@@ -114,7 +116,7 @@ export default defineComponent({
         const reconnectInterval = 3000;
         let reconnectTimer = null;
         const connectWebSocket = () => {
-            const serverAddress = `${WSS_SERVER}?key=${accessToken.value}&user_id=${apartmentNumber.value}&flat_id=${apartmentNumber.value}&role=${role}`;
+            const serverAddress = `${WSS_SERVER}?key=${token.value}&user_id=${apartmentNumber.value}&flat_id=${apartmentNumber.value}&role=${role}`;
             socket.value = new WebSocket(serverAddress);
 
             socket.value.onopen = () => {
@@ -255,7 +257,8 @@ export default defineComponent({
             hashStr,
             connectWebSocket,
             disconnectWebSocket,
-            VIDEO_SERVER
+            VIDEO_SERVER,
+            token
         };
     },
 });

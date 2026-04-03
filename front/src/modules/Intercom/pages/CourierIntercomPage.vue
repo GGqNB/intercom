@@ -7,7 +7,7 @@
                 <div class="block-video flex justify-center items-center">
                     <div v-if="!isCallingVideo">
                         <video autoplay muted playsinline loop class="videosize">
-                            <source src="video/video.mp4" type="video/mp4">
+                            <!-- <source src="video/video.mp4" type="video/mp4"> -->
                             Your browser does not support the video tag.
                         </video>
                     </div>

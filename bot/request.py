@@ -1,6 +1,46 @@
+import json
+
 import aiohttp
 from config import BACKEND_URL, API_KEY 
 import asyncio
+
+async def flat_by_number(phone: str, data) -> dict | None:
+
+    headers = {
+        "Authorization": f"{API_KEY}",
+        "Content-Type": "application/json"
+    }
+
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.post(
+                f"{BACKEND_URL}/api/users/max/{phone}",
+                headers=headers,
+                json=data,
+                timeout=2
+            ) as resp:
+
+                print("STATUS:", resp.status)
+
+                if resp.status == 404:
+                    print("404")
+                    return None
+
+                if resp.status not in (200, 201):
+                    print("ERROR:", resp.status)
+                    return None
+
+                # ✅ ВОТ ГЛАВНОЕ
+                response_data = await resp.json()
+
+                # 👀 красиво смотрим что пришло
+                print(json.dumps(response_data, indent=2, ensure_ascii=False))
+
+                return response_data
+
+    except Exception as e:
+        print(f"Ошибка запроса к backend: {e}")
+        return None
 
 async def register_user(payload: dict) -> bool:
     headers = {
@@ -57,42 +97,50 @@ async def get_user_settings(max_id: str) -> dict | None:
                 if resp.status != 200:
                     return None
                 data = await resp.json()
-                print(data)
+
+                print(json.dumps(data))
                 return data
 
     except Exception as e:
         print(f"Ошибка запроса к backend: {e}")
         return None
-    
-async def flat_by_number(phone: str, data) -> dict | None:
 
+async def call_open_door_backend(open_token: str) -> dict:
+
+    url = f"{BACKEND_URL}/open"
+    headers = {"Authorization": f"{API_KEY}"}
+    data = {"redis_open_token": open_token}
+
+    async with aiohttp.ClientSession() as session:
+        async with session.post(url, json=data, headers=headers) as resp:
+            if resp.status != 200:
+                text = await resp.text()
+                raise Exception(f"Ошибка backend: {resp.status} {text}")
+            return await resp.json()
+
+async def call_open_door_backend(open_token: str) -> dict:
+    """
+    Асинхронно вызывает backend /open
+    """
+    url = f"{BACKEND_URL}/api/open?redis_open_token={open_token}"
     headers = {
         "Authorization": f"{API_KEY}",
         "Content-Type": "application/json"
     }
 
-    try:
-        async with aiohttp.ClientSession() as session:
-            async with session.post(
-                f"{BACKEND_URL}/api/users/max/{phone}",
-                headers=headers,
-                data=data,
-                timeout=2
-            ) as resp:
-                print(resp)
-                if resp.status == 404:
-                    print('400')
-                    
-                    return None
+    async with aiohttp.ClientSession() as session:
+        async with session.post(url, headers=headers) as resp:
+            try:
+                resp_json = await resp.json()
+            except Exception:
+                resp_text = await resp.text()
+                raise Exception(f"Некорректный ответ backend: {resp.status} {resp_text}")
 
-                if resp.status != 200:
-                    return None
-                    print('200')
-                
-                data = await resp.json()
-                print(data)
-                return data
-
-    except Exception as e:
-        print(f"Ошибка запроса к backend: {e}")
-        return None
+            if resp.status == 200:
+                return {"success": True, "data": resp_json}
+            elif resp.status == 400:
+                return {"success": False, "error": "❌ Токен недействителен или истёк"}
+            elif resp.status >= 500:
+                return {"success": False, "error": "❌ Ошибка сервера, попробуйте позже"}
+            else:
+                return {"success": False, "error": f"❌ Неизвестная ошибка: {resp_json}"}

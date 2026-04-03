@@ -1,18 +1,18 @@
 import json
 
-from request import get_user_settings, register_user, flat_by_number
+from request import call_open_door_backend, get_user_settings, register_user, flat_by_number
 from maxapi import Router, F
 from maxapi.types import BotStarted, MessageCreated, MessageCallback, Command
 import aiohttp
 import re
-
 from keyboards import (
     main_menu_kb,
     settings_menu_kb,
     houses_kb,
     confirm_flat_kb,
     HOUSE_MAP,
-    confirm_menu_kb
+    confirm_menu_kb,
+    reset_menu_kb
 )
 
 router = Router()
@@ -27,12 +27,17 @@ async def cmd_start(event: MessageCreated):
         text="👋 Добро пожаловать!\n\nНажмите ⚙ Настройки.",
         attachments=[main_menu_kb()]
     )
+
+def get_house_text(house_id: int) -> str:
+    for house in HOUSE_MAP.values():
+        if house["id"] == house_id:
+            return house["text"]
+    return "Неизвестный дом"
+
 @router.message_created()
 async def handle_contact(event: MessageCreated):
     message = event.message
     body = message.body
-    print(message.sender.user_id) 
-    print(message.recipient.chat_id) 
     
     if not body or not body.attachments:
         return
@@ -48,7 +53,8 @@ async def handle_contact(event: MessageCreated):
     if contact_user_id != sender_user_id:
         await event.bot.send_message(
             chat_id=message.recipient.chat_id,
-            text="❌ Вы можете отправлять только свой контакт!"
+            text="❌ Вы можете отправлять только свой контакт!\n\nЕсли хотите обновить свои данные о домах, нажмите Обновить данные",
+            attachments=[reset_menu_kb()]
         )
         return
 
@@ -57,23 +63,49 @@ async def handle_contact(event: MessageCreated):
         phone_number = match.group(1)
         if phone_number.startswith('7'):
             phone_number = phone_number[1:]
+    print(phone_number)
+    if phone_number != '9505024090' and phone_number != '9505010598':
+        await event.bot.send_message(
+        chat_id=message.recipient.chat_id,
+        text=(
+            f"Вам пока это не доступно\n"
+        ), )
+        return
     first_name = max_info.first_name
     last_name = max_info.last_name
     user_data = {
         "name": first_name,
-        "chat_id": message.recipient.chat_id,
-        "max_id": message.sender.user_id
+        "chat_id": str(message.recipient.chat_id),
+        "max_id": str(message.sender.user_id)
     }
-    await flat_by_number(phone_number, user_data)
-    await event.bot.send_message(
-        chat_id=message.recipient.chat_id,
-        text=(
-            f"✅ Контакт принят:\n"
-            f"ID: {contact_user_id}\n"
-            f"Имя: {first_name} {last_name}"
-            f"Номер - {phone_number}"
-        ),
-    )
+    
+    flats = await flat_by_number(phone_number, user_data)
+
+    if flats and flats.get("data"):
+        addresses = []
+
+        for i, flat in enumerate(flats["data"], start=1):
+            house_text = get_house_text(flat.get("house_id"))
+            stown = flat.get("stown_flat", {})
+
+            text = (
+            f"{i}. {house_text}, "
+            f"{stown.get('type', '')} {stown.get('number', '')}"
+            )
+
+            addresses.append(text)
+
+        message_text = (
+            "✅ Контакт принят:\n"
+            "Ваши адреса:\n" +
+            "\n".join(addresses)
+        )
+
+        await event.bot.send_message(
+            chat_id=message.recipient.chat_id,
+            text=message_text,
+            attachments=[main_menu_kb()]
+        )
 
 @router.bot_started()
 async def handle_bot_started(event: BotStarted):
@@ -102,9 +134,6 @@ async def callback_home(event: MessageCallback):
         attachments=[main_menu_kb()]  # кнопка Home
     )
 
-# --------------------
-# ОТКРЫТЬ НАСТРОЙКИ
-# --------------------
 
 @router.message_callback(F.callback.payload == "cmd_settings")
 async def callback_settings(event: MessageCallback):
@@ -112,177 +141,70 @@ async def callback_settings(event: MessageCallback):
 
     user_id = event.callback.user.user_id
 
-    # 🔹 вызываем функцию из requests.py
-    user_data = await get_user_settings(str(user_id))
+    # 🔹 вызываем функцию
+    user_list = await get_user_settings(str(user_id))
 
-    if not user_data:
+    # ❌ если список пустой или None
+    if not user_list:
         await event.message.edit(
-            text="❌ Настройки не найдены",
+            text="❌ Настройки не найдены\n\n"+
+            "Нажмите кнопку 'Обновить данные'",
             attachments=[settings_menu_kb()]
         )
         return
 
-    flat_number = user_data.get("flat")
-    house_id = user_data.get("house_id")
-    name = user_data.get("name")
+    # 🔹 быстрый мап для домов
+    HOUSE_MAP_BY_ID = {v["id"]: v["text"] for v in HOUSE_MAP.values()}
 
-    house_text = next(
-        (v["text"] for v in HOUSE_MAP.values() if v["id"] == house_id),
-        "Неизвестный дом"
+    lines = []
+    for i, user in enumerate(user_list, start=1):
+        flat_number = user.get("flat")
+        house_id = user.get("house_id")
+        name = user.get("name")
+
+        house_text = HOUSE_MAP_BY_ID.get(house_id, "Неизвестный дом")
+
+        lines.append(
+            f"{i}. 👤 {name}\n"
+            f"   🏠 {house_text}\n"
+            f"   🏢 Квартира: {flat_number}"
+        )
+
+    # 🔹 финальный текст
+    message_text = (
+        "⚙ Ваши настройки:\n\n" +
+        "\n\n".join(lines) +
+        "\n\nВыберите действие ниже:"
     )
 
     await event.message.edit(
-        text=(
-            f"⚙ Настройки пользователя\n\n"
-            f"👤 Имя: {name}\n"
-            f"🏠 Дом: {house_text}\n"
-            f"🏢 Квартира: {flat_number}\n\n"
-            "Выберите действие ниже:"
-        ),
+        text=message_text,
         attachments=[settings_menu_kb()]
     )
-
-
-@router.message_callback(F.callback.payload == "cmd_choose_house")
-async def callback_choose_house(event: MessageCallback):
-    await event.answer()
-
-    await event.message.edit(
-        text="🏠 Выберите дом:",
-        attachments=[houses_kb()]
-    )
-
-
-@router.message_callback(F.callback.payload.startswith("house_"))
-async def callback_house_selected(event: MessageCallback):
-
-    user_id = event.callback.user.user_id
-    key = event.callback.payload 
-
-    house_data = HOUSE_MAP.get(key)
-    if not house_data:
-        return
-
-    user_states[user_id] = {
-        "house_id": house_data["id"],
-        "house_text": house_data["text"], 
-        "step": "waiting_flat"
-    }
-
-    await event.answer()
-
-    await event.message.edit(
-        text=f"🏠 Дом {house_data['text']} выбран.\n\nВведите номер квартиры:",
-        attachments=[]
-    )
-
-
-@router.message_created()
-async def handle_flat_input(event: MessageCreated):
-
-    user_id = event.message.sender.user_id
-
-    if user_id not in user_states:
-        return
-
-    if user_states[user_id].get("step") != "waiting_flat":
-        return
-
-    flat_number = event.message.body.text
-
-    if not flat_number or not flat_number.isdigit():
-        await event.bot.send_message(
-            chat_id=event.message.recipient.chat_id,
-            text="❌ Введите номер квартиры (только цифры)."
-        )
-        return
-
-    user_states[user_id]["flat_number"] = flat_number
-    user_states[user_id]["step"] = "confirming"
-
-    house_text = user_states[user_id]["house_text"]
-
-    await event.bot.send_message(
-        chat_id=event.message.recipient.chat_id,
-        text=(
-            "Подтвердите выбор:\n\n"
-            f"🏠 Дом: {house_text}\n" 
-            f"🏢 Квартира: {flat_number}"
-        ),
-        attachments=[confirm_flat_kb()]
-    )
-
-
-@router.message_callback(F.callback.payload == "confirm_flat")
-async def confirm_flat(event: MessageCallback):
-
-    user_id = event.callback.user.user_id
-    chat_id = event.message.recipient.chat_id
-    name = event.callback.user.first_name
-
-    data = user_states.get(user_id)
-    if not data:
-        return
-
-    house_id = data["house_id"]
-    house_text = data["house_text"]
-    flat_number = int(data["flat_number"])
-
-    payload = {
-        "name": name,
-        "chat_id": str(chat_id),
-        "max_id": str(user_id),
-        "flat": flat_number,
-        "flat_stown": 0,
-        "house_id": house_id
-    }
-
-    result = await register_user(payload)
-
-    if not result["success"]:
-        if result.get("error") == "Квартира не найдена":
-            user_states[user_id]["step"] = "waiting_flat"
-
-            await event.answer(notification="❌ Квартира не найдена")
-
-            await event.message.edit(
-                text=(
-                    f"⚠ Возможно, вы ошиблись в номере квартиры.\n\n"
-                    f"🏠 Дом: {house_text}\n\n"
-                    f"Введите номер квартиры ещё раз:"
-                ),
-                attachments=[]
-            )
-            return
-
-        await event.answer(notification="❌ Ошибка сервера")
-        return
-
-    user_states.pop(user_id, None)
-
-    await event.answer(notification="✅ Сохранено")
-
-    await event.message.edit(
-        text=(
-            f"✅ Настройки сохранены\n\n"
-            f"🏠 Дом: {house_text}\n"
-            f"🏢 Квартира: {flat_number}"
-        ),
-        attachments=[confirm_menu_kb()]
-    )
-
-@router.message_callback(F.callback.payload == "change_flat")
-async def change_flat(event: MessageCallback):
-
-    user_id = event.callback.user.user_id
-
-    if user_id in user_states:
-        user_states[user_id]["step"] = "waiting_flat"
-
-    await event.answer()
-
-    await event.message.edit(
-        text="Введите номер квартиры заново:",
-        attachments=[]
-    )
     
+@router.message_callback(F.callback.payload.startswith("open_door:"))
+async def callback_open_door(event: MessageCallback):
+    """
+    Обработка кнопки 'Открыть' с удалением сообщения и ответом пользователю.
+    """
+    open_token = event.callback.payload.split(":", 1)[1]
+
+    try:
+        result = await call_open_door_backend(open_token)
+        chat_id = event.message.recipient.chat_id
+
+        if result.get("success"):
+            text = "✅ Дверь успешно открыта!"
+        else:
+            text = result.get("error", "❌ Не удалось открыть дверь")
+
+        await event.message.edit(
+            text=text,
+            attachments=[confirm_menu_kb()]
+        )
+
+    except Exception as e:
+        await event.message.edit(
+            text=f"❌ Произошла ошибка: Обратитесь к администратору",
+            attachments=[confirm_menu_kb()]
+        )

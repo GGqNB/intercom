@@ -7,7 +7,7 @@ import threading
 import json
 from fastapi.security.api_key import APIKey
 from fastapi import Depends, HTTPException
-from src.auth import get_api_key
+from src.auth import get_api_key, get_bot_key
 from src.config import get_config
 from starlette.status import HTTP_400_BAD_REQUEST
 from src.intercom_connect.schemas import UserConnection
@@ -63,7 +63,7 @@ async def cleanup_old_websockets():
 @router_intercom_connect.post("/open")
 async def open_door(
     redis_open_token: str,
-    api_key: APIKey = Depends(get_api_key),
+    bot_key: APIKey = Depends(get_bot_key),
     session: AsyncSession = Depends(get_async_session)
 ):
     key = f"{conf.redis.MAX_TOKEN_PREFIX}:{redis_open_token}"

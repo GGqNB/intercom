@@ -67,33 +67,33 @@ const routes: RouteRecordRaw[] = [
       authorization: true,
     },
   },
-  {
-    path: '/intercom-list',
-    component: () => import('layouts/MainLayout.vue'),
-    children: [{ path: '', component: IntercomList, name: 'intercom-list' }],
-    meta: {
-      title: 'STOWN',
-      authorization: true,
-    },
-  },
-    {
-    path: '/entry-list',
-    component: () => import('layouts/MainLayout.vue'),
-    children: [{ path: '', component: EntryList, name: 'entry-list' }],
-    meta: {
-      title: 'STOWN',
-      authorization: true,
-    },
-  },
-    {
-    path: '/house-list',
-    component: () => import('layouts/MainLayout.vue'),
-    children: [{ path: '', component: HouseList, name: 'house-list' }],
-    meta: {
-      title: 'STOWN',
-      authorization: true,
-    },
-  },
+  // {
+  //   path: '/intercom-list',
+  //   component: () => import('layouts/MainLayout.vue'),
+  //   children: [{ path: '', component: IntercomList, name: 'intercom-list' }],
+  //   meta: {
+  //     title: 'STOWN',
+  //     authorization: true,
+  //   },
+  // },
+  //   {
+  //   path: '/entry-list',
+  //   component: () => import('layouts/MainLayout.vue'),
+  //   children: [{ path: '', component: EntryList, name: 'entry-list' }],
+  //   meta: {
+  //     title: 'STOWN',
+  //     authorization: true,
+  //   },
+  // },
+  //   {
+  //   path: '/house-list',
+  //   component: () => import('layouts/MainLayout.vue'),
+  //   children: [{ path: '', component: HouseList, name: 'house-list' }],
+  //   meta: {
+  //     title: 'STOWN',
+  //     authorization: true,
+  //   },
+  // },
   // Always leave this as last one,
   // but you can also remove it
   {

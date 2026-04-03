@@ -32,17 +32,13 @@ async def get_user_by_max_id_service(
     session: AsyncSession,
     max_id: str
 ) -> Users | None:
-    """
-    Возвращает пользователя по max_id.
-    Возвращает None если не найден.
-    """
+
 
     query = (
         select(Users)
         .options(selectinload(Users.house))
         .where(Users.max_id == max_id)
-        .limit(1)
     )
 
     result = await session.execute(query)
-    return result.scalar_one_or_none()
+    return result.scalars().all()

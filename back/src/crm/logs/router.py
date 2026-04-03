@@ -51,7 +51,7 @@ async def clear_redis_intercoms(
                 "args": e.args if hasattr(e, 'args') else None,
             }
         )
-
+#Сделать дату нормальной
 @router_logs.get("/redis-intercom")
 async def redis_intercoms(
     session: AsyncSession = Depends(get_async_session),
@@ -131,7 +131,6 @@ async def edit_log(
 QUEUE_CALLING = f"{conf.rabbit.QUEUE_CALLING}"
 
 @router_logs.put("/{log_id}/rabbit/{indentifier}")
-@router_logs.put("/{log_id}/rabbit") #Потом убрать!
 async def update_log_photo(
     log_id: int,
     indentifier: Optional[str] = None,

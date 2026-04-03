@@ -46,7 +46,7 @@ async def rabbit_listener(bot: Bot):
         async for message in queue_iter:
             try:
                 payload = json.loads(message.body.decode())
-
+                print(payload)
                 if not payload:
                     logger.warning("Пустой payload")
                     await message.reject(requeue=False)
@@ -70,7 +70,7 @@ async def rabbit_listener(bot: Bot):
                 text = (
                     f"📢 Новый вызов!\n\n"
                     f"🏠 Дом: {payload.get('house_id')}\n"
-                    f"🏢 Квартира: {payload.get('flat')}\n"
+                    f"🏢 Квартира: {payload.get('flat_stown')}\n"
                     f"🕒 Время: {created_at_formatted}"
                 )
 
@@ -84,17 +84,13 @@ async def rabbit_listener(bot: Bot):
 
                 for user in users:
                     chat_id = user["chat_id"]
+                    open_token = payload.get("open_token", "")
 
                     if tmp_file_path:
                         await bot.send_message(
                             chat_id=chat_id,
                             text=text,
                             attachments=[InputMedia(path=str(tmp_file_path))]
-                        )
-
-                        await bot.send_message(
-                            chat_id=chat_id,
-                            attachments=[open_door_kb()]
                         )
                     else:
                         await bot.send_message(
@@ -105,12 +101,26 @@ async def rabbit_listener(bot: Bot):
 
                 if tmp_file_path and tmp_file_path.exists():
                     tmp_file_path.unlink()
+                if open_token:
+                    kb_message = await bot.send_message(
+                        chat_id=chat_id,
+                        text="Нажмите кнопку чтобы открыть дверь:",
+                        attachments=[open_door_kb(open_token)]
+                    )
 
-                # ✅ подтверждаем сообщение
+                asyncio.create_task(delete_after(bot, kb_message["id"], delay=10))
                 await message.ack()
 
+                
             except Exception as e:
                 logger.error(f"Ошибка обработки сообщения из RabbitMQ: {e}")
 
-                # ❌ не возвращаем сообщение обратно в очередь
                 await message.reject(requeue=False)
+                
+async def delete_after(bot: Bot, message_id: str, delay: int):
+    """Удаляет сообщение через delay секунд"""
+    await asyncio.sleep(delay)
+    try:
+        await bot.delete_message(message_id)
+    except Exception as e:
+        logger.warning(f"Не удалось удалить сообщение {message_id}: {e}")

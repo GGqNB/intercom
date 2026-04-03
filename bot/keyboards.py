@@ -2,7 +2,6 @@ from maxapi.types import CallbackButton, ButtonsPayload, Attachment, RequestCont
 from maxapi.enums.intent import Intent
 
 
-
 def main_menu_kb():
     return Attachment(
         type="inline_keyboard",
@@ -13,37 +12,30 @@ def main_menu_kb():
                         text="⚙ Настройки",
                         payload="cmd_settings",
                         intent=Intent.DEFAULT
-                    ),
-                      RequestContactButton(
-                        text="Контакты",
-                        payload="request_contact",
-                        intent=Intent.DEFAULT
                     )
                 ]
             ]
         )
     )
 
-def open_door_kb():
+def open_door_kb(open_token: str) -> Attachment:
+    """
+    Клавиатура с одной кнопкой 'Открыть', payload = токен.
+    """
     return Attachment(
         type="inline_keyboard",
         payload=ButtonsPayload(
             buttons=[
                 [
                     CallbackButton(
-                        text="🔑 Открыть",
+                        text="Открыть",
+                        payload='open_door:'+open_token,  # обязательно непустой payload
                         intent=Intent.DEFAULT
-                    ),
-                     CallbackButton(
-                        text="🏠 Главная",
-                        payload="cmd_home",
-                        intent=Intent.DEFAULT
-                    ),
+                    )
                 ]
             ]
         )
     )
-
 def confirm_menu_kb():
     return Attachment(
         type="inline_keyboard",
@@ -65,15 +57,31 @@ def confirm_menu_kb():
         )
     )
 
+def reset_menu_kb():
+    return Attachment(
+        type="inline_keyboard",
+        payload=ButtonsPayload(
+            buttons=[
+                [
+                      RequestContactButton(
+                        text="Обновить данные",
+                        payload="request_contact",
+                        intent=Intent.DEFAULT
+                    )
+                ]
+            ]
+        )
+    )
+
 def settings_menu_kb():
     return Attachment(
         type="inline_keyboard",
         payload=ButtonsPayload(
             buttons=[
                 [
-                    CallbackButton(
-                        text="🏠 Выбрать дом",
-                        payload="cmd_choose_house",
+                      RequestContactButton(
+                        text="Обновить данные",
+                        payload="request_contact",
                         intent=Intent.DEFAULT
                     )
                 ],

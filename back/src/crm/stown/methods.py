@@ -11,15 +11,24 @@ async def flat_by_phone(phone):
         token = redis_client.get(conf.redis.STOWN_KEY)
         if not token:
             token = get_access_token()
+            redis_client.set(conf.redis.STOWN_KEY, token)
 
         headers = {'Authorization': f'JWT {token}'}
         url = conf.stown.FLAT_BY_NUBMER_URL.format(phone=phone)
         print(url)
-        api_response = requests.post(
-            url,
-            headers=headers
-            )
-        print(api_response)
+        
+        api_response = requests.post(url, headers=headers)
+        print(api_response.json())
+        
+        if api_response.status_code == 401:
+            print("Token expired, getting new token...")
+            token = get_access_token()
+            redis_client.set(conf.redis.STOWN_KEY, token)
+            
+            headers = {'Authorization': f'JWT {token}'}
+            api_response = requests.post(url, headers=headers)
+            print(api_response.json())
+        
         if api_response.status_code != 200:
             raise Exception("Stown API error: " + api_response.text)
 
