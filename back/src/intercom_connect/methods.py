@@ -145,7 +145,9 @@ async def send_push_by_external_id(external_ids: list[str], title: str, message:
             "hash_room": hash_room,
             "token_room": token_room,
             "action": "open_call_screen",
-            "indentifier": indentifier
+            "indentifier": indentifier,
+            #stown_id,
+            #block_device
         },
     }
 
