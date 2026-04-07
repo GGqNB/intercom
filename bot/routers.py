@@ -64,13 +64,6 @@ async def handle_contact(event: MessageCreated):
         if phone_number.startswith('7'):
             phone_number = phone_number[1:]
     print(phone_number)
-    if phone_number != '9505024090' and phone_number != '9505010598':
-        await event.bot.send_message(
-        chat_id=message.recipient.chat_id,
-        text=(
-            f"Вам пока это не доступно\n"
-        ), )
-        return
     first_name = max_info.first_name
     last_name = max_info.last_name
     user_data = {
