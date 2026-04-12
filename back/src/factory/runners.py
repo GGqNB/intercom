@@ -80,7 +80,7 @@ async def monitor_intercoms():
         except Exception as e:
             print(f"monitor_intercoms error: {e}")
 
-        await asyncio.sleep(1*60)
+        await asyncio.sleep(1*60*30)
 
 async def cleanup_task():
     while True:
