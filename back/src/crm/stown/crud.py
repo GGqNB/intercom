@@ -48,3 +48,4 @@ async def get_flat_by_house(session: AsyncSession, house_id: int, number: int) -
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(e)
         )
+        

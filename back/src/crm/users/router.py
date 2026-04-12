@@ -141,68 +141,68 @@ async def add_user(
     session: AsyncSession = Depends(get_async_session),
     bot_key: APIKey = Depends(get_bot_key)
 ):
+    flats = await flat_by_phone(phone)
+    flats_data = flats.get("status") or []
+
+    if not flats_data:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Нет данных по номеру"
+        )
+
+    max_id_clean = max_user.max_id.strip()
+
     try:
-        flats = await flat_by_phone(phone)
-        
-        flats_data = flats.get("status", [])
-        if not flats_data:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Нет данных по номеру"
-            )
+        async with session.begin():
 
-        max_id_clean = max_user.max_id.strip() 
-        delete_stmt = delete(Users).where(
-            func.trim(Users.max_id) == max_id_clean
-        ).returning(Users)
-        deleted_result = await session.execute(delete_stmt)
-        await session.commit() 
+            delete_stmt = delete(Users).where(
+                func.trim(Users.max_id) == max_id_clean
+            ).returning(Users)
 
-        users_to_insert = []
-        seen = set()
-      
-        for build in flats_data:
-            for home in build.get("homes", []):
-                key = (
-                    max_id_clean,
-                    build["build_id"],
-                    home["home_id"]
-                )
-                if key in seen:
-                    continue
-                seen.add(key)
+            deleted_result = await session.execute(delete_stmt)
+            deleted_rows = deleted_result.scalars().all()
 
-                users_to_insert.append({
-                    "name": max_user.name,
-                    "chat_id": max_user.chat_id,
-                    "max_id": max_id_clean,
-                    "flat": int(home["home_number"]),
-                    "house_id": build["build_id"],
-                    "flat_stown": home["home_id"]
-                })
+            users_to_insert = []
+            seen = set()
 
-        if not users_to_insert:
-            return {
-                "data": [],
-                "count_deleted": len(deleted_result.scalars().all()),
-                "count_created": 0,
-                "status": "deleted_no_new_data"
-            }
+            for build in flats_data:
+                for home in build.get("homes", []):
+                    key = (max_id_clean, build["build_id"], home["home_id"])
+                    if key in seen:
+                        continue
+                    seen.add(key)
 
-        insert_stmt = insert(Users).values(users_to_insert).returning(Users)
-        result_insert = await session.execute(insert_stmt)
-        await session.commit()
+                    users_to_insert.append({
+                        "name": max_user.name,
+                        "chat_id": max_user.chat_id,
+                        "max_id": max_id_clean,
+                        "flat": int(home["home_number"]),
+                        "house_id": build["build_id"],
+                        "flat_stown": home["home_id"]
+                    })
 
-        created_users = result_insert.scalars().all()
+            created_users = []
 
-        flat_stown_ids = [user.flat_stown for user in created_users if user.flat_stown]
+            if users_to_insert:
+                insert_stmt = insert(Users).values(users_to_insert).returning(Users)
+                result_insert = await session.execute(insert_stmt)
+                created_users = result_insert.scalars().all()
+
+        flat_stown_ids = [
+            user.flat_stown for user in created_users if user.flat_stown
+        ]
+
         stown_flats = {}
+
         if flat_stown_ids:
             stown_flat_query = select(SFlat).where(SFlat.id.in_(flat_stown_ids))
             stown_flat_result = await session.execute(stown_flat_query)
-            stown_flats = {sf.id: sf for sf in stown_flat_result.scalars().all()}
+            stown_flats = {
+                sf.id: sf for sf in stown_flat_result.scalars().all()
+            }
 
         response_data = []
+
         for user in created_users:
             user_dict = {
                 "id": user.id,
@@ -215,8 +215,9 @@ async def add_user(
                 "stown_flat": None
             }
 
-            if user.flat_stown and user.flat_stown in stown_flats:
-                sf = stown_flats[user.flat_stown]
+            sf = stown_flats.get(user.flat_stown)
+
+            if sf:
                 user_dict["stown_flat"] = {
                     "id": sf.id,
                     "type": sf.type,
@@ -229,23 +230,16 @@ async def add_user(
 
         return {
             "data": response_data,
-            "count_deleted": len(deleted_result.scalars().all()),
+            "count_deleted": len(deleted_rows),
             "count_created": len(created_users),
             "status": "success"
         }
 
-    except IntegrityError:
+    except Exception as e:
         await session.rollback()
         raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="Такие данные уже существуют. Попробуйте восстановить доступ."
-        )
-
-    except SQLAlchemyError as e:
-        await session.rollback()
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=str(e)
+            status_code=500,
+            detail=f"Internal error: {str(e)}"
         )
 
 @router_users.patch("/{user_id}", status_code=status.HTTP_200_OK)

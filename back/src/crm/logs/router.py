@@ -1,9 +1,11 @@
 
 import json
 from typing import Any, Dict, List, Optional
+from src.crm.stown.methods import get_flat_number_by_ids
 from fastapi import APIRouter, File, UploadFile, status
 from src.crm.users.methods import get_users_by_house_and_flat
-from src.factory.runners import send_to_rabbitmq
+from src.rabbitmq import send_to_rabbitmq
+
 from src.crm.logs.schemas import FilterCallLog, ReadCallLog, WriteCallLog
 from src.crm.logs.crud import update_call_log, get_call_logs, delete_call_log, create_call_log, update_call_log_photo
 from src.crm.logs.methods import get_logs_intercoms, intercom_to_dict
@@ -154,7 +156,11 @@ async def update_log_photo(
         if not users:
             print('Юзеров нет, Rabbit не трогал')
             return updated
-        
+        flat_number = await get_flat_number_by_ids(
+            session=session,
+            house_id= log.house_id,
+            flat_id=log.flat
+        )
         try:
           open_token = await create_action_token({
            "log_id": log.id,
@@ -164,7 +170,6 @@ async def update_log_photo(
            })
         except Exception as e:
             print('В redis не смог записать, Rabbit не трогал')
-            print(e)
             return updated
         
         users_payload = [
@@ -182,6 +187,7 @@ async def update_log_photo(
             "type": log.type,
             "house_id": log.house_id,
             "flat_stown": log.flat,
+            "flat_number": flat_number,
             "photo_url": log.photo_url,
             "created_at": log.created_at.isoformat(),
             "open_token": open_token,

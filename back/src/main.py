@@ -56,4 +56,7 @@ add_pagination(app)
 
 @app.on_event("startup")
 async def startup_event():
-    asyncio.create_task(cleanup_old_websockets())
+    global intercom_task, cleanup_task
+
+    cleanup_task = asyncio.create_task(cleanup_old_websockets())
+    intercom_task = asyncio.create_task(monitor_intercoms())

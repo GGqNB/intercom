@@ -53,7 +53,7 @@ async def handle_contact(event: MessageCreated):
     if contact_user_id != sender_user_id:
         await event.bot.send_message(
             chat_id=message.recipient.chat_id,
-            text="❌ Вы можете отправлять только свой контакт!\n\nЕсли хотите обновить свои данные о домах, нажмите Обновить данные",
+            text="❌ Вы можете отправлять только свой контакт!\n\nЕсли хотите обновить свои данные о домах, нажмите Обновить данные_",
             attachments=[reset_menu_kb()]
         )
         return
@@ -99,6 +99,12 @@ async def handle_contact(event: MessageCreated):
             text=message_text,
             attachments=[main_menu_kb()]
         )
+    else:
+        await event.bot.send_message(
+            chat_id=message.recipient.chat_id,
+            text="❌ Ой,вы не учитываетесь ни в одной квартире! \n\nОбратитесь к администратору +79505010598 ",
+            attachments=[main_menu_kb()]
+        )
 
 @router.bot_started()
 async def handle_bot_started(event: BotStarted):
@@ -137,7 +143,6 @@ async def callback_settings(event: MessageCallback):
     # 🔹 вызываем функцию
     user_list = await get_user_settings(str(user_id))
 
-    # ❌ если список пустой или None
     if not user_list:
         await event.message.edit(
             text="❌ Настройки не найдены\n\n"+
@@ -146,7 +151,6 @@ async def callback_settings(event: MessageCallback):
         )
         return
 
-    # 🔹 быстрый мап для домов
     HOUSE_MAP_BY_ID = {v["id"]: v["text"] for v in HOUSE_MAP.values()}
 
     lines = []

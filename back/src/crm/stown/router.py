@@ -1,4 +1,5 @@
 
+from src.crm.stown.methods import get_flat_number_by_ids
 from fastapi import APIRouter, status
 import requests
 from sqlalchemy import func, select
@@ -167,6 +168,7 @@ async def get_resident_stown(
     except Exception as e:
         return {"error": str(e)}
 
+
 @router_stown.get("/flats", response_model=Page[ReadSFlat])
 async def get_flats(
     session: AsyncSession = Depends(get_async_session),
@@ -193,6 +195,42 @@ async def get_flats(
                 "args": str(e),  
             }
         )
+
+@router_stown.get("/flats/number")
+async def get_flat_number(
+    house_id: int,
+    flat_id: int,
+    session: AsyncSession = Depends(get_async_session),
+    api_key: APIKey = Depends(get_api_key),
+):
+    try:
+        flat_number = await get_flat_number_by_ids(
+            session=session,
+            house_id=house_id,
+            flat_id=flat_id
+        )
+
+        if flat_number is None:
+            raise HTTPException(
+                status_code=404,
+                detail="Квартира не найдена"
+            )
+
+        return flat_number  # или {"flat_number": flat_number}
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )
+# @router_stown.get("/flats/{flat_id}/{house_id}")
+# async def get_flats(
+#     flat_id: int,
+#     house_id: int,
+#     session: AsyncSession = Depends(get_async_session),
+#     api_key: APIKey = Depends(get_api_key),
+# ):
+#    await get_flat_by_flat_stown(session, house_id, flat_id)
         
 # @router_stown.get("/flats", response_model=Page[ReadSFlat])
 # async def get_flats(

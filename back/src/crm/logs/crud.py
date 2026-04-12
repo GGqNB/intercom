@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi_pagination.ext.sqlalchemy import paginate
 from fastapi import File, HTTPException, UploadFile, status
 
+from src.crm.logs.methods import handle_call_log_event
 from src.crm.helper.image import compress_image_to_1mb, save_image
 from src.crm.logs.models import CallLog
 from src.crm.logs.schemas import ReadCallLog, WriteCallLog, FilterCallLog
@@ -27,13 +28,15 @@ async def get_call_logs(session: AsyncSession, filters: FilterCallLog):
 
 
 async def create_call_log(session: AsyncSession, data: WriteCallLog):
-
     try:
         log = CallLog(**data.model_dump())
 
         session.add(log)
         await session.commit()
         await session.refresh(log)
+
+        # вызываем обработчик
+        await handle_call_log_event(data)
 
         return log
 

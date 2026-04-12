@@ -125,7 +125,7 @@ async def delete_room(hash_room: str) -> bool:
     print('Ключ удален')
     return 
 
-async def send_push_by_external_id(external_ids: list[str], title: str, message: str, token_room, hash_room, indentifier):
+async def send_push_by_external_id(external_ids: list[str], title: str, message: str, token_room, hash_room, indentifier, blockDevice, flat_id):
     headers = {
         "Authorization": f"Basic {conf.oneSignal.ONE_SIGNAL_APP_KEY}",
         "Content-Type": "application/json"
@@ -146,8 +146,8 @@ async def send_push_by_external_id(external_ids: list[str], title: str, message:
             "token_room": token_room,
             "action": "open_call_screen",
             "indentifier": indentifier,
-            #stown_id,
-            #block_device
+            "stown_flat_id": flat_id,
+            "block_device" :  blockDevice.model_dump() if blockDevice else None
         },
     }
 
@@ -158,11 +158,9 @@ async def send_push_by_external_id(external_ids: list[str], title: str, message:
             headers=headers,
             timeout=5.0
         )
-    print(response.json())
-    print(response)
     return response.json()
 
-async def send_push_endpoint(token_room, hash_room, indentifier):
+async def send_push_endpoint(token_room, hash_room, indentifier, blockDevice, flat_id):
     try:
         player_ids = ["69ddad66-feff-4942-ad15-827cb60d5772"]
 
@@ -172,7 +170,9 @@ async def send_push_endpoint(token_room, hash_room, indentifier):
             message="Вас кто-то ждет у входа", 
             token_room=token_room,
             hash_room = hash_room,
-            indentifier= indentifier
+            indentifier= indentifier,
+            blockDevice = blockDevice,
+            flat_id = flat_id
         )
 
         return True

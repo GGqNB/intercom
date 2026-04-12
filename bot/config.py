@@ -10,6 +10,8 @@ RABBIT_PORT = os.getenv("RABBIT_PORT", 5672)
 RABBIT_VHOST = os.getenv("RABBIT_VHOST")
 
 QUEUE_NAME = os.getenv("QUEUE_NAME")
+QUEUE_OFFLINE = os.getenv("QUEUE_OFFLINE")
+ADMIN_CHAT_ID = os.getenv("ADMIN_CHAT_ID")
 
 MAX_TOKEN = os.getenv("MAX_TOKEN")
 API_KEY = os.getenv("API_KEY")
