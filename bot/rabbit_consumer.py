@@ -95,7 +95,7 @@ async def handle_call(payload, bot: Bot):
 
     for user in users:
         chat_id = user["chat_id"]
-
+        open_token = payload.get("open_token", "")
         if tmp_file_path:
             await bot.send_message(
                 chat_id=chat_id,
@@ -112,6 +112,12 @@ async def handle_call(payload, bot: Bot):
     if tmp_file_path and tmp_file_path.exists():
         tmp_file_path.unlink()
         
+    if open_token: 
+        kb_message = await bot.send_message( 
+                    chat_id=chat_id, 
+                    text="Нажмите кнопку чтобы открыть дверь:",
+                    attachments=[open_door_kb(open_token)]
+                )
 
 async def handle_intercom_crash(payload, bot: Bot):
     if payload.get("event") == "intercom_crash":
