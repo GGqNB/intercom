@@ -167,7 +167,7 @@ async def login(key: str):
         return { "key": key}   
     else:
         raise HTTPException(
-            status_code=HTTP_400_BAD_REQUEST, detail="Неправильный токен"
+            status_code=HTTP_400_BAD_REQUEST, detail="400"
         )
 
 

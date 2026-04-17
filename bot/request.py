@@ -42,38 +42,38 @@ async def flat_by_number(phone: str, data) -> dict | None:
         print(f"Ошибка запроса к backend: {e}")
         return None
 
-async def register_user(payload: dict) -> bool:
-    headers = {
-        "Authorization": f"{API_KEY}",
-        "Content-Type": "application/json"
-    }
+# async def register_user(payload: dict) -> bool:
+#     headers = {
+#         "Authorization": f"{API_KEY}",
+#         "Content-Type": "application/json"
+#     }
 
-    timeout = aiohttp.ClientTimeout(total=5)  # максимум 5 секунд
+#     timeout = aiohttp.ClientTimeout(total=5)  # максимум 5 секунд
 
-    try:
-        async with aiohttp.ClientSession(timeout=timeout) as session:
-            async with session.post(
-                f"{BACKEND_URL}/api/users",
-                json=payload,
-                headers=headers
-            ) as response:
-                print(f"{BACKEND_URL}/api/users")
-                print(f"{API_KEY}")
-                if response.status == 201:
-                    return {"success": True}
-                if response.status == 418:
-                    data = await response.json()
-                    return {"success": False, "error": data.get("detail")}
+#     try:
+#         async with aiohttp.ClientSession(timeout=timeout) as session:
+#             async with session.post(
+#                 f"{BACKEND_URL}/api/users",
+#                 json=payload,
+#                 headers=headers
+#             ) as response:
+#                 print(f"{BACKEND_URL}/api/users")
+#                 print(f"{API_KEY}")
+#                 if response.status == 201:
+#                     return {"success": True}
+#                 if response.status == 418:
+#                     data = await response.json()
+#                     return {"success": False, "error": data.get("detail")}
                 
-                return {"success": False, "error": "server_error"}
+#                 return {"success": False, "error": "server_error"}
 
-    except asyncio.TimeoutError:
-        print("Backend timeout")
-        return {"success": False, "error": "server_timeout"}
+#     except asyncio.TimeoutError:
+#         print("Backend timeout")
+#         return {"success": False, "error": "server_timeout"}
 
-    except Exception as e:
-        print(f"Backend error: {e}")
-        return {"success": False, f"error": {e}}
+#     except Exception as e:
+#         print(f"Backend error: {e}")
+#         return {"success": False, f"error": {e}}
     
 
 async def get_user_settings(max_id: str) -> dict | None:
@@ -119,9 +119,6 @@ async def call_open_door_backend(open_token: str) -> dict:
             return await resp.json()
 
 async def call_open_door_backend(open_token: str) -> dict:
-    """
-    Асинхронно вызывает backend /open
-    """
     url = f"{BACKEND_URL}/api/open?redis_open_token={open_token}"
     headers = {
         "Authorization": f"{API_KEY}",
@@ -144,3 +141,15 @@ async def call_open_door_backend(open_token: str) -> dict:
                 return {"success": False, "error": "❌ Ошибка сервера, попробуйте позже"}
             else:
                 return {"success": False, "error": f"❌ Неизвестная ошибка: {resp_json}"}
+            
+
+async def give_device():
+    url = f"{BACKEND_URL}/logs/redis-intercom"
+    headers = {"Authorization": f"{API_KEY}"}
+
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url, headers=headers) as resp:
+            if resp.status != 200:
+                text = await resp.text()
+                raise Exception(f"Ошибка backend: {resp.status} {text}")
+            return await resp.json()

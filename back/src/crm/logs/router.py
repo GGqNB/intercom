@@ -20,7 +20,7 @@ from src.crm.intercom.models import Intercom
 from sqlalchemy import delete, func, insert, select
 from sqlalchemy.orm import selectinload
 from fastapi.security.api_key import APIKey
-from src.auth import get_api_key
+from src.auth import get_api_key, get_bot_key
 from src.crm.intercom.models import Intercom
 from src.crm.logs.methods import create_action_token
 
@@ -53,11 +53,10 @@ async def clear_redis_intercoms(
                 "args": e.args if hasattr(e, 'args') else None,
             }
         )
-#Сделать дату нормальной
 @router_logs.get("/redis-intercom")
 async def redis_intercoms(
     session: AsyncSession = Depends(get_async_session),
-    api_key: APIKey = Depends(get_api_key)
+    bot_key: APIKey = Depends(get_bot_key)
 ):
     try:
         query = select(Intercom).options(selectinload(Intercom.entry))

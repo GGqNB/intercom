@@ -1,10 +1,12 @@
 import json
 
-from request import call_open_door_backend, get_user_settings, register_user, flat_by_number
+from methods import format_device_message
+from request import call_open_door_backend, get_user_settings, flat_by_number, give_device
 from maxapi import Router, F
 from maxapi.types import BotStarted, MessageCreated, MessageCallback, Command
 import aiohttp
 import re
+from config import ADMIN_CHAT_ID
 from keyboards import (
     main_menu_kb,
     settings_menu_kb,
@@ -27,6 +29,23 @@ async def cmd_start(event: MessageCreated):
         text="👋 Добро пожаловать!\n\nНажмите ⚙ Настройки.",
         attachments=[main_menu_kb()]
     )
+
+@router.message_created(Command("check"))
+async def cmd_check(event: MessageCreated):
+    chat_id = event.message.recipient.chat_id
+    print(chat_id)
+    print(ADMIN_CHAT_ID)
+    if str(chat_id) == ADMIN_CHAT_ID:
+        redis_data = await give_device()
+        print(redis_data)
+        message_text = format_device_message(redis_data)
+        print(message_text)
+        await event.bot.send_message(
+            chat_id=int(ADMIN_CHAT_ID),
+            text=message_text,
+            attachments=[main_menu_kb()]
+        )
+
 
 def get_house_text(house_id: int) -> str:
     for house in HOUSE_MAP.values():
