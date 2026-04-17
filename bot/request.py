@@ -144,14 +144,11 @@ async def call_open_door_backend(open_token: str) -> dict:
             
 
 async def give_device():
-    url = f"{BACKEND_URL}/logs/redis-intercom"
+    url = f"{BACKEND_URL}/api/logs/redis-intercom"
     headers = {"Authorization": f"{API_KEY}"}
 
     async with aiohttp.ClientSession() as session:
         async with session.get(url, headers=headers) as resp:
-            print(resp)
-            print(await resp)
-            print(resp.json())
             if resp.status != 200:
                 text = await resp.text()
                 raise Exception(f"Ошибка backend: {resp.status} {text}")
