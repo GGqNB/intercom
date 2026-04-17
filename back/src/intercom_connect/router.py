@@ -307,12 +307,12 @@ async def end_call(flat_id: int, reason: str, hash_room: str):
         print(f"Задача звонка для квартиры {flat_id} удалена из call_tasks.")
         
 
-@router_intercom_connect.get("/valid-key/{key}")
-async def valid(key: str):
-    if key == conf.security.API_KEY:
-        return { "key": key}   
-    else:
-        raise HTTPException(
-            status_code=HTTP_400_BAD_REQUEST, detail="400"
-        )
+# @router_intercom_connect.get("/valid-key/{key}")
+# async def valid(key: str):
+#     if key == conf.security.API_KEY:
+#         return { "key": key}   
+#     else:
+#         raise HTTPException(
+#             status_code=HTTP_400_BAD_REQUEST, detail="400"
+#         )
 

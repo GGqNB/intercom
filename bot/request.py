@@ -149,6 +149,9 @@ async def give_device():
 
     async with aiohttp.ClientSession() as session:
         async with session.get(url, headers=headers) as resp:
+            print(resp)
+            print(await resp)
+            print(resp.json())
             if resp.status != 200:
                 text = await resp.text()
                 raise Exception(f"Ошибка backend: {resp.status} {text}")
