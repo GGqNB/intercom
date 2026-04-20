@@ -184,7 +184,7 @@ async def call(call_data: BaseCallData, api_key: APIKey = Depends(get_api_key), 
     log = await create_call_log(session, log_data)
     
     token_room = await register_room(flat_id, call_data.hash_room)
-    asyncio.create_task(send_push_endpoint(token_room, call_data.hash_room, call_data.indentifier, call_data.blockDevice, flat_id))
+    # asyncio.create_task(send_push_endpoint(token_room, call_data.hash_room, call_data.indentifier, call_data.blockDevice, flat_id))
     intercom_ws = None
     with connections_lock:
         user_conns = connections.get(call_data.indentifier, [])
