@@ -4,22 +4,22 @@ from fastapi import WebSocket
 from pydantic import BaseModel
 
 class BlockDevice(BaseModel):
-       id: int
-       addr: str
-       has_access: Optional[str] 
-       id_permission: Optional[str] 
-       is_one_access: bool
-       is_owner: bool
-       is_time_access: bool
-       name: str
-       owner_id: str
-       owner_short_name: str
-       photo_url: Optional[str]
-       rules: list
-       status: int
-       time_access: Optional[str]
-       type: str
-    
+    id: int
+    addr: str
+    has_access: Optional[str] 
+    id_permission: Optional[str] 
+    is_one_access: bool
+    is_owner: bool
+    is_time_access: bool
+    name: str
+    owner_id: str
+    owner_short_name: str
+    photo_url: Optional[str]
+    rules: list
+    status: int
+    time_access: Optional[str]
+    type: str
+
 class BaseCallData(BaseModel):
     house_id: Optional[int] = None
     apartment_number: int
