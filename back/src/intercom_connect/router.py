@@ -176,13 +176,14 @@ async def websocket_endpoint(websocket: WebSocket):
 
 @router_intercom_connect.post("/call")
 async def call(call_data: BaseCallData, api_key: APIKey = Depends(get_api_key), session: AsyncSession = Depends(get_async_session)):
+  try: 
     flat_id = await get_flat_by_house(session, call_data.house_id, call_data.apartment_number)
     if flat_id is None:
         raise HTTPException(status_code=429, detail="Квартира не найдена, обратитесь к администратору")
 
     log_data = WriteCallLog(type="call", house_id=call_data.house_id, flat=flat_id, photo_url='', indentifier='')
     log = await create_call_log(session, log_data)
-    
+    print(call_data)
     token_room = await register_room(flat_id, call_data.hash_room)
     # asyncio.create_task(send_push_endpoint(token_room, call_data.hash_room, call_data.indentifier, call_data.blockDevice, flat_id))
     intercom_ws = None
@@ -199,6 +200,9 @@ async def call(call_data: BaseCallData, api_key: APIKey = Depends(get_api_key), 
                                   intercom_ws, call_data.hash_room, 
                                   call_data.blockDevice, log.id, token_room, call_data.indentifier))
     return {"message": f"Звонок инициирован в квартиру {call_data.apartment_number}."}
+  except Exception as e:
+            print(f"Ошибка {e}")
+      
 
 @router_intercom_connect.get("/answer_call/{flat_id}")
 async def answer_call(flat_id: int, api_key: APIKey = Depends(get_api_key)):
