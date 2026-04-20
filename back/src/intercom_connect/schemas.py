@@ -2,23 +2,27 @@
 from typing import Optional
 from fastapi import WebSocket
 from pydantic import BaseModel
+from typing import Optional, Union, Any, Dict
 
 class BlockDevice(BaseModel):
     id: int
-    addr: str
-    has_access: Optional[str] 
-    id_permission: Optional[str] 
-    is_one_access: bool
-    is_owner: bool
-    is_time_access: bool
     name: str
     owner_id: str
-    owner_short_name: str
-    photo_url: Optional[str]
-    rules: list
+    addr: str
     status: int
-    time_access: Optional[str]
+    is_owner: bool
+    id_permission: Optional[Union[int, str]]  # может быть int или str
+    is_one_access: bool
+    rules: list
     type: str
+    photo_url: Optional[str]
+    owner_short_name: str
+    is_time_access: bool
+    has_access: Optional[Union[bool, str]]  # может быть bool или str
+    time_access: Optional[Union[Dict, str]]  # может быть dict или str
+    geo_lat: float
+    geo_lon: float
+    kladr_id: str
 
 class BaseCallData(BaseModel):
     house_id: Optional[int] = None
