@@ -59,7 +59,7 @@ async def monitor_intercoms():
                     merged_item = dict(intercom)
                     merged_item["intercom"] = intercom_map.get(tech_name)
 
-                    if delta > timedelta(seconds=10):
+                    if delta > timedelta(seconds=25):
                         print('Але')
                         await send_to_rabbitmq({
                             "event": "intercom_offline",
