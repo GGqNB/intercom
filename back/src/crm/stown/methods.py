@@ -8,6 +8,7 @@ from sqlalchemy import delete, func, insert, select, update
 from fastapi import Depends, HTTPException
 from fastapi import APIRouter, status
 from fastapi_pagination.ext.sqlalchemy import paginate
+import httpx
 
 conf = get_config()
 
@@ -60,27 +61,36 @@ async def get_flat_number_by_ids(
 
     result = await session.execute(stmt)
     return result.scalar()
-    # print(house_id, flat_id)
-    # stmt = select(SFlat.number).where(
-    # SFlat.id == flat_id
-    # )
 
-    # result = await session.execute(stmt)
-    # flat_number = result.scalar()
 
-    # return flat_number
-    # print('Ыу   ')
-    # try:
-    #     stmt = select(SFlat).where(
-    #     # SFlat.house_id == house_id,
-    #     SFlat.id == flat_id,
-    #     # SFlat.type == 'Квартира'
-    # )
-    #     result = await session.execute(stmt)
-    #     flat_id = result.scalars().first()
-    #     return flat_id
-    # except Exception as e:
-    #     raise HTTPException(
-    #         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-    #         detail=str(e)
-    #     )
+async def get_resident_ids(flat_id: int) -> list[str]:
+    try:
+        url = conf.measures.RESIDEN_URL.format(flat_id=flat_id)
+
+        headers = {
+            "Authorization": f"Token {conf.measures.TOKEN}",
+            "Accept": "application/json",
+        }
+
+        async with httpx.AsyncClient() as client:
+            response = await client.get(url, headers=headers)
+
+        if response.status_code != 200:
+            raise Exception(f"Stown API error: {response.text}")
+
+        data = response.json()
+
+        if isinstance(data, dict):
+            items = data.get("data", [])
+        elif isinstance(data, list):
+            items = data
+        else:
+            items = []
+
+        player_ids = [item["stown_id"] for item in items if "stown_id" in item]
+
+        return player_ids
+
+    except Exception as e:
+        print("get_resident_ids error:", e)
+        return []

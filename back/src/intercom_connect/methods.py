@@ -2,6 +2,7 @@ import asyncio
 import json
 from datetime import datetime, timedelta, timezone
 
+from src.crm.stown.methods import get_resident_ids
 import httpx
 from src.redis_client import redis_client
 from src.config import get_config
@@ -162,8 +163,11 @@ async def send_push_by_external_id(external_ids: list[str], title: str, message:
 
 async def send_push_endpoint(token_room, hash_room, indentifier, blockDevice, flat_id):
     try:
-        player_ids = ["69ddad66-feff-4942-ad15-827cb60d5772"]
-
+        # player_ids = ["69ddad66-feff-4942-ad15-827cb60d5772"]
+        player_ids = await get_resident_ids(flat_id)
+        if not player_ids:
+            print("Нет получателей")
+            return False
         await send_push_by_external_id(
             external_ids=player_ids,
             title="Вам звонок 👋",

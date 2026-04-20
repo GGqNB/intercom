@@ -73,6 +73,11 @@ peer.on("call", (call) => {
     });
 });
 
+socket.on("room-full", () => {
+  alert("Комната уже заполнена");
+  window.location.href = "/error";
+});
+
 function startMedia() {
   navigator.mediaDevices.getUserMedia({
       audio: true,

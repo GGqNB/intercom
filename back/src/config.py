@@ -107,7 +107,7 @@ class MeasuresConfig(BaseSettings):
     TOKEN: str = Field(os.environ.get("MEASURES_TOKEN"))
     
     HOMES_URL: str = "https://measures.stown.ooo/api/dashboard/builds/{house_id}/homes"
-    RESIDEN_URL: str = "https://measures.stown.ooo/api/measures/build/intercom/home/{house_id}/users/"
+    RESIDEN_URL: str = "https://measures.stown.ooo/api/measures/build/intercom/home/{flat_id}/users/"
 
 class RabbitConfig(BaseSettings):
     USER: str = os.getenv("RABBIT_USER")

@@ -49,7 +49,7 @@ app.get("/:room", async (req, res) => {
 
     if (parsed.token !== token) {
       return res.status(403).send("Invalid token");
-      
+
     }
 
     res.render("room", { roomId: room, token });
@@ -57,8 +57,8 @@ app.get("/:room", async (req, res) => {
   } catch (err) {
     // console.error(err);
     return res.status(403).render("error", {
-    message: "Звонок уже окончен"
-});
+      message: "Звонок уже окончен"
+    });
   }
 });
 
@@ -79,11 +79,15 @@ app.get("/check/:room", async (req, res) => {
     }
 
     const parsed = JSON.parse(data);
-
     if (parsed.token !== token) {
       return res.status(403).json({ error: "INVALID_TOKEN" });
     }
+    const roomData = io.sockets.adapter.rooms[room];
+    const clientsCount = roomData ? roomData.length : 0;
 
+    if (clientsCount >= 2) {
+      return res.status(403).json({ error: "ROOM_FULL" });
+    }
     return res.status(200).json({ status: "OK" });
 
   } catch (err) {
@@ -97,17 +101,26 @@ app.get("/check/:room", async (req, res) => {
 
 io.on("connection", (socket) => {
   socket.on("join-room", (roomId, userId, userName) => {
+    const room = io.sockets.adapter.rooms[roomId];
+    const clientsCount = room ? room.length : 0;
+
+    if (clientsCount >= 2) {
+      socket.emit("room-full");
+      return;
+    }
+
     socket.join(roomId);
-    setTimeout(()=>{
+
+    setTimeout(() => {
       socket.to(roomId).broadcast.emit("user-connected", userId);
-    }, 1000)
+    }, 1000);
+
     socket.on("message", (message) => {
       io.to(roomId).emit("createMessage", message, userName);
     });
   });
 });
-
 server.listen(3030, '0.0.0.0', () => {
-      console.log('Сервер запущен на порту 3030 на всех интерфейсах');
-    });
-    
+  console.log('Сервер запущен на порту 3030 на всех интерфейсах');
+});
+
