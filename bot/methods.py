@@ -1,7 +1,7 @@
 from request import give_device
 from config import ADMIN_CHAT_ID
 from keyboards import HOUSE_MAP, main_menu_kb
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Optional
 
 
@@ -24,6 +24,10 @@ def time_ago(iso_date_string: str) -> str:
     try:
         clean_date = iso_date_string.split('.')[0].replace('T', ' ')
         device_time = datetime.strptime(clean_date[:19], "%Y-%m-%d %H:%M:%S")
+        
+        # 👇 КОСТЫЛЬ: компенсируем -5 часов
+        device_time += timedelta(hours=5)
+        
         now = datetime.now()
         
         diff_seconds = int((now - device_time).total_seconds())
