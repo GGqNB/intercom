@@ -11,8 +11,12 @@ def format_date(iso_date_string: str) -> str:
             iso_date_string = iso_date_string.split('.')[0].replace('T', ' ')
         else:
             iso_date_string = iso_date_string[:19]
+
+        dt = datetime.strptime(iso_date_string, "%Y-%m-%d %H:%M:%S")
         
-        return iso_date_string
+        dt += timedelta(hours=5)
+
+        return dt.strftime("%Y-%m-%d %H:%M:%S")
     except:
         return iso_date_string
 
