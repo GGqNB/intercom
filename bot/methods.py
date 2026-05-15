@@ -3,6 +3,23 @@ from config import ADMIN_CHAT_ID
 from keyboards import HOUSE_MAP, main_menu_kb
 from datetime import datetime, timedelta
 from typing import Optional
+from zoneinfo import ZoneInfo
+
+LOCAL_TZ = ZoneInfo("Asia/Yekaterinburg")
+
+def parse_device_time(iso_date_string: str):
+    try:
+        dt = datetime.fromisoformat(iso_date_string)
+
+        # если вдруг пришло без timezone
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=LOCAL_TZ)
+
+        return dt.astimezone(LOCAL_TZ)
+
+    except Exception as e:
+        print(f"parse_device_time error: {e}")
+        return None
 
 
 def format_date(iso_date_string: str) -> str:
@@ -24,32 +41,28 @@ def format_date(iso_date_string: str) -> str:
 def time_ago(iso_date_string: str) -> str:
     if not iso_date_string:
         return ''
-    
+
     try:
-        clean_date = iso_date_string.split('.')[0].replace('T', ' ')
-        device_time = datetime.strptime(clean_date[:19], "%Y-%m-%d %H:%M:%S")
-        
-        # 👇 КОСТЫЛЬ: компенсируем -5 часов
-        device_time += timedelta(hours=5)
-        
-        now = datetime.now()
-        
+        device_time = parse_device_time(iso_date_string)
+
+        if not device_time:
+            return ""
+
+        now = datetime.now(LOCAL_TZ)
+
         diff_seconds = int((now - device_time).total_seconds())
-        
+
         if diff_seconds < 0:
             return "в будущем"
         elif diff_seconds < 60:
             return f"{diff_seconds} секунд назад"
         elif diff_seconds < 3600:
-            minutes = diff_seconds // 60
-            return f"{minutes} минут назад"
+            return f"{diff_seconds // 60} минут назад"
         elif diff_seconds < 86400:
-            hours = diff_seconds // 3600
-            return f"{hours} часов назад"
+            return f"{diff_seconds // 3600} часов назад"
         else:
-            days = diff_seconds // 86400
-            return f"{days} дней назад"
-    
+            return f"{diff_seconds // 86400} дней назад"
+
     except Exception as e:
         print(f"Ошибка time_ago: {e}")
         return ""
