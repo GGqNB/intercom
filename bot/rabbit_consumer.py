@@ -120,39 +120,62 @@ async def handle_call(payload, bot: Bot):
                 )
 
 async def handle_intercom_crash(payload, bot: Bot):
-    if payload.get("event") == "intercom_crash":
-        tech_name = payload.get("tech_name")
-        intercom_data = payload.get("intercom_data")
-
-        text = (
-            f"🚨 КРАШ ДОМОФОНА\n\n"
-            f"🔧 Устройство: {tech_name}\n"
-            f"🏠 Дом: {intercom_data.get('entry', {}).get('name') if intercom_data else 'unknown'}\n"
-            f"📍 Адрес: {intercom_data.get('entry', {}).get('house_id') if intercom_data else 'unknown'}"
-        )
-
-        await bot.send_message(
-                chat_id=ADMIN_CHAT_ID,
-                text=text
-            )
-    elif payload.get("event") == "intercom_offline":
+    try:
+        event = payload.get("event")
         tech_name = payload.get("tech_name")
 
         intercom_data = payload.get("intercom_data") or {}
-
         intercom = intercom_data.get("intercom") or {}
         entry = intercom.get("entry") or {}
 
-        text = (
-            f"🚨 СОН ДОМОФОНА\n\n"
-            f"🔧 Устройство: {tech_name}\n"
-            f"🏠 Дом: {entry.get('name', 'unknown')}\n"
-            f"📍 Адрес: {entry.get('house_id', 'unknown')}"
-        )
+        house_name = entry.get("name", "unknown")
+        house_address = entry.get("house_id", "unknown")
+
+        if event == "intercom_crash":
+            text = (
+                f"🚨 КРАШ ДОМОФОНА\n\n"
+                f"🔧 Устройство: {tech_name}\n"
+                f"🏠 Дом: {house_name}\n"
+                f"📍 Адрес: {house_address}"
+            )
+
+        elif event == "intercom_offline":
+            text = (
+                f"😴 СОН ДОМОФОНА\n\n"
+                f"🔧 Устройство: {tech_name}\n"
+                f"🏠 Дом: {house_name}\n"
+                f"📍 Адрес: {house_address}"
+            )
+
+        elif event == "intercom_low_battery":
+            battery_level = intercom_data.get("battery_level", "unknown")
+
+            text = (
+                f"🪫 НИЗКИЙ ЗАРЯД ДОМОФОНА\n\n"
+                f"🔧 Устройство: {tech_name}\n"
+                f"🔋 Заряд: {battery_level}%\n"
+                f"🏠 Дом: {house_name}\n"
+                f"📍 Адрес: {house_address}"
+            )
+
+        elif event == "intercom_temp_critical":
+            battery_temp = intercom_data.get("battery_temp", "unknown")
+
+            text = (
+                f"🌡 КРИТИЧЕСКАЯ ТЕМПЕРАТУРА ДОМОФОНА\n\n"
+                f"🔧 Устройство: {tech_name}\n"
+                f"🌡 Температура: {battery_temp}°C\n"
+                f"🏠 Дом: {house_name}\n"
+                f"📍 Адрес: {house_address}"
+            )
+
+        else:
+            return
 
         await bot.send_message(
             chat_id=ADMIN_CHAT_ID,
             text=text
         )
-    else:
-        return
+
+    except Exception as e:
+        print(f"handle_intercom_crash error: {e}")

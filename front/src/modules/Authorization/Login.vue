@@ -98,13 +98,13 @@ export default defineComponent({
             }
 
             try {
-                const response = await makeRequest(async () =>
-                    AuthSystemApi.me(formValue.value.key));
-                if (response) {
-                    $userDataSet.setToken(response.key);
+                // const response = await makeRequest(async () =>
+                //     AuthSystemApi.me(formValue.value.key));
+                // if (response) {
+                    $userDataSet.setToken(formValue.value.key);
                     router.push('/')
                     // setUser();
-                }
+                // }
             } catch (error) {}
         }
 

@@ -49,6 +49,7 @@ async def monitor_intercoms():
             for intercom in current_intercoms:
                 try:
                     last_update = datetime.fromisoformat(intercom["last_update"])
+                    print(intercom)
 
                     if last_update.tzinfo is None:
                         last_update = last_update.replace(tzinfo=timezone.utc)
@@ -59,10 +60,37 @@ async def monitor_intercoms():
                     merged_item = dict(intercom)
                     merged_item["intercom"] = intercom_map.get(tech_name)
 
+                    # OFFLINE
                     if delta > timedelta(seconds=25):
-                        print('Але')
+
                         await send_to_rabbitmq({
                             "event": "intercom_offline",
+                            "tech_name": tech_name,
+                            "timestamp": current_time.isoformat(),
+                            "last_update": intercom["last_update"],
+                            "intercom_data": merged_item,
+                        }, QUEUE_OFF_INTERCOM)
+
+                    # LOW BATTERY
+                    battery_level = intercom.get("battery_level")
+                    if battery_level is not None and battery_level < 20:
+                        print('Заряд broken')
+                        await send_to_rabbitmq({
+                            "event": "intercom_low_battery",
+                            "tech_name": tech_name,
+                            "timestamp": current_time.isoformat(),
+                            "last_update": intercom["last_update"],
+                            "intercom_data": merged_item,
+                        }, QUEUE_OFF_INTERCOM)
+
+                    # CRITICAL TEMPERATURE
+                    battery_temp = intercom.get("battery_temp")
+
+                    if battery_temp is not None and (
+                        battery_temp < 0 or battery_temp > 40
+                    ):
+                        await send_to_rabbitmq({
+                            "event": "intercom_temp_critical",
                             "tech_name": tech_name,
                             "timestamp": current_time.isoformat(),
                             "last_update": intercom["last_update"],
@@ -86,3 +114,5 @@ async def cleanup_task():
     while True:
         delete_old_photos(days=1)
         await asyncio.sleep(60 * 60)
+        
+# {'tech_name': 'XNM-YDF-R5Q-QW3', 'last_update': '2026-05-15T00:29:35.026382-05:00', 'date_start': '2026-05-15T00:29:27.023848-05:00', 'battery_level': 100, 'battery_temp': 28.0}

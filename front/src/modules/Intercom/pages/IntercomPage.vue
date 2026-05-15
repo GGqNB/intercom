@@ -189,7 +189,7 @@ export default defineComponent({
                         if (socket.value && socket.value.readyState === WebSocket.OPEN) {
                               socket.value.send(JSON.stringify({
                                 'type':'ping', 
-                                'battery_level': '100',
+                                'battery_level': '19',
                                 'battery_temp': '28'
                             }))
                             // socket.value.send('ping')

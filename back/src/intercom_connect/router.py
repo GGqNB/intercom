@@ -262,7 +262,7 @@ async def make_call(flat_id: int, apartment_number: int, caller_ws: WebSocket, h
                                                               })
 
         try:
-            await asyncio.wait_for(call_ended_event.wait(), timeout=30)
+            await asyncio.wait_for(call_ended_event.wait(), timeout=60)
             print(f"Звонок в квартиру {apartment_number} flat_id={flat_id} завершен событием.")
         except asyncio.TimeoutError:
             if call_tasks[flat_id]['answered_by'] is not None:
