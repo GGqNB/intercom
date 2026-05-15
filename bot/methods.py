@@ -1,11 +1,11 @@
 from request import give_device
 from config import ADMIN_CHAT_ID
 from keyboards import HOUSE_MAP, main_menu_kb
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 from zoneinfo import ZoneInfo
 
-LOCAL_TZ = ZoneInfo("Asia/Yekaterinburg")
+LOCAL_TZ = timezone(timedelta(hours=5))
 
 def parse_device_time(iso_date_string: str):
     try:
