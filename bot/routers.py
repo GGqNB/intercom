@@ -39,7 +39,7 @@ async def cmd_check(event: MessageCreated):
         redis_data = await give_device()
         print(redis_data)
         message_text = format_device_message(redis_data)
-        print(message_text)
+        # print(message_text)
         await event.bot.send_message(
             chat_id=int(ADMIN_CHAT_ID),
             text=message_text,

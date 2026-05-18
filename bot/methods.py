@@ -53,7 +53,7 @@ def time_ago(iso_date_string: str) -> str:
         diff_seconds = int((now - device_time).total_seconds())
 
         if diff_seconds < 0:
-            return "в будущем"
+           return f"{diff_seconds} секунд назад"
         elif diff_seconds < 60:
             return f"{diff_seconds} секунд назад"
         elif diff_seconds < 3600:
